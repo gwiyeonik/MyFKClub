@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MyFKClub Login</title>
   <link rel="stylesheet" href="../CSS/login.css">
+  <style>
+    .error-msg { color: #d9534f; background: #f2dede; padding: 10px; border-radius: 4px; margin-bottom: 15px; text-align: center; font-size: 14px; }
+  </style>
 </head>
 <body>
   <div class="page-shell">
@@ -15,7 +18,13 @@
           <h1>MyFKClub</h1>
         </div>
 
-        <form class="login-form" action="#" method="post">
+        <!-- Display error message if redirect contains 'error' -->
+        <?php if (isset($_GET['error'])): ?>
+          <div class="error-msg"><?php echo htmlspecialchars($_GET['error']); ?></div>
+        <?php endif; ?>
+
+        <!-- Form action points to auth.php -->
+        <form class="login-form" action="auth.php" method="post">
           <label class="form-group">
             <span>User ID</span>
             <input type="text" name="userId" placeholder="User ID..." autocomplete="username" required>
@@ -36,7 +45,7 @@
             </select>
           </label>
 
-          <button type="submit" class="primary-button">Login</button>
+          <button type="submit" name="login_btn" class="primary-button">Login</button>
 
           <div class="utility-row">
             <a href="#" class="text-link">Forgot Password?</a>
@@ -44,11 +53,11 @@
         </form>
 
         <div class="signup-row">
-          <a href="adminsignup.html" class="signup-link">Sign Up (Admin)</a>
+          <a href="adminsignup.php" class="signup-link">Sign Up (Admin)</a>
           <span class="separator">|</span>
-          <a href="studentsignup.html" class="signup-link">Sign Up (Student)</a>
+          <a href="studentsignup.php" class="signup-link">Sign Up (Student)</a>
           <span class="separator">|</span>
-          <a href="committeesignup.html" class="signup-link">Sign Up (Committee)</a>
+          <a href="committeesignup.php" class="signup-link">Sign Up (Committee)</a>
         </div>
       </div>
     </main>
