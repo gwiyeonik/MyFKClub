@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyFKClub Login</title>
+  <link rel="stylesheet" href="../CSS/login.css">
+</head>
+<body>
+  <div class="page-shell">
+    <main class="login-stage">
+      <div class="login-card">
+        <div class="login-card-header">
+          <img class="header-logo" src="../Image/fkclub.jpg" alt="FKClub logo">
+          <h1>MyFKClub</h1>
+        </div>
+
+        <form class="login-form" action="#" method="post">
+          <label class="form-group">
+            <span>User ID</span>
+            <input type="text" name="userId" placeholder="User ID..." autocomplete="username" required>
+          </label>
+
+          <label class="form-group">
+            <span>Password</span>
+            <input type="password" name="password" placeholder="Password..." autocomplete="current-password" required>
+          </label>
+
+          <label class="form-group select-group">
+            <span>Select role</span>
+            <select name="role" required>
+              <option value="" disabled selected>Select role</option>
+              <option value="admin">Admin</option>
+              <option value="student">Student</option>
+              <option value="committee">Committee</option>
+            </select>
+          </label>
+
+          <button type="submit" class="primary-button">Login</button>
+
+          <div class="utility-row">
+            <a href="#" class="text-link">Forgot Password?</a>
+          </div>
+        </form>
+
+        <div class="signup-row">
+          <a href="#" class="signup-link">Sign Up (Admin)</a>
+          <span class="separator">|</span>
+          <a href="#" class="signup-link">Sign Up (Student)</a>
+          <span class="separator">|</span>
+          <a href="#" class="signup-link">Sign Up (Committee)</a>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
