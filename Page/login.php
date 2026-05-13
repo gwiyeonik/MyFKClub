@@ -56,8 +56,6 @@
           <a href="adminsignup.php" class="signup-link">Sign Up (Admin)</a>
           <span class="separator">|</span>
           <a href="studentsignup.php" class="signup-link">Sign Up (Student)</a>
-          <span class="separator">|</span>
-          <a href="committeesignup.php" class="signup-link">Sign Up (Committee)</a>
         </div>
       </div>
     </main>

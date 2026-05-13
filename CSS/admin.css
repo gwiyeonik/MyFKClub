@@ -1,0 +1,85 @@
+/* admin.css */
+
+/* Message Notifications */
+.msg { 
+    padding: 10px; 
+    border-radius: 4px; 
+    margin-bottom: 15px; 
+    text-align: center; 
+    font-size: 14px; 
+}
+
+.error { 
+    color: #d9534f; 
+    background: #f2dede; 
+    border: 1px solid #d9534f; 
+}
+
+.success { 
+    color: #3c763d; 
+    background: #dff0d8; 
+    border: 1px solid #3c763d; 
+}
+
+/* Form Layout & Centering */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Keeps text left-aligned like in your image */
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.form-group span {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+    margin-left: 10px; /* Optional: aligns text with the curve of the box */
+}
+
+/* Input Fields */
+input[readonly] { 
+    margin-top: -10px;
+    background-color: #f4f4f4; 
+    cursor: not-allowed; 
+    color: #777; 
+}
+
+/* File Input Fix (Removes blue box/styling) */
+input[type="file"] {
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    padding: 10px 0;
+    width: auto;
+    cursor: pointer;
+    margin-bottom: -25px;
+}
+
+/* Ensure other inputs stay consistent */
+.form-group input:not([type="file"]) {
+    width: 100%;           /* Makes the box stretch to full width */
+    padding: 12px 20px;    /* Adds height and inside space */
+    border: 1px solid #d1e3f8;
+    border-radius: 12px;   /* Makes it rounded like the image */
+    background-color: #f8fbff; /* Subtle light tint */
+    box-sizing: border-box; /* Crucial: ensures padding doesn't break the width */
+    font-size: 16px;
+    outline: none;
+    margin-top: -10px;
+    margin-bottom: -10px;
+}
+
+.text-link {
+    align-self: flex-start; /* Overrides the center alignment of the form */
+    margin-left: 10px;      /* Adds a little space from the edge */
+    text-decoration: none;
+    margin-top: 15px;       /* Adds space below the button */
+    display: block;
+}

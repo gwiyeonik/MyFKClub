@@ -1,28 +1,27 @@
+<?php
+// Connect to database to get the next ID
+$link = mysqli_connect("localhost", "root", "", "myfkclub");
+if (!$link) { die("Connection failed: " . mysqli_connect_error()); }
+
+$result = mysqli_query($link, "SHOW TABLE STATUS LIKE 'user'");
+$row = mysqli_fetch_assoc($result);
+$nextID = $row['Auto_increment'] ?? 1; 
+
+mysqli_close($link);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Sign Up | MyFKClub</title>
+  <!-- Main CSS -->
   <link rel="stylesheet" href="../CSS/login.css">
-  <style>
-    .msg { padding: 10px; border-radius: 4px; margin-bottom: 15px; text-align: center; font-size: 14px; }
-    .error { color: #d9534f; background: #f2dede; border: 1px solid #d9534f; }
-    .success { color: #3c763d; background: #dff0d8; border: 1px solid #3c763d; }
-    /* Keeping your design, just making the ID look slightly 'locked' */
-    input[readonly] { background-color: #f4f4f4; cursor: not-allowed; color: #777; }
-  </style>
+  <!-- New Specific Student CSS -->
+  <link rel="stylesheet" href="../CSS/student.css">
 </head>
 <body>
-  <?php
-    // Connect to database to get the next ID
-    $link = mysqli_connect("localhost", "root", "", "myfkclub");
-    $result = mysqli_query($link, "SHOW TABLE STATUS LIKE 'user'");
-    $row = mysqli_fetch_assoc($result);
-    $nextID = $row['Auto_increment'] ?? 1; // Fallback to 1 if table is empty
-    mysqli_close($link);
-  ?>
-
   <div class="page-shell">
     <main class="login-stage">
       <div class="login-card">
@@ -39,11 +38,9 @@
         <?php if (isset($_GET['error'])): ?>
           <div class="msg error"><?php echo htmlspecialchars($_GET['error']); ?></div>
         <?php endif; ?>
-        <?php if (isset($_GET['success'])): ?>
-          <div class="msg success"><?php echo htmlspecialchars($_GET['success']); ?></div>
-        <?php endif; ?>
 
-        <form class="login-form" action="register_student.php" method="post">
+        <form class="login-form" action="register_student.php" method="post" enctype="multipart/form-data">
+          
           <label class="form-group">
             <span>User ID</span>
             <input type="text" name="userId" value="<?php echo $nextID; ?>" readonly required>
@@ -51,22 +48,32 @@
 
           <label class="form-group">
             <span>User Name</span>
-            <input type="text" name="userName" placeholder="User Name" required>
+            <input type="text" name="userName" placeholder="Full Name" required>
           </label>
 
           <label class="form-group">
             <span>User Email</span>
-            <input type="email" name="userEmail" placeholder="User Email" required>
+            <input type="email" name="userEmail" placeholder="user@gmail.com" required>
+          </label>
+
+          <label class="form-group">
+            <span>User Contact</span>
+            <input type="text" name="userContact" placeholder="Phone Number" required>
+          </label>
+
+          <label class="form-group">
+            <span>Profile Photo</span>
+            <input type="file" name="userProfile" accept="image/*" required>
           </label>
 
           <label class="form-group">
             <span>Password</span>
-            <input type="password" name="password" placeholder="Password" required>
+            <input type="password" name="password" placeholder="Create Password" required>
           </label>
 
           <label class="form-group">
             <span>Confirm Password</span>
-            <input type="password" name="confirmPassword" placeholder="Confirm Password" required>
+            <input type="password" name="confirmPassword" placeholder="Repeat Password" required>
           </label>
 
           <button type="submit" name="signup_btn" class="primary-button">Confirm Student Details</button>
