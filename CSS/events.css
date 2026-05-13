@@ -1,0 +1,45 @@
+/* events.css */
+
+:root {
+  --blue: #17418f;
+  --blue-dark: #102f6a;
+  --white: #ffffff;
+  --surface: #f8fbff;
+  --surface-strong: #eef3ff;
+  --text: #0f2e60;
+  --muted: #5e6d8e;
+  --border: rgba(17, 53, 111, 0.12);
+  --shadow: 0 24px 56px rgba(15, 63, 141, 0.12);
+}
+
+.events-grid-main {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.chart-highlight {
+  border: 2px solid var(--blue);
+  position: relative;
+}
+
+.events-grid-bottom {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 18px;
+}
+
+@media (max-width: 1120px) {
+  .events-grid-main,
+  .events-grid-bottom {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .events-grid-main,
+  .events-grid-bottom {
+    grid-template-columns: 1fr;
+  }
+}

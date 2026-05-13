@@ -25,13 +25,14 @@ session_start();
       <nav class="sidebar-nav">
         <a href="admin_dashboard.php" class="sidebar-link active">Home</a>
         <a href="admin_manage_users.php" class="sidebar-link">Manage Users</a>
-        <a href="#" class="sidebar-link">Student Clubs</a>
-        <a href="#" class="sidebar-link">Events</a>
+        <a href="admin_student_clubs.php" class="sidebar-link">Student Clubs</a>
+        <a href="admin_events.php" class="sidebar-link">Events</a>
         <a href="#" class="sidebar-link">Participation Reports</a>
       </nav>
     </aside>
 
     <main class="dashboard-main">
+      <!-- Topbar stays flush to the sidebar -->
       <div class="topbar">
         <div class="topbar-left">
           <div class="topbar-title">FK Club Admin</div>
@@ -39,55 +40,48 @@ session_start();
         <a href="#profile" class="topbar-button">My Profile</a>
       </div>
 
-      <section class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Registered Students</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Active Clubs</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Upcoming Events</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Avg Attendance Rate</div>
-        </div>
-      </section>
+      <!-- NEW WRAPPER: This provides the 'breathing room' seen in image_2a6841.png -->
+      <div class="content-area">
+        <section class="stats-row">
+          <div class="stat-card"><div class="stat-label">Registered Students</div></div>
+          <div class="stat-card"><div class="stat-label">Active Clubs</div></div>
+          <div class="stat-card"><div class="stat-label">Upcoming Events</div></div>
+          <div class="stat-card"><div class="stat-label">Avg Attendance Rate</div></div>
+        </section>
 
-      <section class="charts-row">
-        <div class="chart-card chart-large">
-          <div class="chart-title">Students per Club</div>
-          <div class="chart-placeholder">&lt;&lt; chart &gt;&gt;</div>
-        </div>
-        <div class="chart-card chart-small">
-          <div class="chart-title">Students per Club</div>
-          <div class="chart-placeholder">&lt;&lt; pie chart &gt;&gt;</div>
-        </div>
-      </section>
-
-      <section class="table-section">
-        <div class="table-panel">
-          <div class="table-heading">Recent Registrations</div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>User ID</th>
-                  <th>User Name</th>
-                  <th>User Email</th>
-                  <th>RoleID</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td colspan="5" class="empty-cell">No recent registrations yet.</td>
-                </tr>
-              </tbody>
-            </table>
+        <section class="charts-row">
+          <div class="chart-card chart-large">
+            <div class="chart-title">Students per Club</div>
+            <div class="chart-placeholder">&lt;&lt; chart &gt;&gt;</div>
           </div>
-        </div>
-      </section>
+          <div class="chart-card chart-small">
+            <div class="chart-title">Students per Club</div>
+            <div class="chart-placeholder">&lt;&lt; pie chart &gt;&gt;</div>
+          </div>
+        </section>
+
+        <section class="table-section">
+          <div class="table-panel">
+            <div class="table-heading">Recent Registrations</div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>User ID</th>
+                    <th>User Name</th>
+                    <th>User Email</th>
+                    <th>RoleID</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="5" class="empty-cell">No recent registrations yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div> <!-- End content-area -->
     </main>
   </div>
 </body>

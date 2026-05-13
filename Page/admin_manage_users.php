@@ -20,8 +20,8 @@ session_start();
       <nav class="sidebar-nav">
         <a href="admin_dashboard.php" class="sidebar-link">Home</a>
         <a href="admin_manage_users.php" class="sidebar-link active">Manage Users</a>
-        <a href="#" class="sidebar-link">Student Clubs</a>
-        <a href="#" class="sidebar-link">Events</a>
+        <a href="admin_student_clubs.php" class="sidebar-link">Student Clubs</a>
+        <a href="admin_events.php" class="sidebar-link">Events</a>
         <a href="#" class="sidebar-link">Participation Reports</a>
       </nav>
     </aside>
