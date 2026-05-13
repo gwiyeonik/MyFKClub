@@ -42,7 +42,7 @@ body {
   padding: 32px 22px;
   gap: 32px;
   box-shadow: 4px 0 10px rgba(0, 0, 0, 0.25);
-    position: relative; /* Ensures the shadow stays on top of the content below */
+    position: relative; 
     z-index: 100;
 }
 
@@ -76,17 +76,21 @@ body {
 }
 
 .dashboard-main {
+  width: 100%;
   padding: 0;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .content-area {
-  padding: 30px; /* Adjust this value to change the 'sidewall' gap */
+  padding: 30px;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  margin-top: -20px;
+  width: 100%; 
+  max-width: none;
+  flex: 1;
 }
 
 .topbar {
@@ -123,16 +127,17 @@ body {
 
 .search-bar-wrap {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+  justify-content: flex-start;
+  gap: 15px;
   background: var(--white);
-  border-radius: 24px;
-  padding: 20px 24px;
+  padding: 16px 24px; 
   margin-bottom: 24px;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.25);
+  border-radius: 0; 
+  flex-wrap: nowrap; 
 }
 
 .search-input,
@@ -148,15 +153,24 @@ body {
 }
 
 .search-input {
-  max-width: 620px;
+  flex: 1; 
+  min-width: 150px;
+  max-width: 400px; 
+  border-radius: 999px;
 }
 
 .filter-row {
+  display: flex;  
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+.action-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: flex-end;
-  flex: 1;
+  gap: 8px;
+  flex-shrink: 0; 
 }
 
 .filter-pill,
@@ -164,7 +178,7 @@ body {
 .secondary-pill {
   border: none;
   border-radius: 999px;
-  padding: 12px 18px;
+  padding: 6px 12px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -173,6 +187,12 @@ body {
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
+  padding: 6px 30px 6px 12px; /* Reduced vertical and horizontal padding */
+  font-size: 0.85rem;          /* Smaller text size */
+  font-weight: 600;
+  border-radius: 999px;         /* Keeps your 2px preference */
+  background-size: 12px;      /* Smaller arrow icon */
+  min-height: auto;
 }
 
 .primary-pill {
@@ -187,19 +207,27 @@ body {
 
 .manage-grid {
   display: grid;
-  grid-template-columns: 1.45fr 0.85fr;
+  grid-template-columns: 1.2fr 0.8fr;
   gap: 20px;
   margin-bottom: 24px;
+  width: 100%;
+}
+
+.assign-committee {
+  width: 100%;
+  margin-bottom: 30px; 
 }
 
 .manage-panel,
 .requests-card,
 .list-card {
+  width: 100%;
   background: var(--white);
   border-radius: 0px;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.25);
   padding: 24px;
+  
 }
 
 .topbar-manage {
@@ -233,6 +261,22 @@ body {
   color: var(--blue-dark);
 }
 
+.action-row-committee {
+  display: flex;
+  justify-content: flex-end; 
+  margin-top: 20px;
+  width: 100%;
+  border-radius: 2px;
+}
+
+.action-row-register {
+  display: flex;
+  justify-content: flex-end; 
+  margin-top: 20px;
+  width: 100%;
+  border-radius: 2px;
+}
+
 .role-row {
   display: flex;
   align-items: center;
@@ -240,42 +284,59 @@ body {
 }
 
 .role-row label {
+  display: flex;       
+  align-items: center; 
+  gap: 8px;            
+  cursor: pointer;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text);
+  margin-bottom: 0;   
 }
 
 .form-field input,
 .form-field select {
   min-height: 52px;
   padding: 0 16px;
-  border-radius: 16px;
   border: 1px solid var(--border);
   background: #f6f9ff;
   color: var(--text);
 }
 
-.file-field .file-upload {
-  width: 96px;
-  height: 96px;
-  display: grid;
-  place-items: center;
-  border-radius: 18px;
-  border: 1px solid var(--border);
-  background: #f6f9ff;
+.file-field input[type="file"] {
+  width: 100%;
+  padding: 10px 0;
+  cursor: pointer;
+  font-size: 0.9rem;
   color: var(--muted);
-  font-weight: 700;
+}
+
+.file-field input[type="file"]::file-selector-button {
+  padding: 8px 16px;
+  border-radius: 2px; /* Matching your preference */
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background 0.2s;
+}
+
+.file-field input[type="file"]::file-selector-button:hover {
+  background: var(--surface-strong);
 }
 
 .assign-button {
   margin-top: 12px;
   padding: 14px 24px;
-  border-radius: 16px;
+  border-radius: 4px;
   border: none;
   background: #00a988;
   color: #ffffff;
   font-weight: 700;
   cursor: pointer;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.25);
 }
 
 .requests-card .request-item {

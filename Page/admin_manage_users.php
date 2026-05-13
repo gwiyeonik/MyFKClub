@@ -31,14 +31,30 @@ session_start();
         <div class="topbar-title">Manage Users</div>
       </div>
 
+    <div class="content-area">
+
       <div class="search-bar-wrap">
         <input class="search-input" type="search" placeholder="Search name/email/userID">
         <div class="filter-row">
-          <button class="filter-pill">Filter by club</button>
-          <button class="filter-pill">Semester</button>
-          <button class="filter-pill">Club Status</button>
-          <button class="primary-pill">Apply Filter</button>
-          <button class="secondary-pill">Export Report</button>
+          <select class="filter-pill">
+            <option value="all">Filter by club</option>
+            <option value="club1">Club 1</option>
+            <option value="club2">Club 2</option>
+          </select>
+          <select class="filter-pill">
+            <option value="all">Filter by semester</option>
+            <option value="sem1">Semester 1</option>
+            <option value="sem2">Semester 2</option>
+          </select>
+          <select class="filter-pill">
+            <option value="all">Filter by status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+        <div class="action-row">
+            <button class="primary-pill">Add User</button>
+            <button class="secondary-pill">Export List</button>
         </div>
       </div>
 
@@ -74,59 +90,41 @@ session_start();
               <input type="text" placeholder="Contact">
             </div>
             <div class="form-field file-field">
-              <label>User Photo</label>
-              <div class="file-upload">Photo</div>
+                <label>User Photo</label>
+                <input type="file" name="user_photo" accept="image/*">
             </div>
           </div>
-          <button class="assign-button">Add User</button>
+            <div class="action-row-register">
+                <button class="assign-button">Add User</button>
+            </div>
         </div>
 
-        <aside class="requests-card">
-          <div class="section-header">Requests</div>
-          <div class="request-item">
-            <div>
-              <div class="request-title">User ID</div>
-              <div class="request-meta">User Name • Role Type</div>
+        <div class="requests-card">
+    <div class="section-header">Requests</div>
+    
+    <?php
+    // We check if $requests exists AND if it has data
+    if (isset($requests) && $requests && mysqli_num_rows($requests) > 0) {
+        while($row = mysqli_fetch_assoc($requests)) { ?>
+            <div class="request-item">
+                <div class="request-info">
+                    <div class="request-title"><?php echo $row['user_id']; ?></div>
+                    <div class="request-meta"><?php echo $row['name']; ?> • <?php echo $row['role']; ?></div>
+                </div>
+                <div class="request-actions">
+                    <button class="reject-btn">Reject</button>
+                    <button class="accept-btn">Accept</button>
+                </div>
             </div>
-            <div class="request-actions">
-              <button class="reject-btn">Reject</button>
-              <button class="accept-btn">Accept</button>
-            </div>
-          </div>
-          <div class="request-item">
-            <div>
-              <div class="request-title">User ID</div>
-              <div class="request-meta">User Name • Role Type</div>
-            </div>
-            <div class="request-actions">
-              <button class="reject-btn">Reject</button>
-              <button class="accept-btn">Accept</button>
-            </div>
-          </div>
-          <div class="request-item">
-            <div>
-              <div class="request-title">User ID</div>
-              <div class="request-meta">User Name • Role Type</div>
-            </div>
-            <div class="request-actions">
-              <button class="reject-btn">Reject</button>
-              <button class="accept-btn">Accept</button>
-            </div>
-          </div>
-          <div class="request-item">
-            <div>
-              <div class="request-title">User ID</div>
-              <div class="request-meta">User Name • Role Type</div>
-            </div>
-            <div class="request-actions">
-              <button class="reject-btn">Reject</button>
-              <button class="accept-btn">Accept</button>
-            </div>
-          </div>
-        </aside>
+        <?php } 
+    } else {
+        // This is what will show now instead of the error
+        echo '<p class="request-meta" style="padding: 20px; opacity: 0.7;">No pending requests at the moment.</p>';
+    }
+    ?>
+</div>
       </section>
-
-      <section class="manage-grid">
+    <section class="assign-committee">
         <div class="manage-panel">
           <div class="section-header">Assign Committees</div>
           <div class="form-grid">
@@ -158,20 +156,23 @@ session_start();
               <label>Email</label>
               <input type="email" placeholder="Email">
             </div>
-            <div class="form-field file-field">
-              <label>User Photo</label>
-              <div class="file-upload">Photo</div>
-            </div>
             <div class="form-field">
               <label>Contact</label>
               <input type="text" placeholder="Contact">
             </div>
+            <div class="form-field file-field">
+                <label>User Photo</label>
+                <input type="file" name="user_photo" accept="image/*">
+            </div>
           </div>
-          <button class="assign-button">Assign</button>
+            <div class="action-row-committee">
+                <button class="assign-button">Assign</button>
+            </div>
         </div>
+    </section>
 
-        <div class="list-card">
-          <div class="list-header">
+     <section class="list-card">
+        <div class="list-header">
             <div class="section-header">User List</div>
             <input class="inline-search" type="search" placeholder="Search userName/userID">
           </div>
@@ -195,6 +196,7 @@ session_start();
           </div>
         </div>
       </section>
+    </div>
     </main>
   </div>
 </body>
