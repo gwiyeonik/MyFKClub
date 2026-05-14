@@ -29,19 +29,36 @@ session_start();
 
     <main class="dashboard-main">
       <div class="topbar">
-        <div class="topbar-title">Events</div>
+        <div class="topbar-left">
+          <div class="topbar-title">Events</div>
+        </div>
+        <a href="#profile" class="topbar-button">My Profile</a>
       </div>
 
-      <div class="search-bar-wrap">
-        <input class="search-input" type="search" placeholder="Search Events/EventID">
+    <div class="content-area">
+
+     <div class="search-bar-wrap">
+        <input type="text" class="search-input" placeholder="Search Event/EventID">
         <div class="filter-row">
-          <button class="filter-pill">Filter by club</button>
-          <button class="filter-pill">Semester</button>
-          <button class="filter-pill">Event Status</button>
-          <button class="primary-pill">Apply Filter</button>
-          <button class="secondary-pill">Export Report</button>
+            <select class="filter-select" name="filter_club">
+                <option value="">Filter by club</option>
+                <option value="club_a">Club A</option>
+            </select>
+            
+            <select class="filter-select" name="filter_semester">
+                <option value="">Semester</option>
+                <option value="sem1">1st Semester</option>
+            </select>
+            
+            <select class="filter-select" name="filter_status">
+                <option value="">Event Status</option>
+                <option value="active">Active</option>
+            </select>
+            
+            <button class="primary-pill" type="button">Apply Filter</button>
+            <button class="secondary-pill" type="button">Export Report</button>
         </div>
-      </div>
+    </div>
 
       <section class="stats-row">
         <div class="stat-card">
@@ -59,7 +76,7 @@ session_start();
       </section>
 
       <section class="events-grid-main">
-        <div class="chart-card chart-highlight">
+        <div class="chart-card ">
           <div class="chart-title">Number of Events Organized by Each Club</div>
           <div class="chart-placeholder">&lt;&lt; bar chart &gt;&gt;</div>
         </div>
@@ -93,6 +110,7 @@ session_start();
           <div class="chart-placeholder">&lt;&lt; line graph &gt;&gt;</div>
         </div>
       </section>
+    </div>
     </main>
   </div>
 </body>

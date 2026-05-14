@@ -101,7 +101,7 @@ body {
   background: var(--blue);
   color: #ffffff;
   padding: 24px 28px;
-  margin-bottom: 30px; 
+  margin-bottom: 10px; 
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     position: relative; /* Ensures the shadow stays on top of the content below */
     z-index: 99;
@@ -127,81 +127,82 @@ body {
 
 .search-bar-wrap {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: center;
-  width: 100%;
-  margin-bottom: 25px;
-  gap: 20px;
-  background: transparent;
-  padding: 0;
-  border: none;
-  box-shadow: none;
+  justify-content: flex-start;
+  gap: 15px;
+  background: var(--white);
+  padding: 16px 24px; 
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.25);
+  border-radius: 0; 
+  flex-wrap: nowrap; 
 }
 
 .search-input,
 .inline-search {
-  width: 300px;
-  height: 42px;
+  width: 100%;
+  min-height: 52px;
   padding: 0 20px;
-  border: 1px solid #e0e6ed;
-  border-radius: 25px;
-  background: #ffffff;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #f6f9ff;
   color: var(--text);
   font-size: 0.95rem;
 }
 
 .search-input {
-  flex: none;
-  min-width: 300px;
-  max-width: 520px;
+  flex: 1; 
+  min-width: 150px;
+  max-width: 400px; 
+  border-radius: 999px;
 }
 
 .filter-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: flex;  
+  gap: 8px;
   margin-left: auto;
+  flex-shrink: 0;
+  justify-content: center;
 }
 
 .action-row {
   display: flex;
   gap: 8px;
-  flex-shrink: 0;
+  flex-shrink: 0; 
 }
 
 .filter-pill,
 .primary-pill,
 .secondary-pill {
-  min-height: 42px;
-  padding: 0 24px;
-  border-radius: 25px;
   border: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 999px;
+  padding: 6px 12px;
   font-weight: 600;
   cursor: pointer;
-  white-space: nowrap;
 }
 
 .filter-pill {
-  background: #f8fbff;
-  color: var(--blue-dark);
-  border: 1px solid #e0e6ed;
-  font-size: 0.95rem;
-  font-weight: 500;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 6px 30px 6px 12px; /* Reduced vertical and horizontal padding */
+  font-size: 0.85rem;          /* Smaller text size */
+  font-weight: 600;
+  border-radius: 999px;         /* Keeps your 2px preference */
+  background-size: 12px;      /* Smaller arrow icon */
+  min-height: auto;
 }
 
 .primary-pill {
-  background: #00a9ab;
+  background: #00a988;
   color: #ffffff;
-  font-weight: 600;
 }
 
 .secondary-pill {
-  background: #17418f;
+  background: #0f3f8d;
   color: #ffffff;
-  font-weight: 600;
 }
 
 .manage-grid {
@@ -302,27 +303,19 @@ body {
   color: var(--text);
 }
 
-.file-field {
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-
 .file-field input[type="file"] {
   width: 100%;
   padding: 10px 0;
   cursor: pointer;
   font-size: 0.9rem;
   color: var(--muted);
-  background: transparent;
-  border: none;
 }
 
 .file-field input[type="file"]::file-selector-button {
   padding: 8px 16px;
-  border-radius: 2px;
+  border-radius: 2px; /* Matching your preference */
   border: 1px solid var(--border);
-  background: transparent;
+  background: var(--surface);
   color: var(--text);
   font-weight: 600;
   cursor: pointer;
@@ -331,7 +324,7 @@ body {
 }
 
 .file-field input[type="file"]::file-selector-button:hover {
-  background: rgba(238, 243, 255, 0.6);
+  background: var(--surface-strong);
 }
 
 .assign-button {
@@ -453,33 +446,9 @@ body {
 
 .charts-row {
   display: grid;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: 2fr 1fr;
   gap: 18px;
   margin-bottom: 28px;
-}
-
-.aside-cards {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 18px;
-  width: 100%;
-  min-width: 0;
-}
-
-.aside-cards .stat-card {
-  background: var(--white);
-  border-radius: 0px;
-  border: 1px solid var(--border);
-  min-height: 108px;
-  padding: 20px 22px;
-  box-shadow: var(--shadow);
-}
-
-.chart-group {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  width: 100%;
 }
 
 .chart-card {
@@ -488,11 +457,6 @@ body {
   border: 1px solid var(--border);
   padding: 24px;
   box-shadow: var(--shadow);
-}
-
-.chart-card.chart-large,
-.chart-card.chart-small {
-  min-height: 260px;
 }
 
 .chart-title {

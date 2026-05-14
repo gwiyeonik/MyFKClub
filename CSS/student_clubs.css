@@ -137,7 +137,7 @@ body {
 /* Search Bar & Filters */
 .search-bar-wrap {
 display: flex;
-    justify-content: space-between; 
+    justify-content: space-between; /* Pushes search to left, filters to right */
     align-items: center;
     width: 100%;
     margin-bottom: 25px;
@@ -145,7 +145,7 @@ display: flex;
 }
 
 .search-input {
-width: 300px;
+width: 300px; /* Specific width like in the first pic */
     height: 42px;
     padding: 0 20px;
     border: 1px solid #e0e6ed;
@@ -557,14 +557,7 @@ background: #17418f; /* Dark blue color */
   }
 
   .search-input {
-  width: 450px;
-    height: 42px;
-    padding: 0 20px;
-    border: 1px solid #e0e6ed;
-    border-radius: 25px; 
-    background-color: #ffffff;
-    outline: none;
-    transition: width 0.3s ease;
+    max-width: 100%;
   }
 
   .filter-row {
