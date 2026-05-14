@@ -10,6 +10,7 @@ session_start();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Participation Reports | MyFKClub Admin</title>
   <link rel="stylesheet" href="../CSS/dashboard.css">
+  <link rel="stylesheet" href="../CSS/participationreport.css">
 </head>
 <body>
   <div class="dashboard-shell">
