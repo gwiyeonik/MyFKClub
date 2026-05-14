@@ -136,30 +136,22 @@ body {
 
 /* Search Bar & Filters */
 .search-bar-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  background: var(--white);
-  border-radius: 0px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    width: 100%;
+    margin-bottom: 25px;
+    gap: 20px;
 }
 
 .search-input {
-  width: 100%;
-  min-height: 52px;
-  padding: 0 20px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: #f6f9ff;
-  color: var(--text);
-  font-size: 0.95rem;
-  max-width: 620px;
-  font-family: inherit;
+width: 300px;
+    height: 42px;
+    padding: 0 20px;
+    border: 1px solid #e0e6ed;
+    border-radius: 25px; /* Pill shape */
+    background-color: #ffffff;
+    outline: none;
 }
 
 .search-input::placeholder {
@@ -167,33 +159,32 @@ body {
 }
 
 .filter-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: flex-end;
-  flex: 1;
+display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.filter-pill,
-.primary-pill,
-.secondary-pill,
-.filter-select {
-  border: none;
-  border-radius: 999px;
-  padding: 12px 18px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.92rem;
-  transition: background 180ms ease;
-  font-family: inherit;
+.primary-pill, .secondary-pill {
+    height: 42px;
+    padding: 0 25px;
+    border-radius: 25px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .filter-select {
-  min-width: 180px;
-  background: #f6f9ff;
-  color: var(--text);
-  border: 1px solid var(--border);
-  appearance: none;
+height: 42px;
+    padding: 0 15px;
+    border: 1px solid #e0e6ed;
+    border-radius: 25px; /* Pill shape */
+    background-color: #f8fbff; /* Light blue tint from image */
+    color: #17418f;
+    font-size: 0.85rem;
+    cursor: pointer;
+    outline: none;
+    min-width: 140px;
 }
 
 .filter-select option {
@@ -211,8 +202,8 @@ body {
 }
 
 .primary-pill {
-  background: var(--green);
-  color: #ffffff;
+background: #00a9ab; /* Teal color */
+    color: white;
 }
 
 .primary-pill:hover {
@@ -220,8 +211,8 @@ body {
 }
 
 .secondary-pill {
-  background: var(--blue);
-  color: #ffffff;
+background: #17418f; /* Dark blue color */
+    color: white;
 }
 
 .secondary-pill:hover {
@@ -566,7 +557,14 @@ body {
   }
 
   .search-input {
-    max-width: 100%;
+  width: 450px;
+    height: 42px;
+    padding: 0 20px;
+    border: 1px solid #e0e6ed;
+    border-radius: 25px; 
+    background-color: #ffffff;
+    outline: none;
+    transition: width 0.3s ease;
   }
 
   .filter-row {
