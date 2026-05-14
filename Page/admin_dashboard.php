@@ -50,13 +50,23 @@ session_start();
         </section>
 
         <section class="charts-row">
-          <div class="chart-card chart-large">
-            <div class="chart-title">Students per Club</div>
-            <div class="chart-placeholder">&lt;&lt; chart &gt;&gt;</div>
+          <div class="aside-cards">
+            <div class="stat-card">
+              <div class="stat-label">Club in Faculty</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Student Join Club</div>
+            </div>
           </div>
-          <div class="chart-card chart-small">
-            <div class="chart-title">Students per Club</div>
-            <div class="chart-placeholder">&lt;&lt; pie chart &gt;&gt;</div>
+          <div class="chart-group">
+            <div class="chart-card chart-large">
+              <div class="chart-title">Students per Club</div>
+              <div class="chart-placeholder">&lt;&lt; chart &gt;&gt;</div>
+            </div>
+            <div class="chart-card chart-small">
+              <div class="chart-title">Role Distribution</div>
+              <div class="chart-placeholder">&lt;&lt; pie chart &gt;&gt;</div>
+            </div>
           </div>
         </section>
 
