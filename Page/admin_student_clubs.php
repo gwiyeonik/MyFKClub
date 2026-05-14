@@ -46,7 +46,7 @@ mysqli_close($link);
         <a href="admin_manage_users.php" class="sidebar-link">Manage Users</a>
         <a href="admin_student_clubs.php" class="sidebar-link active">Student Clubs</a>
         <a href="admin_events.php" class="sidebar-link">Events</a>
-        <a href="#" class="sidebar-link">Participation Reports</a>
+        <a href="admin_participation_reports.php" class="sidebar-link">Participation Reports</a>
       </nav>
     </aside>
 

@@ -22,7 +22,7 @@ session_start();
         <a href="admin_manage_users.php" class="sidebar-link active">Manage Users</a>
         <a href="admin_student_clubs.php" class="sidebar-link">Student Clubs</a>
         <a href="admin_events.php" class="sidebar-link">Events</a>
-        <a href="#" class="sidebar-link">Participation Reports</a>
+        <a href="admin_participation_reports.php" class="sidebar-link">Participation Reports</a>
       </nav>
     </aside>
 
