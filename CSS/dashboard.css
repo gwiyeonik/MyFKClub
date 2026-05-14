@@ -127,82 +127,81 @@ body {
 
 .search-bar-wrap {
   display: flex;
-  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  justify-content: flex-start;
-  gap: 15px;
+  width: 100%;
+  margin-bottom: 25px;
+  gap: 20px;
   background: transparent;
-  padding: 16px 24px;
-  margin-bottom: 24px;
+  padding: 0;
   border: none;
   box-shadow: none;
-  border-radius: 0;
-  flex-wrap: nowrap;
 }
 
 .search-input,
 .inline-search {
-  width: 100%;
-  min-height: 52px;
+  width: 300px;
+  height: 42px;
   padding: 0 20px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: #f6f9ff;
+  border: 1px solid #e0e6ed;
+  border-radius: 25px;
+  background: #ffffff;
   color: var(--text);
   font-size: 0.95rem;
 }
 
 .search-input {
-  flex: 1; 
-  min-width: 150px;
-  max-width: 400px; 
-  border-radius: 999px;
+  flex: none;
+  min-width: 300px;
+  max-width: 520px;
 }
 
 .filter-row {
-  display: flex;  
-  gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-left: auto;
-  flex-shrink: 0;
-  justify-content: center;
 }
 
 .action-row {
   display: flex;
   gap: 8px;
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
 .filter-pill,
 .primary-pill,
 .secondary-pill {
+  min-height: 42px;
+  padding: 0 24px;
+  border-radius: 25px;
   border: none;
-  border-radius: 999px;
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .filter-pill {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-  padding: 6px 30px 6px 12px; /* Reduced vertical and horizontal padding */
-  font-size: 0.85rem;          /* Smaller text size */
-  font-weight: 600;
-  border-radius: 999px;         /* Keeps your 2px preference */
-  background-size: 12px;      /* Smaller arrow icon */
-  min-height: auto;
+  background: #f8fbff;
+  color: var(--blue-dark);
+  border: 1px solid #e0e6ed;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
 .primary-pill {
-  background: #00a988;
+  background: #00a9ab;
   color: #ffffff;
+  font-weight: 600;
 }
 
 .secondary-pill {
-  background: #0f3f8d;
+  background: #17418f;
   color: #ffffff;
+  font-weight: 600;
 }
 
 .manage-grid {

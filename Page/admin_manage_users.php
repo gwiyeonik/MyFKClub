@@ -27,8 +27,12 @@ session_start();
     </aside>
 
     <main class="dashboard-main">
-      <div class="topbar topbar-manage">
-        <div class="topbar-title">Manage Users</div>
+      <!-- Topbar stays flush to the sidebar -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-title">FK Club Admin</div>
+        </div>
+        <a href="#profile" class="topbar-button">My Profile</a>
       </div>
 
     <div class="content-area">
