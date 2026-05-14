@@ -1,11 +1,30 @@
 <?php
 // admin_student_clubs.php
 session_start();
-// Add authentication logic here if needed:
-// if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-//     header('Location: login.php');
-//     exit;
-// }
+
+// Database connection for next Club ID auto-increment
+$link = mysqli_connect("localhost", "root", "", "myfkclub");
+if (!$link) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$nextID = 1;
+$result = mysqli_query($link, "SHOW TABLES");
+if ($result) {
+    while ($row = mysqli_fetch_array($result)) {
+        $tableName = $row[0];
+        if (stripos($tableName, 'club') !== false) {
+            $escapedTable = mysqli_real_escape_string($link, $tableName);
+            $status = mysqli_query($link, "SHOW TABLE STATUS LIKE '$escapedTable'");
+            if ($status && mysqli_num_rows($status) > 0) {
+                $statusRow = mysqli_fetch_assoc($status);
+                $nextID = isset($statusRow['Auto_increment']) ? $statusRow['Auto_increment'] : 1;
+                break;
+            }
+        }
+    }
+}
+mysqli_close($link);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -46,167 +65,126 @@ session_start();
         <div class="search-bar-wrap">
           <input type="text" class="search-input" placeholder="Search clubname/clubID">
           <div class="filter-row">
-            <button class="filter-pill">Filter by club ▼</button>
-            <button class="filter-pill">Semester ▼</button>
-            <button class="filter-pill">Club Status ▼</button>
-            <button class="primary-pill">Apply filter</button>
-            <button class="secondary-pill">Export Report</button>
+            <select class="filter-select" name="filter_club">
+              <option value="">Filter by club</option>
+              <option value="club_a">Club A</option>
+              <option value="club_b">Club B</option>
+            </select>
+            <select class="filter-select" name="filter_semester">
+              <option value="">Semester</option>
+              <option value="sem1">1st Semester</option>
+              <option value="sem2">2nd Semester</option>
+              <option value="sem3">3rd Semester</option>
+            </select>
+            <select class="filter-select" name="filter_status">
+              <option value="">Club Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Not Active</option>
+            </select>
+            <button class="primary-pill" type="button">Apply Filter</button>
+            <button class="secondary-pill" type="button">Export Report</button>
           </div>
         </div>
 
-        <!-- Stats Cards Row -->
-        <section class="stats-row">
-          <div class="stat-card">
-            <div class="stat-label">Total Clubs in Faculty</div>
-            <div class="stat-value">--</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Total Number Active Clubs</div>
-            <div class="stat-value">--</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Total Students Join Clubs</div>
-            <div class="stat-value">--</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Avg Attendance Rate</div>
-            <div class="stat-value">--</div>
-          </div>
-        </section>
-
-        <!-- Main Content Grid: Club Registration Form + Club Info Panel + Recent Registrations -->
         <div class="clubs-grid">
-          <!-- Left Column: Club Registration Form -->
-          <div class="form-section">
+          <section class="card club-form">
             <h3 class="section-title">Club Registration</h3>
-            <form class="club-form">
+            <div class="form-grid club-info-grid">
               <div class="form-field">
-                <label>Club ID</label>
-                <input type="text" placeholder="">
+                <label for="club-id">Club ID</label>
+                <input id="club-id" type="text" name="club_id" value="<?= isset($nextID) ? htmlspecialchars($nextID) : '' ?>" readonly required>
               </div>
-
               <div class="form-field">
-                <label>Club Name</label>
-                <input type="text" placeholder="">
+                <label for="club-name">Club Name</label>
+                <input id="club-name" type="text" name="club_name">
               </div>
-
               <div class="form-field">
-                <label>Club Desc</label>
-                <input type="text" placeholder="">
+                <label for="club-desc">Club Desc</label>
+                <input id="club-desc" type="text" name="club_desc">
               </div>
-
               <div class="form-field">
-                <label>Club Advisor</label>
-                <input type="text" placeholder="">
+                <label for="club-advisor">Club Advisor</label>
+                <input id="club-advisor" type="text" name="club_advisor">
               </div>
-
-              <div class="form-field">
+              <div class="form-field form-row--inline">
                 <label>Club Status</label>
-                <div class="radio-group">
-                  <label class="radio-label">
-                    <input type="radio" name="clubStatus" value="active">
-                    <span>Active</span>
-                  </label>
-                  <label class="radio-label">
-                    <input type="radio" name="clubStatus" value="inactive">
-                    <span>Not Active</span>
-                  </label>
-                </div>
+                <label class="radio-label"><input type="radio" name="club_status" value="active"> Active</label>
+                <label class="radio-label"><input type="radio" name="club_status" value="inactive"> Not Active</label>
               </div>
-
               <div class="form-field">
-                <label>Club Create</label>
-                <input type="text" placeholder="">
+                <label for="club-created">Club Create</label>
+                <input id="club-created" type="text" name="club_created">
               </div>
-
-              <button type="submit" class="btn-add">Add</button>
-            </form>
-
-            <!-- Charts Section -->
-            <div class="charts-section">
-              <div class="chart-card chart-large">
-                <div class="chart-title">Number of Students per Club</div>
-                <div class="chart-placeholder">&lt;&lt;bar chart&gt;&gt;</div>
-              </div>
-
-              <div class="chart-card chart-small">
-                <div class="chart-title">Number of Participants by Events</div>
-                <div class="chart-placeholder">&lt;&lt;donut chart&gt;&gt;</div>
+              <div class="form-actions">
+                <button type="submit" class="btn-add">Add</button>
               </div>
             </div>
-          </div>
+          </section>
 
-          <!-- Right Column: Club Information + Recent Registrations -->
-          <div class="info-section">
-            <!-- Club Information Panel -->
-            <div class="club-info-panel">
-              <h3 class="section-title">Club Information</h3>
-              <div class="form-grid">
-                <div class="form-field">
-                  <label>Club Name</label>
-                  <input type="text" placeholder="">
+          <section class="card club-info-panel">
+                <h3 class="section-title">Club Information</h3><br>
+                <div class="form-grid club-info-grid">
+                   <div class="form-field form-field--stacked">
+                  <label for="club-select">Club ID/Name</label>
+                  <select id="club-select" class="club-select">
+                    <option value=""></option>
+                  </select>
                 </div>
-
                 <div class="form-field">
-                  <label>Club Desc</label>
-                  <input type="text" placeholder="">
-                </div>
-
-                <div class="form-field">
-                  <label>Club Advisor</label>
-                  <input type="text" placeholder="">
-                </div>
-
-                <div class="form-field">
-                  <label>Club Status</label>
-                  <div class="radio-group">
-                    <label class="radio-label">
-                      <input type="radio" name="clubStatusInfo" value="active">
-                      <span>Active</span>
-                    </label>
-                    <label class="radio-label">
-                      <input type="radio" name="clubStatusInfo" value="inactive">
-                      <span>Not Active</span>
-                    </label>
+                    <label for="info-club-name">Club Name</label>
+                    <input id="info-club-name" type="text" name="info_club_name">
+                  </div>
+                  <div class="form-field">
+                    <label for="info-club-desc">Club Desc</label>
+                    <input id="info-club-desc" type="text" name="info_club_desc">
+                  </div>
+                  <div class="form-field">
+                    <label for="info-club-advisor">Club Advisor</label>
+                    <input id="info-club-advisor" type="text" name="info_club_advisor">
+                  </div>
+                  <div class="form-field form-row--inline">
+                    <label>Club Status</label>
+                    <label class="radio-label"><input type="radio" name="info_club_status" value="active"> Active</label>
+                    <label class="radio-label"><input type="radio" name="info_club_status" value="inactive"> Not Active</label>
+                  </div>
+                  <div class="form-field">
+                    <label for="info-club-created">Club Create</label>
+                    <input id="info-club-created" type="text" name="info_club_created">
                   </div>
                 </div>
 
-                <div class="form-field">
-                  <label>Club Create</label>
-                  <input type="text" placeholder="">
+                <div class="action-buttons">
+                  <button type="button" class="btn-delete">Delete</button>
+                  <button type="button" class="btn-update">Update</button>
                 </div>
               </div>
+          </section>
 
-              <div class="action-buttons">
-                <button class="btn-delete">Delete</button>
-                <button class="btn-update">Update</button>
+          <section class="card committee-panel">
+            <div class="card-header">
+              <h3 class="section-title">Club Committee</h3>
+              <input type="text" placeholder="Search userName/userID/......" class="pill-search">
+            </div>
+
+            <div class="committee-table-content">
+              <div class="committee-grid-header">
+                <span>Club ID</span>
+                <span>Membership ID</span>
+                <span>Committee ID</span>
+                <span>User ID</span>
+                <span>User Name</span>
+              </div>
+              <div class="committee-data-area">
+                <div class="empty-cell">No committee records available.</div>
               </div>
             </div>
 
-            <!-- Recent Registrations Table -->
-            <div class="registrations-panel">
-              <h3 class="section-title">Recent Registrations</h3>
-              <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>User ID</th>
-                      <th>Club Name</th>
-                      <th>Membership ID</th>
-                      <th>User Name</th>
-                      <th>Committee Type (if committee)</th>
-                      <th>Join Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td colspan="6" class="empty-cell">No recent registrations yet.</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+            <div class="committee-actions">
+              <button class="btn-action btn-teal">Add</button>
+              <button class="btn-action btn-teal">Update</button>
+              <button class="btn-action btn-red">Delete</button>
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </main>
