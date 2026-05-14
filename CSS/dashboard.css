@@ -8,6 +8,8 @@
   --muted: #5e6d8e;
   --border: rgba(17, 53, 111, 0.12);
   --shadow: 0 24px 56px rgba(15, 63, 141, 0.12);
+  --teal-btn: #00a988; /* The accent color for buttons */
+
 }
 
 * {

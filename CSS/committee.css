@@ -1,0 +1,223 @@
+:root {
+  --blue: #17418f;
+  --white: #ffffff;
+  --surface: #f4f7f9;
+  --text: #0f2e60;
+  --muted: #5e6d8e;
+  --border: rgba(17, 53, 111, 0.1);
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --teal-btn: #00a988; 
+  --teal-hover: #008f73;
+  --header-blue: #4a90e2; 
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.dashboard-shell {
+  display: grid !important;
+  grid-template-columns: 280px 1fr !important;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* --- SIDEBAR --- */
+.dashboard-sidebar {
+  background: var(--blue);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px;
+  gap: 30px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+/* ERROR 1 FIXED: Removed the double dot ".." in front of brand-panel */
+.brand-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.brand-panel img {
+  width: 140px;
+  border-radius: 24px;
+  object-fit: cover;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 14px 18px;
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+/* --- TOPBAR --- */
+.topbar {
+  background: var(--blue);
+  color: #ffffff;
+  padding: 25px 40px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.topbar-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* --- CONTENT AREA --- */
+.content-area {
+  padding: 40px;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: var(--white);
+  padding: 25px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  color: var(--header-blue);
+  font-weight: 500;
+  min-height: 110px;
+}
+
+/* ERROR 2 FIXED: Added .dashboard-grid class to match your PHP file exactly */
+.dashboard-grid, .manage-grid {
+  display: grid !important;
+  grid-template-columns: 1.6fr 1fr !important;
+  gap: 25px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* ERROR 3 FIXED: Added .content-panel class to match your PHP file exactly */
+.content-panel, .manage-panel, .requests-card {
+  min-width: 0;
+  background: var(--white) !important;
+  border: 1px solid var(--border);
+  padding: 30px;
+  border-radius: 4px; /* Matches reference image_78ac11.png */
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Positions */
+/* Fixed: Targeting panel headers inside content-panel as well */
+.content-panel .panel-header-centered, .manage-panel .section-header {
+  text-align: center;
+  color: var(--header-blue);
+  font-size: 1.25rem;
+  margin: 0 0 25px 0;
+}
+
+.content-panel .panel-header-left, .requests-card .section-header {
+  text-align: left;
+  color: var(--header-blue);
+  font-size: 1.25rem;
+  margin: 0 0 25px 0;
+}
+
+.event-list-header {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--surface-strong);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.event-body {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-columns {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--surface);
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+.panel-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto; /* Pushes button to bottom of card */
+}
+
+.chart-placeholder {
+  min-height: 260px;
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+  background: #fcfdff;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* --- BUTTONS --- */
+/* Fixed: Added .btn-teal class used in your PHP */
+.btn-teal, .btn-primary {
+  background: var(--teal-btn);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.btn-teal:hover, .btn-primary:hover {
+  filter: brightness(0.9);
+}
+
+@media (max-width: 1100px) {
+  .dashboard-shell { grid-template-columns: 1fr !important; }
+  .dashboard-sidebar { height: auto; position: relative; }
+  .dashboard-grid, .manage-grid { grid-template-columns: 1fr !important; }
+}
