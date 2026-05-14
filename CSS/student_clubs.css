@@ -137,7 +137,7 @@ body {
 /* Search Bar & Filters */
 .search-bar-wrap {
 display: flex;
-    justify-content: space-between; 
+    justify-content: space-between; /* Pushes search to left, filters to right */
     align-items: center;
     width: 100%;
     margin-bottom: 25px;
@@ -145,7 +145,7 @@ display: flex;
 }
 
 .search-input {
-width: 300px;
+width: 300px; /* Specific width like in the first pic */
     height: 42px;
     padding: 0 20px;
     border: 1px solid #e0e6ed;
@@ -557,14 +557,7 @@ background: #17418f; /* Dark blue color */
   }
 
   .search-input {
-  width: 450px;
-    height: 42px;
-    padding: 0 20px;
-    border: 1px solid #e0e6ed;
-    border-radius: 25px; 
-    background-color: #ffffff;
-    outline: none;
-    transition: width 0.3s ease;
+    max-width: 100%;
   }
 
   .filter-row {
@@ -748,7 +741,7 @@ background: #17418f; /* Dark blue color */
 .committee-grid-header,
 .committee-data-row {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: 1fr 2fr 1.4fr;
   gap: 16px;
   padding: 16px 18px;
   align-items: center;
@@ -763,6 +756,78 @@ background: #17418f; /* Dark blue color */
 .committee-data-area {
   min-height: 180px;
   background: var(--white);
+  padding: 10px 0;
+}
+
+.committee-data-area .empty-cell {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--muted);
+  padding: 30px 0;
+}
+
+.club-summary {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.summary-item label {
+  min-width: 120px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--blue-dark);
+}
+
+.summary-item span {
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.events-panel {
+  margin-top: 32px;
+}
+
+.events-title {
+  margin: 0 0 18px;
+  font-size: 1rem;
+  color: var(--blue-dark);
+  font-weight: 700;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.event-card {
+  min-height: 110px;
+  background: #f6f9ff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.btn-view-events {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 12px;
+  background: var(--blue-dark);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-view-events:hover {
+  background: #102f6a;
 }
 
 .committee-actions {
@@ -906,4 +971,5 @@ background: #17418f; /* Dark blue color */
     justify-content: flex-end;
     margin-top: 20px;
 }
+
 

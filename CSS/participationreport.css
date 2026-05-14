@@ -16,9 +16,10 @@ body {
 .search-bar-wrap {
   align-items: center;
   padding: 18px 24px;
-  background: #ffffff;
+  background: transparent;
   border-radius: 24px;
-  border: 1px solid rgba(17, 53, 111, 0.08);
+  border: none;
+  box-shadow: none;
 }
 
 .search-input {
@@ -29,16 +30,38 @@ body {
 }
 
 .filter-row {
+  display: flex;
+  align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
 
+.filter-select,
 .filter-pill,
 .primary-pill,
 .secondary-pill {
   min-height: 48px;
   padding: 12px 20px;
   font-size: 0.92rem;
+}
+
+.filter-select {
+  min-width: 180px;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 53, 111, 0.12);
+  background: #f6f9ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%233c4a6b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E") no-repeat right 18px center;
+  background-size: 10px 6px;
+  color: var(--text);
+  font-weight: 400;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  padding-right: 42px;
+}
+
+.filter-select option {
+  font-weight: 400;
 }
 
 .stats-row {
@@ -49,13 +72,15 @@ body {
   min-height: 120px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 26px 24px;
+  justify-content: flex-start;
+  padding: 16px 24px 24px;
 }
 
 .stat-label {
   font-size: 1rem;
   letter-spacing: 0.02em;
+  margin-top: 0;
+  padding-top: 2px;
 }
 
 .charts-row {
@@ -70,8 +95,15 @@ body {
   min-height: 280px;
 }
 
+.table-section {
+  margin-bottom: 24px;
+}
+
 .table-panel {
   padding: 0;
+  margin-bottom: 18px;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 .table-heading {
