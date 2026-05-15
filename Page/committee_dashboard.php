@@ -22,6 +22,7 @@
                 <a href="#" class="sidebar-link">Members</a>
                 <a href="#" class="sidebar-link">Attendance</a>
                 <a href="#" class="sidebar-link">Reports</a>
+                <a href="committee_participation_report.php" class="sidebar-link active">Reports</a>
             </nav>
         </aside>
 

@@ -14,6 +14,7 @@ session_start();
   <link rel="stylesheet" href="../CSS/committee_participation_report.css">
 </head>
 <body>
+
   <div class="dashboard-shell">
 
     <!-- SIDEBAR -->
@@ -24,7 +25,7 @@ session_start();
 
       <nav class="sidebar-nav">
         <a href="committee_dashboard.php" class="sidebar-link">Home</a>
-        <a href="committee_club_details.php" class="sidebar-link">View Clubs</a>
+        <a href="committee_club_details.php" class="sidebar-link">Manage Clubs</a>
         <a href="committee_manage_events.php" class="sidebar-link">Manage Events</a>
         <a href="committee_members.php" class="sidebar-link">Members</a>
         <a href="committee_attendance.php" class="sidebar-link">Attendance</a>
@@ -40,21 +41,23 @@ session_start();
         <div class="topbar-left">
           <div class="topbar-title">Participation Reports</div>
         </div>
+
         <a href="#profile" class="topbar-button">My Profile</a>
       </div>
 
+      <!-- CONTENT -->
       <div class="content-area">
 
-        <!-- SEARCH AND FILTER -->
+        <!-- SEARCH -->
         <div class="search-bar-wrap">
           <input class="search-input" type="search" placeholder="Search Events/EventID">
 
           <div class="filter-row">
             <select class="filter-select" name="event_filter">
               <option value="">Event</option>
-              <option value="event_1">Unity Workshop</option>
-              <option value="event_2">Game Jam</option>
-              <option value="event_3">Club Talk</option>
+              <option value="unity_workshop">Unity Workshop</option>
+              <option value="game_jam">Game Jam</option>
+              <option value="club_talk">Club Talk</option>
             </select>
 
             <select class="filter-select" name="semester_filter">
@@ -68,12 +71,13 @@ session_start();
           </div>
         </div>
 
-        <!-- TOP SUMMARY CARDS -->
+        <!-- TOP CARDS -->
         <section class="committee-stats-row">
+
           <div class="committee-card">
             <div class="committee-card-title">Total Club Participation</div>
             <div class="committee-card-meta">
-              Registered&nbsp;&nbsp;|&nbsp;&nbsp;Present&nbsp;&nbsp;|&nbsp;&nbsp;Late&nbsp;&nbsp;|&nbsp;&nbsp;Absent
+              Registered&nbsp;&nbsp; | &nbsp;&nbsp;Present&nbsp;&nbsp; | &nbsp;&nbsp;Late&nbsp;&nbsp; | &nbsp;&nbsp;Absent
             </div>
           </div>
 
@@ -84,25 +88,28 @@ session_start();
           <div class="committee-card">
             <div class="committee-card-title">Most Active Members & Top Members by Points</div>
           </div>
+
         </section>
 
         <!-- CHARTS -->
         <section class="committee-charts-row">
+
           <div class="chart-card">
             <div class="chart-title">Club Attendance Trend</div>
-            <div class="chart-placeholder">&lt;&lt; bar chart &gt;&gt;</div>
+            <div class="chart-placeholder">&lt;&lt;bar chart&gt;&gt;</div>
           </div>
 
           <div class="chart-card">
             <div class="chart-title">Points Distribution</div>
-            <div class="chart-placeholder">&lt;&lt; bar chart &gt;&gt;</div>
+            <div class="chart-placeholder">&lt;&lt;bar chart&gt;&gt;</div>
           </div>
+
         </section>
 
-        <!-- CLUB MEMBER PARTICIPATION TABLE -->
+        <!-- CLUB MEMBER PARTICIPATION -->
         <section class="table-section">
-          <div class="table-panel">
-            <div class="table-heading">Club Member Participation</div>
+          <div class="table-panel large-table-panel">
+            <div class="table-heading">&lt;&lt;table&gt;&gt; Club Member Participation</div>
 
             <div class="table-wrapper">
               <table>
@@ -118,7 +125,9 @@ session_start();
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="6" class="empty-cell">No data available.</td>
+                    <td colspan="6" class="table-placeholder">
+                      Student&nbsp;&nbsp; | &nbsp;&nbsp;Event&nbsp;&nbsp; | &nbsp;&nbsp;Attendance Status&nbsp;&nbsp; | &nbsp;&nbsp;Volunteer&nbsp;&nbsp; | &nbsp;&nbsp;Points&nbsp;&nbsp; | &nbsp;&nbsp;Recognition
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -129,8 +138,8 @@ session_start();
         <!-- BOTTOM SECTION -->
         <section class="committee-bottom-grid">
 
-          <div class="table-panel">
-            <div class="table-heading">Most Active Members</div>
+          <div class="table-panel small-table-panel">
+            <div class="table-heading">&lt;&lt;table&gt;&gt; Most Active Members</div>
 
             <div class="table-wrapper">
               <table>
@@ -145,7 +154,9 @@ session_start();
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="5" class="empty-cell">No data available.</td>
+                    <td colspan="5" class="table-placeholder">
+                      Rank&nbsp;&nbsp; | &nbsp;&nbsp;Student&nbsp;&nbsp; | &nbsp;&nbsp;Event Attended&nbsp;&nbsp; | &nbsp;&nbsp;Total Points&nbsp;&nbsp; | &nbsp;&nbsp;Recognition Status
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -155,7 +166,7 @@ session_start();
           <div class="engagement-card">
             <div class="engagement-title">Engagement Summary</div>
             <div class="engagement-content">
-              Participation Trend&nbsp;&nbsp;|&nbsp;&nbsp;Active Members
+              Participation Trend&nbsp;&nbsp; | &nbsp;&nbsp;Active Members
             </div>
           </div>
 
@@ -164,5 +175,6 @@ session_start();
       </div>
     </main>
   </div>
+
 </body>
 </html>
