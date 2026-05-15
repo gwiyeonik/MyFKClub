@@ -16,13 +16,12 @@
             </div>
 
             <nav class="sidebar-nav">
-                <a href="#" class="sidebar-link active">Home</a>
+                <a href="#" class="sidebar-link ">Home</a>
                 <a href="#" class="sidebar-link">View Clubs</a>
                 <a href="#" class="sidebar-link">Manage Events</a>
                 <a href="#" class="sidebar-link">Members</a>
                 <a href="#" class="sidebar-link">Attendance</a>
-                <a href="#" class="sidebar-link">Reports</a>
-                <a href="committee_participation_report.php" class="sidebar-link active">Reports</a>
+                <a href="committee_participation_report.php" class="sidebar-link">Reports</a>
             </nav>
         </aside>
 
