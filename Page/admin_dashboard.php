@@ -1,11 +1,10 @@
 <?php
 // admin_dashboard.php
 session_start();
-// Add authentication logic here if needed:
-// if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-//     header('Location: login.php');
-//     exit;
-// }
+if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
+    header('Location: login.php');
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -42,6 +41,16 @@ session_start();
 
       <!-- NEW WRAPPER: This provides the 'breathing room' seen in image_2a6841.png -->
       <div class="content-area">
+        <section class="quick-links-row">
+          <div class="section-heading">Quick Admin Access</div>
+          <div class="stats-row">
+            <a href="admin_manage_users.php" class="stat-card" style="text-decoration:none;color:inherit;"><div class="stat-label">Manage Users</div></a>
+            <a href="admin_student_clubs.php" class="stat-card" style="text-decoration:none;color:inherit;"><div class="stat-label">Student Clubs</div></a>
+            <a href="admin_events.php" class="stat-card" style="text-decoration:none;color:inherit;"><div class="stat-label">Events</div></a>
+            <a href="admin_participation_reports.php" class="stat-card" style="text-decoration:none;color:inherit;"><div class="stat-label">Participation Reports</div></a>
+          </div>
+        </section>
+
         <section class="stats-row">
           <div class="stat-card"><div class="stat-label">Registered Students</div></div>
           <div class="stat-card"><div class="stat-label">Active Clubs</div></div>

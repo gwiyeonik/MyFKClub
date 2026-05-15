@@ -12,6 +12,8 @@
   --shadow: 0 24px 56px rgba(15, 63, 141, 0.12);
   --green: #00a988;
   --red: #e74c3c;
+  --primary-blue: #1a428a;
+  --teal: #009688;
 }
 
 * {
@@ -300,12 +302,53 @@ background: #17418f; /* Dark blue color */
     color: #333;
 }
 
-.form-field input[type="text"], 
+.form-field input[type="text"],
+.form-field input[type="date"],
 .club-select {
     width: 100%;
-    height: 40px;
+    height: 44px;
     border: 1px solid #17418f;
+    border-radius: 14px;
     background: #ffffff;
+    padding: 0 14px;
+    color: #102f6a;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+    position: relative;
+}
+
+.form-field input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 2V5' stroke='%2317418f' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M17 2V5' stroke='%2317418f' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M4 8H20' stroke='%2317418f' stroke-width='2'/%3E%3Crect x='4' y='6' width='16' height='14' rx='2' stroke='%2317418f' stroke-width='2'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 20px 20px;
+    padding-right: 44px;
+    cursor: pointer;
+}
+
+.form-field input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    right: 14px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+}
+
+.form-field input[type="date"]::-webkit-inner-spin-button,
+.form-field input[type="date"]::-webkit-clear-button {
+    display: none;
+}
+
+.form-field input[type="text"]:focus,
+.form-field input[type="date"]:focus,
+.club-select:focus {
+    border-color: #0f2e60;
+    box-shadow: 0 0 0 4px rgba(23, 65, 143, 0.08);
 }
 
 .radio-group {
@@ -741,7 +784,7 @@ background: #17418f; /* Dark blue color */
 .committee-grid-header,
 .committee-data-row {
   display: grid;
-  grid-template-columns: 1fr 2fr 1.4fr;
+  grid-template-columns: 0.3fr 0.4fr 0.4fr;
   gap: 16px;
   padding: 16px 18px;
   align-items: center;
@@ -972,4 +1015,153 @@ background: #17418f; /* Dark blue color */
     margin-top: 20px;
 }
 
+.club-list-container {
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--primary-blue);
+}
 
+.main-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    padding: 30px;
+    border-radius: 0px;
+    box-shadow: var(--shadow);
+}
+
+.top-row {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.club-details {
+    flex: 1;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.input-group select {
+    padding: 8px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    flex-grow: 1;
+}
+
+.info-field {
+    margin-bottom: 15px;
+}
+
+.committee-card {
+    flex: 1;
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    min-height: 150px;
+    margin-top: -28px;
+}
+
+.committee-table-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.events-section {
+    border: 1px solid var(--border-color);
+    padding: 20px;
+}
+
+.events-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.event-placeholder {
+    height: 100px;
+    border: 1px solid #eee;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    color: #a8b4c8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button-wrapper {
+    text-align: center;
+}
+
+.view-events-btn {
+    background-color: var(--green);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#club-input {
+    width: 60%;
+    padding: 10px 15px;
+    border: 1px solid #d1d1d1;
+    border-radius: 25px; /* Creates the pill shape in your image */
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.info-value {
+    margin-top: 8px;
+    color: #a8b4c8;
+}
+
+.committee-row {
+    display: grid;
+    grid-template-columns: 0.3fr 0.4fr 0.4fr;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+#list-events-grid {
+    min-height: 120px;
+}
+
+.event-card {
+    min-height: 100px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 18px;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.event-card h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: #17418f;
+}
+
+.event-card p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: #425066;
+}
+
+#club-input:focus {
+    border-color: #1a428a;
+}

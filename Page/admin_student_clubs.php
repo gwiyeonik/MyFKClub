@@ -2,28 +2,46 @@
 // admin_student_clubs.php
 session_start();
 
-// Database connection for next Club ID auto-increment
 $link = mysqli_connect("localhost", "root", "", "myfkclub");
 if (!$link) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-$nextID = 1;
-$result = mysqli_query($link, "SHOW TABLES");
-if ($result) {
-    while ($row = mysqli_fetch_array($result)) {
-        $tableName = $row[0];
-        if (stripos($tableName, 'club') !== false) {
-            $escapedTable = mysqli_real_escape_string($link, $tableName);
-            $status = mysqli_query($link, "SHOW TABLE STATUS LIKE '$escapedTable'");
-            if ($status && mysqli_num_rows($status) > 0) {
-                $statusRow = mysqli_fetch_assoc($status);
-                $nextID = isset($statusRow['Auto_increment']) ? $statusRow['Auto_increment'] : 1;
-                break;
-            }
-        }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['club_name'])) {
+    $clubName = trim($_POST['club_name']);
+    $clubDesc = trim($_POST['club_desc']);
+    $clubAdvisor = trim($_POST['club_advisor']);
+    $clubStatus = (isset($_POST['club_status']) && $_POST['club_status'] === 'inactive') ? 'inactive' : 'Active';
+    $clubCreated = trim($_POST['club_created']);
+
+    if ($clubCreated === '') {
+        $clubCreated = date('Y-m-d');
+    }
+
+    $stmt = mysqli_prepare($link, "INSERT INTO club (clubName, clubDesc, clubCreated, clubAdvisor, clubStatus) VALUES (?, ?, ?, ?, ?)");
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "sssss", $clubName, $clubDesc, $clubCreated, $clubAdvisor, $clubStatus);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+        header("Location: admin_student_clubs.php");
+        exit;
     }
 }
+
+$nextID = 1;
+$idResult = mysqli_query($link, "SELECT MAX(clubID) AS maxID FROM club");
+if ($idResult && $row = mysqli_fetch_assoc($idResult)) {
+    $nextID = isset($row['maxID']) ? ((int)$row['maxID'] + 1) : 1;
+}
+
+$clubList = [];
+$clubResult = mysqli_query($link, "SELECT clubID, clubName FROM club ORDER BY clubName");
+if ($clubResult) {
+    while ($row = mysqli_fetch_assoc($clubResult)) {
+        $clubList[] = $row;
+    }
+}
+
 mysqli_close($link);
 ?>
 <!DOCTYPE html>
@@ -87,9 +105,10 @@ mysqli_close($link);
         </div>
 
         <div class="clubs-grid">
-          <section class="card club-form">
-            <h3 class="section-title">Club Registration</h3>
-            <div class="form-grid club-info-grid">
+          <form method="post" action="admin_student_clubs.php">
+            <section class="card club-form">
+              <h3 class="section-title">Club Registration</h3>
+              <div class="form-grid club-info-grid">
               <div class="form-field">
                 <label for="club-id">Club ID</label>
                 <input id="club-id" type="text" name="club_id" value="<?= isset($nextID) ? htmlspecialchars($nextID) : '' ?>" readonly required>
@@ -113,21 +132,25 @@ mysqli_close($link);
               </div>
               <div class="form-field">
                 <label for="club-created">Club Create</label>
-                <input id="club-created" type="text" name="club_created">
+                <input id="club-created" type="date" name="club_created">
               </div>
               <div class="form-actions">
                 <button type="submit" class="btn-add">Add</button>
               </div>
             </div>
           </section>
+          </form>
 
           <section class="card club-info-panel">
                 <h3 class="section-title">Club Information</h3><br>
                 <div class="form-grid club-info-grid">
                    <div class="form-field form-field--stacked">
                   <label for="club-select">Club ID/Name</label>
-                  <select id="club-select" class="club-select">
+                  <select id="club-select" class="club-select" name="club_select">
                     <option value=""></option>
+                    <?php foreach ($clubList as $club): ?>
+                      <option value="<?= htmlspecialchars($club['clubID']) ?>"><?= htmlspecialchars($club['clubID'] . ' - ' . $club['clubName']) ?></option>
+                    <?php endforeach; ?>
                   </select>
                 </div>
                 <div class="form-field">
@@ -149,7 +172,7 @@ mysqli_close($link);
                   </div>
                   <div class="form-field">
                     <label for="info-club-created">Club Create</label>
-                    <input id="info-club-created" type="text" name="info_club_created">
+                    <input id="info-club-created" type="date" name="info_club_created">
                   </div>
                 </div>
 
@@ -168,11 +191,9 @@ mysqli_close($link);
 
             <div class="committee-table-content">
               <div class="committee-grid-header">
-                <span>Club ID</span>
-                <span>Membership ID</span>
-                <span>Committee ID</span>
                 <span>User ID</span>
                 <span>User Name</span>
+                <span>Committee Position</span>
               </div>
               <div class="committee-data-area">
                 <div class="empty-cell">No committee records available.</div>
@@ -185,9 +206,56 @@ mysqli_close($link);
               <button class="btn-action btn-red">Delete</button>
             </div>
           </section>
+
+          <section class="club-list-container">
+              <h1 class="page-title">List of Clubs</h1>
+              
+              <div class="main-card">
+                  <div class="top-row">
+                      <div class="club-details">
+                          <div class="input-group">
+                              <label><strong>Club Name/Club ID</strong></label>
+                              <input list="club-options" id="club-input" name="club-selection" placeholder="Select or type a club...">
+                              <datalist id="club-options">
+                                  <?php foreach ($clubList as $club): ?>
+                                      <option value="<?= htmlspecialchars($club['clubID'] . ' - ' . $club['clubName']) ?>">
+                                  <?php endforeach; ?>
+                              </datalist>
+                          </div>
+                          <div class="info-field"><strong>Club Desc</strong><p id="list-club-desc" class="info-value">Select a club to view details</p></div>
+                          <div class="info-field"><strong>Club Advisor</strong><p id="list-club-advisor" class="info-value">Select a club to view details</p></div>
+                          <div class="info-field"><strong>Club Status</strong><p id="list-club-status" class="info-value">Select a club to view details</p></div>
+                          <div class="info-field"><strong>Club Created</strong><p id="list-club-created" class="info-value">Select a club to view details</p></div>
+                      </div>
+
+                      <div class="committee-card">
+                          <h3>Club Committee</h3>
+                          <div class="committee-table-header">
+                              <span>User ID</span>
+                              <span>User Name</span>
+                              <span>Committee Position</span>
+                          </div>
+                          <div class="committee-content" id="list-committee-content">
+                              <div class="empty-cell">Select a club to load committee members.</div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="events-section">
+                      <h3>Club Events</h3>
+                      <div class="events-grid" id="list-events-grid">
+                          <div class="event-placeholder">Select a club to view events.</div>
+                      </div>
+                      <div class="button-wrapper">
+                          <button class="view-events-btn" type="button">View Events</button>
+                      </div>
+                  </div>
+              </div>
+          </section>
         </div>
       </div>
     </main>
+    <script src="admin_student_clubs.js"></script>
   </div>
 </body>
 </html>

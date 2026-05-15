@@ -28,16 +28,23 @@ if (isset($_POST['login_btn'])) {
         $user = mysqli_fetch_assoc($result);
 
         // 5. Verify Password
-        // password_verify checks if the raw password matches the $2y$ hash in your DB
         if (password_verify($password, $user['userPass'])) {
             
             // Set Session variables
             $_SESSION['user_id']   = $user['userID'];
             $_SESSION['user_name'] = $user['userName'];
-            $_SESSION['role_id']   = $user['roleID'];
+            
+            // FIX: Force cast the database value to an Integer to pass strict dashboard checks
+            $_SESSION['role_id']   = (int)$user['roleID']; 
+            $_SESSION['role']      = $roleType;
 
-            // 6. Redirect to dashboard
-            header("Location: " . $roleType . "_dashboard.php");
+            // 6. Redirect to dashboard securely
+            // Clean up comparison to ensure integer mapping matches
+            if ($_SESSION['role_id'] === 1 || $roleType === 'admin') {
+                header('Location: admin_dashboard.php');
+            } else {
+                header("Location: " . $roleType . "_dashboard.php");
+            }
             exit();
 
         } else {
