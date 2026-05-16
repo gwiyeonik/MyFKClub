@@ -90,7 +90,6 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
                     <th>User Name</th>
                     <th>User Email</th>
                     <th>RoleID</th>
-                    <th>Date</th>
                   </tr>
                 </thead>
                 <tbody>

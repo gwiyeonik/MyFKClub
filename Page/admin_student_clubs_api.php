@@ -75,5 +75,58 @@ if ($action === 'club_details') {
     exit;
 }
 
+    if ($action === 'update_club') {
+    $clubID = (int)$_POST['club_id'];
+    $name = mysqli_real_escape_string($link, $_POST['info_club_name']);
+    $desc = mysqli_real_escape_string($link, $_POST['info_club_desc']);
+    $advisor = mysqli_real_escape_string($link, $_POST['info_club_advisor']);
+    $status = mysqli_real_escape_string($link, $_POST['info_club_status']);
+    $created = mysqli_real_escape_string($link, $_POST['info_club_created']);
+
+    $query = "UPDATE club SET 
+              clubName = '$name', 
+              clubDesc = '$desc', 
+              clubAdvisor = '$advisor', 
+              clubStatus = '$status', 
+              clubCreated = '$created' 
+              WHERE clubID = $clubID";
+
+    if (mysqli_query($link, $query)) {
+        echo json_encode(['success' => true, 'message' => 'Club updated successfully!']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Update failed: ' . mysqli_error($link)]);
+    }
+    exit;
+    }
+
+    if ($action === 'delete_club') {
+    // Get the ID from the request (using POST for better security)
+    $clubID = isset($_POST['clubID']) ? (int)$_POST['clubID'] : 0;
+
+    if ($clubID <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid Club ID for deletion.']);
+        exit;
+    }
+
+    // Prepare the delete statement
+    $stmt = mysqli_prepare($link, "DELETE FROM club WHERE clubID = ?");
+    mysqli_stmt_bind_param($stmt, 'i', $clubID);
+
+    if (mysqli_stmt_execute($stmt)) {
+        if (mysqli_stmt_affected_rows($stmt) > 0) {
+            echo json_encode(['success' => true, 'message' => 'Club deleted successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Club not found or already deleted.']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . mysqli_error($link)]);
+    }
+
+    mysqli_stmt_close($stmt);
+    exit;
+    }
+
+
 echo json_encode(['success' => false, 'message' => 'Invalid action.']);
 exit;
+

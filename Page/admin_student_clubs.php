@@ -79,30 +79,7 @@ mysqli_close($link);
 
       <!-- Content Area -->
       <div class="content-area">
-        <!-- Search and Filter Bar -->
-        <div class="search-bar-wrap">
-          <input type="text" class="search-input" placeholder="Search clubname/clubID">
-          <div class="filter-row">
-            <select class="filter-select" name="filter_club">
-              <option value="">Filter by club</option>
-              <option value="club_a">Club A</option>
-              <option value="club_b">Club B</option>
-            </select>
-            <select class="filter-select" name="filter_semester">
-              <option value="">Semester</option>
-              <option value="sem1">1st Semester</option>
-              <option value="sem2">2nd Semester</option>
-              <option value="sem3">3rd Semester</option>
-            </select>
-            <select class="filter-select" name="filter_status">
-              <option value="">Club Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Not Active</option>
-            </select>
-            <button class="primary-pill" type="button">Apply Filter</button>
-            <button class="secondary-pill" type="button">Export Report</button>
-          </div>
-        </div>
+
 
         <div class="clubs-grid">
           <form method="post" action="admin_student_clubs.php">
@@ -118,7 +95,7 @@ mysqli_close($link);
                 <input id="club-name" type="text" name="club_name">
               </div>
               <div class="form-field">
-                <label for="club-desc">Club Desc</label>
+                <label for="club-desc">Club Description</label>
                 <input id="club-desc" type="text" name="club_desc">
               </div>
               <div class="form-field">
@@ -131,7 +108,7 @@ mysqli_close($link);
                 <label class="radio-label"><input type="radio" name="club_status" value="inactive"> Not Active</label>
               </div>
               <div class="form-field">
-                <label for="club-created">Club Create</label>
+                <label for="club-created">Date Created</label>
                 <input id="club-created" type="date" name="club_created">
               </div>
               <div class="form-actions">
@@ -144,21 +121,32 @@ mysqli_close($link);
           <section class="card club-info-panel">
                 <h3 class="section-title">Club Information</h3><br>
                 <div class="form-grid club-info-grid">
-                   <div class="form-field form-field--stacked">
-                  <label for="club-select">Club ID/Name</label>
-                  <select id="club-select" class="club-select" name="club_select">
-                    <option value=""></option>
-                    <?php foreach ($clubList as $club): ?>
-                      <option value="<?= htmlspecialchars($club['clubID']) ?>"><?= htmlspecialchars($club['clubID'] . ' - ' . $club['clubName']) ?></option>
-                    <?php endforeach; ?>
-                  </select>
+                <input type="hidden" id="info-club-id" name="info_club_id">
+                <div class="form-field form-field--stacked">
+                    <label for="club-input">Club ID/Name</label>
+                    <input 
+                        type="text" 
+                        id="club-input" 
+                        name="club_select" 
+                        list="club-options" 
+                        class="club-select" 
+                        placeholder="Type or select a club..."
+                        onchange="fetchClubData(this.value)" 
+                    >
+                    <datalist id="club-options">
+                        <?php foreach ($clubList as $club): ?>
+                            <option value="<?= htmlspecialchars($club['clubID']) ?>">
+                                <?= htmlspecialchars($club['clubName']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </datalist>
                 </div>
                 <div class="form-field">
                     <label for="info-club-name">Club Name</label>
                     <input id="info-club-name" type="text" name="info_club_name">
                   </div>
                   <div class="form-field">
-                    <label for="info-club-desc">Club Desc</label>
+                    <label for="info-club-desc">Club Description</label>
                     <input id="info-club-desc" type="text" name="info_club_desc">
                   </div>
                   <div class="form-field">
@@ -171,7 +159,7 @@ mysqli_close($link);
                     <label class="radio-label"><input type="radio" name="info_club_status" value="inactive"> Not Active</label>
                   </div>
                   <div class="form-field">
-                    <label for="info-club-created">Club Create</label>
+                    <label for="info-club-created">Date Created</label>
                     <input id="info-club-created" type="date" name="info_club_created">
                   </div>
                 </div>
@@ -222,10 +210,10 @@ mysqli_close($link);
                                   <?php endforeach; ?>
                               </datalist>
                           </div>
-                          <div class="info-field"><strong>Club Desc</strong><p id="list-club-desc" class="info-value">Select a club to view details</p></div>
+                          <div class="info-field"><strong>Club Description</strong><p id="list-club-desc" class="info-value">Select a club to view details</p></div>
                           <div class="info-field"><strong>Club Advisor</strong><p id="list-club-advisor" class="info-value">Select a club to view details</p></div>
                           <div class="info-field"><strong>Club Status</strong><p id="list-club-status" class="info-value">Select a club to view details</p></div>
-                          <div class="info-field"><strong>Club Created</strong><p id="list-club-created" class="info-value">Select a club to view details</p></div>
+                          <div class="info-field"><strong>Date Created</strong><p id="list-club-created" class="info-value">Select a club to view details</p></div>
                       </div>
 
                       <div class="committee-card">
@@ -257,5 +245,85 @@ mysqli_close($link);
     </main>
     <script src="admin_student_clubs.js"></script>
   </div>
+<script>
+    function fetchClubData(inputValue) {
+        if (!inputValue) return;
+
+        const url = `admin_student_clubs_api.php?action=club_details&clubKey=${encodeURIComponent(inputValue)}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const club = data.club;
+
+                    // 1. SET THE HIDDEN ID VALUE
+                    document.getElementById('info-club-id').value = club.clubID;
+
+                    document.getElementById('info-club-name').value = club.clubName;
+                    document.getElementById('info-club-desc').value = club.clubDesc;
+                    document.getElementById('info-club-advisor').value = club.clubAdvisor;
+                    document.getElementById('info-club-created').value = club.clubCreated;
+
+                    const status = club.clubStatus.toLowerCase();
+                    if (status === 'active') {
+                        document.querySelector('input[name="info_club_status"][value="active"]').checked = true;
+                    } else {
+                        document.querySelector('input[name="info_club_status"][value="inactive"]').checked = true;
+                    }
+                } else {
+                    console.log("Club not found in database.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // UPDATE HANDLER
+    document.querySelector('.btn-update').addEventListener('click', function() {
+        const clubId = document.getElementById('info-club-id').value;
+        if (!clubId) {
+            alert("Please select a club first.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('club_id', clubId);
+        formData.append('info_club_name', document.getElementById('info-club-name').value);
+        formData.append('info_club_desc', document.getElementById('info-club-desc').value);
+        formData.append('info_club_advisor', document.getElementById('info-club-advisor').value);
+        
+        const statusEl = document.querySelector('input[name="info_club_status"]:checked');
+        formData.append('info_club_status', statusEl ? statusEl.value : 'active');
+        formData.append('info_club_created', document.getElementById('info-club-created').value);
+
+        fetch('admin_student_clubs_api.php?action=update_club', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => { 
+                alert(data.message); 
+                if(data.success) location.reload(); 
+            });
+    });
+
+    // DELETE HANDLER
+    document.querySelector('.btn-delete').addEventListener('click', function() {
+        const clubId = document.getElementById('info-club-id').value;
+        if (!clubId) {
+            alert("Please select a club first.");
+            return;
+        }
+
+        if(!confirm("Are you sure you want to delete this club?")) return;
+        
+        const formData = new FormData();
+        formData.append('clubID', clubId);
+
+        fetch('admin_student_clubs_api.php?action=delete_club', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => { 
+                alert(data.message); 
+                if(data.success) location.reload(); 
+            });
+    });
+</script>
 </body>
 </html>
