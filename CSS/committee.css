@@ -41,6 +41,9 @@ html, body {
   position: sticky;
   top: 0;
   height: 100vh;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.25);
+    position: relative; 
+    z-index: 100;
 }
 
 /* ERROR 1 FIXED: Removed the double dot ".." in front of brand-panel */
@@ -86,7 +89,9 @@ html, body {
   background: var(--blue);
   color: #ffffff;
   padding: 25px 40px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    position: relative; 
+    z-index: 99;
 }
 
 .topbar-title {
@@ -123,7 +128,7 @@ html, body {
   display: grid !important;
   grid-template-columns: 1.6fr 1fr !important;
   gap: 25px;
-  width: 100%;
+  
   margin-top: 20px;
 }
 
