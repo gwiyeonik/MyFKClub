@@ -28,7 +28,7 @@ session_start();
         <a href="committee_club_details.php" class="sidebar-link">Manage Clubs</a>
         <a href="committee_manage_events.php" class="sidebar-link">Manage Events</a>
         <a href="committee_members.php" class="sidebar-link">Members</a>
-        <a href="committee_attendance.php" class="sidebar-link">Attendance</a>
+        <a href="committee_attendance_report.php" class="sidebar-link">Attendance</a>
         <a href="committee_participation_report.php" class="sidebar-link active">Reports</a>
       </nav>
     </aside>
@@ -51,24 +51,24 @@ session_start();
         <!-- SEARCH -->
         <div class="search-bar-wrap">
           <input class="search-input" type="search" placeholder="Search Events/EventID">
+        </div>
 
-          <div class="filter-row">
-            <select class="filter-select" name="event_filter">
-              <option value="">Event</option>
-              <option value="unity_workshop">Unity Workshop</option>
-              <option value="game_jam">Game Jam</option>
-              <option value="club_talk">Club Talk</option>
-            </select>
+        <div class="filter-row">
+          <select class="filter-select" name="event_filter">
+            <option value="">Event</option>
+            <option value="unity_workshop">Unity Workshop</option>
+            <option value="game_jam">Game Jam</option>
+            <option value="club_talk">Club Talk</option>
+          </select>
 
-            <select class="filter-select" name="semester_filter">
-              <option value="">Semester</option>
-              <option value="sem1">1st Semester</option>
-              <option value="sem2">2nd Semester</option>
-              <option value="sem3">3rd Semester</option>
-            </select>
+          <select class="filter-select" name="semester_filter">
+            <option value="">Semester</option>
+            <option value="sem1">1st Semester</option>
+            <option value="sem2">2nd Semester</option>
+            <option value="sem3">3rd Semester</option>
+          </select>
 
-            <button class="secondary-pill" type="button">Export Report</button>
-          </div>
+          <button class="secondary-pill" type="button">Export Report</button>
         </div>
 
         <!-- TOP CARDS -->
