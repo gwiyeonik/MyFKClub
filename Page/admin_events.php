@@ -1,8 +1,37 @@
 <?php
 // admin_events.php
 session_start();
-// Add authentication logic as needed.
+
+// 1. DATABASE CONNECTION
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db   = "myfkclub"; 
+
+$conn = new mysqli($host, $user, $pass, $db);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// 2. FETCH STATS DATA (Using your exact column names)
+// Total Events
+$resTotal = $conn->query("SELECT COUNT(*) as total FROM event");
+$totalEvents = ($resTotal) ? $resTotal->fetch_assoc()['total'] : 0;
+
+// Upcoming Events (Using eventDate)
+$resUpcoming = $conn->query("SELECT COUNT(*) as total FROM event WHERE eventDate >= CURDATE()");
+$upcomingEvents = ($resUpcoming) ? $resUpcoming->fetch_assoc()['total'] : 0;
+
+// Total Participants (Summing the eventParticipants column)
+$resParticipants = $conn->query("SELECT SUM(eventParticipants) as total FROM event");
+$totalParticipants = ($resParticipants) ? $resParticipants->fetch_assoc()['total'] : 0;
+
+// 3. FETCH POPULAR EVENTS FOR TABLE (Using eventTitle and eventParticipants)
+$popQuery = "SELECT eventTitle, eventParticipants FROM event ORDER BY eventParticipants DESC LIMIT 5";
+$popResult = $conn->query($popQuery);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,15 +92,22 @@ session_start();
       <section class="stats-row">
         <div class="stat-card">
           <div class="stat-label">Total Events</div>
+          <div class="stat-value"><?php echo $totalEvents; ?></div>
         </div>
+
         <div class="stat-card">
           <div class="stat-label">Upcoming Events</div>
+          <div class="stat-value"><?php echo $upcomingEvents; ?></div>
         </div>
+
         <div class="stat-card">
           <div class="stat-label">Total Participants</div>
+          <div class="stat-value"><?php echo $totalParticipants; ?></div>
         </div>
+
         <div class="stat-card">
           <div class="stat-label">Fully Booked Events</div>
+          <div class="stat-value">0</div>
         </div>
       </section>
 
@@ -98,9 +134,18 @@ session_start();
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td colspan="2" class="empty-cell">No events found.</td>
-                </tr>
+                <?php if ($popResult && $popResult->num_rows > 0): ?>
+                <?php while($row = $popResult->fetch_assoc()): ?>
+                  <tr>
+                    <td><?php echo htmlspecialchars($row['eventTitle']); ?></td>
+                    <td><?php echo $row['eventParticipants']; ?></td>
+                  </tr>
+                <?php endwhile; ?>
+                <?php else: ?>
+                  <tr>
+                    <td colspan="2" class="empty-cell">No events found.</td>
+                  </tr>
+                <?php endif; ?>
               </tbody>
             </table>
           </div>
