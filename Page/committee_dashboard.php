@@ -18,7 +18,7 @@
             <nav class="sidebar-nav">
                 <a href="#" class="sidebar-link ">Home</a>
                 <a href="#" class="sidebar-link">View Clubs</a>
-                <a href="#" class="sidebar-link">Manage Events</a>
+                <a href="committee_manage_events.php" class="sidebar-link">Manage Events</a>
                 <a href="#" class="sidebar-link">Members</a>
                 <a href="committee_attendance_report.php" class="sidebar-link">Attendance</a>
                 <a href="committee_participation_report.php" class="sidebar-link">Reports</a>
