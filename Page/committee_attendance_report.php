@@ -56,48 +56,127 @@ session_start();
             </div>
           </div>
 
-          <div class="attendance-card attendance-manual">
-            <div class="attendance-title">Manual Attendance Entry</div>
-            <input type="text" name="student_search" placeholder="Student ID / Name">
-            <div class="manual-actions">
-              <select class="filter-select">
-                <option>Attendance Status</option>
-                <option>Present</option>
-                <option>Late</option>
-                <option>Absent</option>
-              </select>
-              <select class="filter-select">
-                <option>Volunteer / Helper</option>
-                <option>Volunteer</option>
-                <option>Helper</option>
-              </select>
-            </div>
-            <div class="points-preview">
-              <div class="points-heading">Points Preview</div>
-              <ul>
-                <li>Present on time : +5 Points</li>
-                <li>Late arrival : -5 Points</li>
-                <li>Absent without notice : -10 Points</li>
-                <li>Volunteer / helper : +5 Points</li>
-              </ul>
-            </div>
-            <div class="attendance-actions">
-              <button class="primary-pill">Save Attendance</button>
-            </div>
-          </div>
-        </section>
+<div class="attendance-card attendance-manual">
+  <div class="attendance-title">Manual Attendance Entry</div>
+
+  <form class="manual-attendance-form" action="" method="POST">
+
+    <div class="manual-form-grid">
+
+      <div class="form-group">
+        <label for="student_search">Student Name</label>
+        <input 
+          type="text" 
+          id="student_search" 
+          name="student_search" 
+          class="manual-input"
+          placeholder="Enter student name"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="student_search">Student ID</label>
+        <input 
+          type="text" 
+          id="student_search" 
+          name="student_search" 
+          class="manual-input"
+          placeholder="Enter student ID"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="event_name">Event Name</label>
+        <input 
+          type="text" 
+          id="event_name" 
+          name="event_name" 
+          class="manual-input"
+          placeholder="Enter event name"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="event_date">Event Date</label>
+        <input 
+         type="date" 
+          id="event_date" 
+          name="event_date" 
+          class="manual-input"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="checkin_time">Check-in Time</label>
+        <input 
+          type="text" 
+          id="checkin_time" 
+          name="checkin_time" 
+          class="manual-input readonly-input"
+          value=""
+          readonly
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="attendance_status">Attendance Status</label>
+        <select id="attendance_status" name="attendance_status" class="filter-select" required>
+          <option value="">Select Status</option>
+          <option value="present">Present on time</option>
+          <option value="late">Late arrival</option>
+          <option value="absent">Absent without notice</option>
+        </select>
+      </div>
+      
+
+      <div class="form-group">
+        <label for="is_volunteer">Volunteer / Helper</label>
+        <select id="is_volunteer" name="is_volunteer" class="filter-select">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="points-preview">
+      <div class="points-heading">Points Preview</div>
+
+      <div class="points-result">
+        Total Points:
+        <span id="total_points">0</span>
+      </div>
+
+      <ul>
+        <li>Present on time : +10 Points</li>
+        <li>Late arrival : -5 Points</li>
+        <li>Absent without notice : -10 Points</li>
+        <li>Volunteer / helper : +5 Points</li>
+      </ul>
+    </div>
+
+    <div class="attendance-actions">
+      <button class="primary-pill" type="submit">Save Attendance</button>
+    </div>
+
+  </form>
+</div>
 
         <section class="table-section">
           <div class="table-panel">
             <div class="table-heading">
-              &lt;&lt;table&gt;&gt; Registered Participants
+              Registered Participants
               <button class="edit-btn">Edit</button>
             </div>
             <div class="table-wrapper">
               <table>
                 <thead>
                   <tr>
-                    <th>Student</th>
+                    <th>Name</th>
                     <th>ID</th>
                     <th>Check-in Time</th>
                     <th>Status</th>
@@ -108,7 +187,7 @@ session_start();
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="7" class="empty-cell">Student &nbsp; | &nbsp; ID &nbsp; | &nbsp; Check-in Time &nbsp; | &nbsp; Status &nbsp; | &nbsp; Volunteer &nbsp; | &nbsp; Points &nbsp; | &nbsp; Action</td>
+                   
                   </tr>
                 </tbody>
               </table>
@@ -118,5 +197,39 @@ session_start();
       </div>
     </main>
   </div>
+  <script>
+  const attendanceStatus = document.getElementById("attendance_status");
+  const volunteerStatus = document.getElementById("is_volunteer");
+  const totalPoints = document.getElementById("total_points");
+  const checkinTime = document.getElementById("checkin_time");
+
+  function updateCheckinTime() {
+    const now = new Date();
+    checkinTime.value = now.toLocaleString();
+  }
+
+  function calculatePoints() {
+    let points = 0;
+
+    if (attendanceStatus.value === "present") {
+      points += 10;
+    } else if (attendanceStatus.value === "late") {
+      points -= 5;
+    } else if (attendanceStatus.value === "absent") {
+      points -= 10;
+    }
+
+    if (volunteerStatus.value === "yes") {
+      points += 5;
+    }
+
+    totalPoints.textContent = points;
+  }
+
+  updateCheckinTime();
+
+  attendanceStatus.addEventListener("change", calculatePoints);
+  volunteerStatus.addEventListener("change", calculatePoints);
+</script>
 </body>
 </html>
