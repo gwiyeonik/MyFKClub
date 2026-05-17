@@ -20,7 +20,7 @@ $resTotal = $conn->query("SELECT COUNT(*) as total FROM event");
 $totalEvents = ($resTotal) ? $resTotal->fetch_assoc()['total'] : 0;
 
 // Upcoming Events (Using eventDate)
-$resUpcoming = $conn->query("SELECT COUNT(*) as total FROM event WHERE eventDate >= CURDATE()");
+$resUpcoming = $conn->query("SELECT COUNT(*) as total FROM event WHERE eventDateStart >= CURDATE()");
 $upcomingEvents = ($resUpcoming) ? $resUpcoming->fetch_assoc()['total'] : 0;
 
 // Total Participants (Summing the eventParticipants column)

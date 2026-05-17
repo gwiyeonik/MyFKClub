@@ -85,9 +85,6 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-    overflow-x: hidden;
-    width: 100%;
-
 }
 
 .topbar {
@@ -232,24 +229,6 @@ background: #17418f; /* Dark blue color */
   margin-bottom: 28px;
 }
 
-.chart-card {
-    position: relative; /* Allows absolute positioning of the button */
-    padding-bottom: 50px; /* Adds space at the bottom so chart doesn't cover button */
-}
-
-.card-actions {
-    position: absolute;
-    bottom: 15px;
-    left: 15px;
-}
-
-.mini-btn {
-    text-decoration: none;
-    font-size: 0.85rem;
-    padding: 8px 15px;
-    display: inline-block;
-}
-
 .stat-card {
   background: var(--white);
   border-radius: 0px;
@@ -276,32 +255,11 @@ background: #17418f; /* Dark blue color */
 }
 
 /* Main Clubs Grid Layout */
-/* Container for side-by-side cards */
-.manage-grid {
-    display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap: 24px;
-    align-items: start;
-}
-
-.chart-card, .club-info-panel {
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    width: 100%;
-    box-sizing: border-box;
-}
-.role-row {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-}
-
-.left-column {
-    display: flex;
-    flex-direction: column;
-    width: 100%; 
+.clubs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
 /* Form Section (Left Column) */
@@ -330,44 +288,60 @@ background: #17418f; /* Dark blue color */
 
 /* Form Fields Styling */
 .form-field {
+
     display: flex;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
+    gap: 20px;
+    width: 100%;
 }
 
 .form-field label {
     width: 120px;
     font-size: 0.9rem;
     color: #333;
-    width: 100%;
 }
 
-.form-field input,
-.form-field select,
-.form-field textarea {
-    width: 100%;
-}
-
-.form-field input[type="date"] {
+.form-field input[type="text"],
+.form-field input[type="date"],
+.club-select {
     width: 100%;
     height: 44px;
     border: 1px solid #17418f;
     border-radius: 14px;
+    background: #ffffff;
     padding: 0 14px;
+    color: #102f6a;
     font-size: 0.95rem;
-    cursor: pointer;
+    outline: none;
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+    position: relative;
 }
 
 .form-field input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 2V5' stroke='%2317418f' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M17 2V5' stroke='%2317418f' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M4 8H20' stroke='%2317418f' stroke-width='2'/%3E%3Crect x='4' y='6' width='16' height='14' rx='2' stroke='%2317418f' stroke-width='2'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 20px 20px;
+    padding-right: 44px;
     cursor: pointer;
 }
 
 .form-field input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    right: 14px;
     cursor: pointer;
+    width: 30px;
+    height: 30px;
 }
 
-input[type="date"] {
-    cursor: pointer;
+.form-field input[type="date"]::-webkit-inner-spin-button,
+.form-field input[type="date"]::-webkit-clear-button {
+    display: none;
 }
 
 .form-field input[type="text"]:focus,
@@ -375,63 +349,6 @@ input[type="date"] {
 .club-select:focus {
     border-color: #0f2e60;
     box-shadow: 0 0 0 4px rgba(23, 65, 143, 0.08);
-}
-
-/* Modal Background */
-.modal-overlay {
-    display: none; /* Hidden by default */
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
-    backdrop-filter: blur(4px);
-}
-
-/* Modal Box */
-.modal-content {
-    background-color: #fff;
-    margin: 10% auto;
-    padding: 25px;
-    border-radius: 15px;
-    width: 40%;
-    box-shadow: 0 5px 30px rgba(0,0,0,0.3);
-    animation: slideDown 0.3s ease-out;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
-}
-
-.close-modal {
-    font-size: 28px;
-    cursor: pointer;
-    color: #888;
-}
-
-.event-row:hover {
-    background-color: #eef3ff;
-}
-
-.detail-item { margin-bottom: 10px; font-size: 1rem; }
-.modal-description { 
-    background: #f9f9f9; 
-    padding: 15px; 
-    border-radius: 8px; 
-    margin-top: 5px;
-    line-height: 1.5;
-}
-
-@keyframes slideDown {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
 }
 
 .radio-group {
@@ -500,6 +417,7 @@ input[type="date"] {
     display: flex;
     flex-direction: column;
     min-height: 400px;
+    width: 100%;
 }
 
 .chart-title {
@@ -527,55 +445,41 @@ input[type="date"] {
 }
 
 .club-info-panel {
-    display: flex;
-    flex-direction: column;
-    height: 100%; 
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-.club-info-panel form {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1; 
-}
-
-.action-buttons {
-    margin-top: auto; 
-    display: flex;
-    gap: 12px;
-    padding-top: 20px;
+  background: var(--white);
+  border-radius: 0px;
+  border: 1px solid var(--border);
+  padding: 24px;
+  box-shadow: var(--shadow);
 }
 
 .form-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+  display: grid;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
-input, select, textarea {
-    width: 100%;
-    box-sizing: border-box;
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .btn-delete,
 .btn-update {
-
-  padding: 10px 45px;      
-  border-radius: 6px;     
+  /* Remove flex: 1 to allow buttons to sit side-by-side on the right */
+  padding: 10px 45px;       /* Increase horizontal padding for that 'long' look */
+  border-radius: 6px;       /* Slightly sharper corners than 8px */
   border: none;
   font-weight: 700;
   cursor: pointer;
   font-size: 0.95rem;
   transition: all 180ms ease;
   font-family: inherit;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow like in the image */
 }
 
 .btn-delete {
-  background: #ff0000;    
+  background: #ff0000;      /* Pure red to match image_e87340.png */
   color: #ffffff;
 }
 
@@ -585,7 +489,7 @@ input, select, textarea {
 }
 
 .btn-update {
-  background: #00a9ab;     
+  background: #00a9ab;      /* Teal/Cyan shade from the reference image */
   color: #ffffff;
 }
 
@@ -597,10 +501,10 @@ input, select, textarea {
 /* Container for the buttons */
 .action-buttons {
   display: flex;
-  gap: 12px;  
-  margin-top: 20px;
+  justify-content: flex-end; /* Aligns them to the right side of the panel */
+  gap: 12px;                 /* Space between the two buttons */
+  margin-top: 25px;
 }
-
 
 /* Recent Registrations Panel */
 .registrations-panel {
@@ -618,8 +522,6 @@ input, select, textarea {
 
 .table-wrapper {
   overflow-x: auto;
-  overflow-y: auto;
-  max-height: 400px;
 }
 
 .table-wrapper table {
@@ -635,12 +537,11 @@ input, select, textarea {
   border-bottom: 1px solid rgba(17, 53, 111, 0.08);
 }
 
-.table-wrapper thead th {
-    position: sticky;
-    top: 0;
-    background: #f8fbff;
-    z-index: 10;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+.table-wrapper th {
+  font-size: 0.92rem;
+  color: var(--muted);
+  font-weight: 700;
+  background: #f8fbff;
 }
 
 .table-wrapper td {
@@ -838,10 +739,8 @@ input, select, textarea {
 
 .form-field {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    width: 100%;
+    align-items: center;
+    margin-bottom: 25px; 
 }
 
 .form-field label {
@@ -958,14 +857,6 @@ input, select, textarea {
   background: #f6f9ff;
   border: 1px solid var(--border);
   border-radius: 16px;
-}
-
-.event-data-table thead th {
-    position: sticky;
-    top: 0;
-    background-color: #f8fbff; /* Match your card background */
-    z-index: 2;
-    border-bottom: 2px solid #d1e3f8;
 }
 
 .btn-view-events {
@@ -1273,26 +1164,4 @@ input, select, textarea {
 
 #club-input:focus {
     border-color: #1a428a;
-}
-
-.club-info-panel .form-grid {
-    display: flex;
-    flex-direction: column;
-}
-
-.club-info-panel .form-field {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-}
-
-.club-info-panel .form-field label {
-    width: 100%;
-}
-
-.club-info-panel input,
-.club-info-panel select,
-.club-info-panel textarea {
-    width: 100%;
 }
