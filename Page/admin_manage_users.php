@@ -226,49 +226,197 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
 
     <div class="content-area">
 
-      <section class="manage-user-registration">
-        <div class="manage-panel">
-          <div class="section-header">User Registration</div>
-          <div class="form-grid">
-            <div class="form-field">
-              <label>User ID <span style="color: red;">*</span></label>
-              <input type="text" id="inputUserID" placeholder="e.g., CD23002">
-            </div>
-            <div class="form-field">
-              <label>Password <span style="color: red;">*</span></label>
-              <input type="password" id="inputPassword" placeholder="Password">
-            </div>
-            <div class="form-field">
-              <label>Name <span style="color: red;">*</span></label>
-              <input type="text" id="inputName" placeholder="Full Name">
-            </div>
-            <div class="form-field">
-              <label>Email <span style="color: red;">*</span></label>
-              <input type="email" id="inputEmail" placeholder="Email Address">
-            </div>
-            <div class="form-field">
-              <label>Role <span style="color: red;">*</span></label>
-              <div class="role-row">
-                <label><input type="radio" name="userRole" id="roleAdmin" value="1"> Admin</label>
-                <label><input type="radio" name="userRole" id="roleStudent" value="3" checked> Student</label>
-              </div>
-            </div>
-            <div class="form-field">
-              <label>Contact</label>
-              <input type="text" id="inputContact" placeholder="Phone Number">
-            </div>
-            <div class="form-field file-field">
-                <label>User Photo</label>
-                <input type="file" id="inputUserPhoto" name="user_photo" accept="image/*">
-            </div>
-          </div>
-            <div class="action-row-register">
-                <button type="button" class="assign-button" onclick="addNewUser()">Add User</button>
-                <button type="button" class="assign-button" onclick="clearUserForm()">Clear</button>
-            </div>
+<div class="user-registration-wrapper" style="display: flex; gap: 20px; align-items: flex-start;">
+
+  <!-- USER REGISTRATION (LEFT SIDE) -->
+  <section class="manage-user-registration" style="flex: 2;">
+
+    <div class="manage-panel">
+
+      <div class="section-header">
+        User Registration
+      </div>
+
+      <div class="form-grid">
+
+        <!-- USER ID -->
+        <div class="form-field">
+          <label>User ID</label>
+          <input 
+            type="text"
+            id="inputUserID"
+            readonly
+            style="background:#f1f5f9; cursor:not-allowed;"
+          >
         </div>
-      </section>
-    
+
+        <!-- PASSWORD -->
+        <div class="form-field">
+          <label>Password</label>
+
+          <input 
+            type="password"
+            id="inputPassword"
+          >
+        </div>
+
+        <!-- NAME -->
+        <div class="form-field">
+          <label>Full Name</label>
+
+          <input 
+            type="text"
+            id="inputName"
+          >
+        </div>
+
+        <!-- EMAIL -->
+        <div class="form-field">
+          <label>Email Address</label>
+
+          <input 
+            type="email"
+            id="inputEmail"
+          >
+        </div>
+
+        <!-- ROLE -->
+        <div class="form-field">
+
+          <label>Role</label>
+
+          <div class="role-row">
+
+            <label class="role-option">
+              <input 
+                type="radio"
+                name="userRole"
+                value="1"
+              >
+              <span>Admin</span>
+            </label>
+
+            <label class="role-option">
+              <input 
+                type="radio"
+                name="userRole"
+                value="3"
+              >
+              <span>Student</span>
+            </label>
+
+          </div>
+
+        </div>
+
+        <!-- CONTACT -->
+        <div class="form-field">
+          <label>Contact Number</label>
+
+          <input 
+            type="text"
+            id="inputContact"
+
+          >
+        </div>
+
+<!-- USER PHOTO -->
+<div class="form-field">
+
+  <label style="display:block; font-weight:700; margin-bottom:6px; color:#0f2e60;">
+    User Photo
+  </label>
+
+  <!-- CUSTOM UPLOAD AREA -->
+  <div 
+    onclick="document.getElementById('inputUserPhoto').click()"
+    style="
+      width:120px;
+      height:120px;
+      border:2px dashed #cbd5e0;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      overflow:hidden;
+      position:relative;
+      background:#f8fafc;
+    "
+  >
+
+    <!-- ICON / TEXT -->
+    <span id="uploadText" style="font-size:14px; color:#64748b;">
+      Upload
+    </span>
+
+    <!-- PREVIEW IMAGE -->
+    <img 
+      id="userPhotoPreview"
+      style="
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        display:none;
+      "
+    >
+
+  </div>
+
+  <!-- hidden input -->
+  <input 
+    type="file" 
+    id="inputUserPhoto" 
+    accept="image/*"
+    onchange="previewUserPhoto(event)"
+    style="display:none;"
+  >
+
+</div>
+
+      </div>
+
+      <!-- BUTTON -->
+<div class="action-row-register">
+
+  <button 
+    type="button"
+    class="clear-button"
+    onclick="clearUserForm()"
+  >
+    Clear
+  </button>
+
+  <button 
+    type="button"
+    class="assign-button"
+    onclick="addNewUser()"
+  >
+    Add User
+  </button>
+
+</div>
+
+    </div>
+
+  </section>
+
+  <!-- REQUEST PANEL -->
+<section class="request-panel" style="flex: 1;">
+
+    <div class="request-header">
+      Registration Requests
+    </div>
+
+    <div class="request-list">
+
+      <!-- JS LOAD HERE -->
+
+    </div>
+
+  </section>
+
+</div>
 
    <section class="list-card">
   <div class="list-header">
@@ -347,6 +495,29 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
         <input type="text" id="modalContact" style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box;">
       </div>
 
+      <div class="form-group" style="margin-bottom: 16px;">
+  <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155; text-align: left;">
+    User Profile
+  </label>
+
+  <input 
+    type="file" 
+    id="modalUserProfile" 
+    accept="image/*"
+    onchange="previewProfileImage(event)"
+  >
+
+  <!-- Preview -->
+  <div style="margin-top: 10px;">
+    <img 
+      id="profilePreview" 
+      src="" 
+      alt="Profile Preview"
+      style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid #ccc;"
+    >
+  </div>
+</div>
+
       <div class="form-group" style="margin-bottom: 24px;">
         <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155; text-align: left;">System Role</label>
         <div style="display: flex; gap: 20px; margin-top: 4px;">
@@ -404,6 +575,19 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
         }
       });
     }
+
+    function loadNextUserID() {
+  fetch('admin_manage_users_api.php?action=get_next_user_id')
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('inputUserID').value = data.nextID;
+      }
+    })
+    .catch(err => console.error(err));
+}
+
+document.addEventListener('DOMContentLoaded', loadNextUserID);
 
     function loadClubOptions() {
       const clubSelect = document.getElementById('selectClub');
@@ -741,59 +925,61 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
       }
     }
 
-    // Attach submit event handler specifically targeting our modal form alterations
-    document.addEventListener('DOMContentLoaded', function() {
-      const modalForm = document.getElementById('editUserForm');
-      if (modalForm) {
-        modalForm.addEventListener('submit', function(event) {
-          event.preventDefault(); // Stop standard browser page navigation refresh
-          
-          const userID = document.getElementById('modalUserID').value.trim();
-          const oldUserID = document.getElementById('modalOldUserID').value.trim();
-          const name = document.getElementById('modalName').value.trim();
-          const email = document.getElementById('modalEmail').value.trim();
-          const contact = document.getElementById('modalContact').value.trim();
-          const roleElement = document.querySelector('input[name="modalRole"]:checked');
-          const roleID = roleElement ? roleElement.value : '3';
+document.addEventListener('DOMContentLoaded', function() {
+  const modalForm = document.getElementById('editUserForm');
 
-          // Basic Validation Guard
-          if (!userID || !name || !email) {
-            alert("User ID, Name, and Email cannot be empty.");
-            return;
-          }
+  if (modalForm) {
+    modalForm.addEventListener('submit', function(event) {
+      event.preventDefault();
 
-          // Format parameters object data structure
-          const formData = new FormData();
-          formData.append('action', 'update_user'); // Your PHP switch case block should route here
-          formData.append('userID', userID);
-          formData.append('oldUserID', oldUserID);
-          formData.append('userName', name);
-          formData.append('userEmail', email);
-          formData.append('userContact', contact);
-          formData.append('roleID', roleID);
+      const userID = document.getElementById('modalUserID').value.trim();
+      const oldUserID = document.getElementById('modalOldUserID').value.trim();
+      const name = document.getElementById('modalName').value.trim();
+      const email = document.getElementById('modalEmail').value.trim();
+      const contact = document.getElementById('modalContact').value.trim();
+      const roleElement = document.querySelector('input[name="modalRole"]:checked');
+      const roleID = roleElement ? roleElement.value : '3';
 
-          // Deliver structural data stream downward to your database operations API
-          fetch('admin_manage_users_api.php', {
-            method: 'POST',
-            body: formData
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              alert('Profile information updated successfully!');
-              closeEditModal(); // Hide window frame view
-              loadUsers();      // Reload matrix table content column elements cleanly
-            } else {
-              alert('Error updating user data values: ' + data.message);
-            }
-          })
-          .catch(error => {
-            console.error('Submission processing mistake:', error);
-            alert('A networking operational failure dropped the saving connection pipeline.');
-          });
-        });
+      if (!name || !email) {
+        alert("Name and Email cannot be empty.");
+        return;
       }
+
+      const formData = new FormData();
+      formData.append('action', 'update_user');
+
+      // 🔥 IMPORTANT: use OLD ID for WHERE condition
+      formData.append('oldUserID', oldUserID);
+
+      // updated values
+      formData.append('userID', userID); // optional (only if you allow ID change)
+      formData.append('userName', name);
+      formData.append('userEmail', email);
+      formData.append('userContact', contact);
+      formData.append('userPhoto', document.getElementById('modalUserProfile').files[0] || ''); // optional file upload
+      formData.append('roleID', roleID);
+
+      fetch('admin_manage_users_api.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('Profile updated successfully!');
+          closeEditModal();
+          loadUsers();
+        } else {
+          alert('Error: ' + (data.message || 'Update failed'));
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Network error');
+      });
     });
+  }
+});
 
     // Delete user
     function deleteUser(userID) {
@@ -820,75 +1006,94 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
     }
 
     // Add new user
-    function addNewUser() {
-      const userID = document.getElementById('inputUserID').value.trim();
-      const password = document.getElementById('inputPassword').value.trim();
-      const name = document.getElementById('inputName').value.trim();
-      const email = document.getElementById('inputEmail').value.trim();
-      const contact = document.getElementById('inputContact').value.trim();
-      
-      // Get selected role
-      const selectedRole = document.querySelector('input[name="userRole"]:checked');
-      const roleID = selectedRole ? selectedRole.value : '3';
-      
-      // Validate required fields
-      if (!userID || !password || !name || !email) {
-        alert('Please fill in all required fields: User ID, Password, Name, and Email');
-        return;
-      }
-      
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        alert('Please enter a valid email address');
-        return;
-      }
-      
-      // Create form data payload
-      const formData = new FormData();
-      formData.append('action', 'add_user');
-      formData.append('userID', userID);
-      formData.append('userName', name);
-      formData.append('userEmail', email);
-      formData.append('userContact', contact);
-      formData.append('userPass', password);
-      formData.append('roleID', roleID);
-      
-      // Send to API
-      fetch('admin_manage_users_api.php', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('User added successfully!');
-          clearUserForm();
-          loadUsers(); // Reload the list to show the newly added user profile
-        } else {
-          alert('Error: ' + data.message);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error submitting form');
-      });
+function addNewUser() {
+
+  const userID = document.getElementById('inputUserID').value.trim();
+  const password = document.getElementById('inputPassword').value.trim();
+  const name = document.getElementById('inputName').value.trim();
+  const email = document.getElementById('inputEmail').value.trim();
+  const contact = document.getElementById('inputContact').value.trim();
+
+  const selectedRole = document.querySelector('input[name="userRole"]:checked');
+  const roleID = selectedRole ? selectedRole.value : '3';
+
+  const photoFile = document.getElementById('inputUserPhoto').files[0]; // ✅ ADD THIS
+
+  if (!userID || !password || !name || !email) {
+    alert('Please fill in required fields');
+    return;
+  }
+
+  const formData = new FormData();
+
+  formData.append('action', 'add_user');
+  formData.append('userID', userID);
+  formData.append('userName', name);
+  formData.append('userEmail', email);
+  formData.append('userContact', contact);
+  formData.append('userPass', password);
+  formData.append('roleID', roleID);
+
+  // ✅ THIS IS WHERE YOU PUT IT
+  if (photoFile) {
+    formData.append('userPhoto', photoFile);
+  }
+
+  fetch('admin_manage_users_api.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('User added successfully!');
+      clearUserForm();
+      loadUsers();
+      loadNextUserID(); // Refresh the next available user ID in the form
+    } else {
+      alert('Error: ' + data.message);
     }
+  })
+  .catch(err => console.error(err));
+}
 
     // Clear user registration form fields
-    function clearUserForm() {
-      document.getElementById('inputUserID').value = '';
-      document.getElementById('inputPassword').value = '';
-      document.getElementById('inputName').value = '';
-      document.getElementById('inputEmail').value = '';
-      document.getElementById('inputContact').value = '';
-      const defaultRole = document.getElementById('roleStudent');
-      if (defaultRole) defaultRole.checked = true;
-    }
+function clearUserForm() {
 
-    // Show system alert messages
-    function showError(message) {
-      alert(message);
-      console.error(message);
-    }
+  // text inputs
+  document.getElementById('inputPassword').value = '';
+  document.getElementById('inputName').value = '';
+  document.getElementById('inputEmail').value = '';
+  document.getElementById('inputContact').value = '';
+  document.getElementByID('inputRole').value = '';
+
+
+  // reset file input (VERY IMPORTANT)
+  const fileInput = document.getElementById('inputUserPhoto');
+  if (fileInput) {
+    fileInput.value = null;
+  }
+
+  // reset image preview
+  const preview = document.getElementById('userPhotoPreview');
+  if (preview) {
+    preview.src = '';
+    preview.style.display = 'none';
+  }
+}
+function previewUserPhoto(event) {
+  const file = event.target.files[0];
+
+  if (file) {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      document.getElementById('userPhotoPreview').src = e.target.result;
+      document.getElementById('userPhotoPreview').style.display = 'block';
+      document.getElementById('uploadText').style.display = 'none';
+    };
+
+    reader.readAsDataURL(file);
+  }
+}
   </script>

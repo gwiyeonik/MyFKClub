@@ -66,7 +66,7 @@ mysqli_close($link);
 
           <label class="form-group">
             <span>Profile Photo</span>
-            <input type="file" name="userProfile" accept="image/*" required>
+            <input type="file" name="userPhoto" accept="image/*" required>
           </label>
 
           <label class="form-group">

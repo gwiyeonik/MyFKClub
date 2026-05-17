@@ -395,7 +395,7 @@ background: #17418f; /* Dark blue color */
 }
 
 .btn-add:hover {
-  background: #008870;
+  background: #00a9ab;
     transform: translateY(-1px);
 }
 
@@ -924,12 +924,12 @@ display: grid; grid-template-columns: 0.2fr 0.3fr 0.2fr 0.5fr 0.3fr 0.2fr; gap: 
 
 .btn-add {
   padding: 14px 34px;
-  background: var(--green);
+  background: #00a9ab;
   color: #ffffff;
 }
 
 .btn-add:hover {
-  background: #008870;
+  background: #00a9ab;
   transform: translateY(-1px);
 }
 
@@ -1101,7 +1101,7 @@ display: grid; grid-template-columns: 0.2fr 0.3fr 0.2fr 0.5fr 0.3fr 0.2fr; gap: 
 }
 
 .view-events-btn {
-    background-color: var(--green);
+    background-color: #00a9ab;
     color: white;
     border: none;
     padding: 10px 25px;

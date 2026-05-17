@@ -1,273 +1,277 @@
 <?php
-/**
- * admin_manage_users_api.php
- * Handles all database operations for user management
- */
-
+header('Content-Type: application/json; charset=utf-8');
 session_start();
 
-// Security check - only allow admins
-if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
-    http_response_code(403);
-    exit(json_encode(['success' => false, 'message' => 'Unauthorized access']));
+error_reporting(0);
+ini_set('display_errors', 0);
+
+$conn = mysqli_connect("localhost", "root", "", "myfkclub");
+
+if (!$conn) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Database connection failed'
+    ]);
+    exit;
 }
 
-// Database Connection
-$link = mysqli_connect("localhost", "root", "", "myfkclub");
-if (!$link) { 
-    http_response_code(500);
-    exit(json_encode(['success' => false, 'message' => 'Connection failed: ' . mysqli_connect_error()]));
+/* ================= SECURITY ================= */
+if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) != 1) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Unauthorized access'
+    ]);
+    exit;
 }
 
-// Get the action from request
-$action = isset($_GET['action']) ? $_GET['action'] : (isset($_POST['action']) ? $_POST['action'] : '');
+$action = $_GET['action'] ?? $_POST['action'] ?? '';
 
-header('Content-Type: application/json');
+/* ================= GET USERS ================= */
+if ($action === 'get_users') {
 
-switch ($action) {
-    
-    case 'get_users':
-        // Fetch all users from database
-        $userQuery = "SELECT userID, userName, userEmail, userContact, roleID FROM user ORDER BY userID ASC";
-        $usersResult = mysqli_query($link, $userQuery);
-        
-        if (!$usersResult) {
-            echo json_encode(['success' => false, 'message' => 'Query failed: ' . mysqli_error($link)]);
-            break;
-        }
-        
-        $users = [];
-        while ($row = mysqli_fetch_assoc($usersResult)) {
-            $users[] = $row;
-        }
-        
-        echo json_encode(['success' => true, 'users' => $users]);
-        break;
+$result = $conn->query("
+    SELECT userID, userName, userEmail, userContact, roleID, userStatus 
+    FROM user
+    ORDER BY userID ASC
+");
 
-    case 'add_user':
-        // Add a new user to database
-        $userID = isset($_POST['userID']) ? mysqli_real_escape_string($link, $_POST['userID']) : '';
-        $userName = isset($_POST['userName']) ? mysqli_real_escape_string($link, $_POST['userName']) : '';
-        $userEmail = isset($_POST['userEmail']) ? mysqli_real_escape_string($link, $_POST['userEmail']) : '';
-        $userContact = isset($_POST['userContact']) ? mysqli_real_escape_string($link, $_POST['userContact']) : '';
-        $userPass = isset($_POST['userPass']) ? $_POST['userPass'] : '';
-        $roleID = isset($_POST['roleID']) ? (int)$_POST['roleID'] : 3;
-        
-        // Validate required fields
-        if (empty($userID) || empty($userName) || empty($userEmail) || empty($userPass)) {
-            echo json_encode(['success' => false, 'message' => 'All fields are required']);
-            break;
-        }
-        
-        // Check if user already exists
-        $checkQuery = "SELECT userID FROM user WHERE userID = '$userID'";
-        $checkResult = mysqli_query($link, $checkQuery);
-        if (mysqli_num_rows($checkResult) > 0) {
-            echo json_encode(['success' => false, 'message' => 'User ID already exists']);
-            break;
-        }
-        
-        // Hash password
-        $hashedPassword = password_hash($userPass, PASSWORD_BCRYPT);
-        
-        // Insert user
-        $insertQuery = "INSERT INTO user (userID, userName, userEmail, userContact, userPass, roleID) 
-                       VALUES ('$userID', '$userName', '$userEmail', '$userContact', '$hashedPassword', $roleID)";
-        
-        if (mysqli_query($link, $insertQuery)) {
-            echo json_encode(['success' => true, 'message' => 'User added successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Insert failed: ' . mysqli_error($link)]);
-        }
-        break;
+    if (!$result) {
+        echo json_encode([
+            'success' => false,
+            'message' => $conn->error
+        ]);
+        exit;
+    }
 
-    case 'update_user':
-        // Update user information
-        $oldUserID = isset($_POST['oldUserID']) ? mysqli_real_escape_string($link, $_POST['oldUserID']) : '';
-        $newUserID = isset($_POST['userID']) ? mysqli_real_escape_string($link, $_POST['userID']) : '';
-        $userName = isset($_POST['userName']) ? mysqli_real_escape_string($link, $_POST['userName']) : '';
-        $userEmail = isset($_POST['userEmail']) ? mysqli_real_escape_string($link, $_POST['userEmail']) : '';
-        $userContact = isset($_POST['userContact']) ? mysqli_real_escape_string($link, $_POST['userContact']) : '';
-        $roleID = isset($_POST['roleID']) ? (int)$_POST['roleID'] : 3;
-        
-        if (empty($oldUserID) || empty($newUserID)) {
-            echo json_encode(['success' => false, 'message' => 'Old and new User ID are required']);
-            break;
-        }
-        
-        if ($newUserID !== $oldUserID) {
-            $checkQuery = "SELECT userID FROM user WHERE userID = '$newUserID'";
-            $checkResult = mysqli_query($link, $checkQuery);
-            if (mysqli_num_rows($checkResult) > 0) {
-                echo json_encode(['success' => false, 'message' => 'New User ID already exists']);
-                break;
-            }
-        }
-        
-        $updateQuery = "UPDATE user SET userID = '$newUserID', userName = '$userName', userEmail = '$userEmail', 
-                       userContact = '$userContact', roleID = $roleID WHERE userID = '$oldUserID'";
-        
-        if (mysqli_query($link, $updateQuery)) {
-            echo json_encode(['success' => true, 'message' => 'User updated successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Update failed: ' . mysqli_error($link)]);
-        }
-        break;
+    $users = [];
 
-    case 'get_user':
-        // Get single user details
-        $userID = isset($_GET['userID']) ? mysqli_real_escape_string($link, $_GET['userID']) : '';
-        
-        if (empty($userID)) {
-            echo json_encode(['success' => false, 'message' => 'User ID is required']);
-            break;
-        }
-        
-        $query = "SELECT userID, userName, userEmail, userContact, roleID FROM user WHERE userID = '$userID'";
-        $result = mysqli_query($link, $query);
-        
-        if (mysqli_num_rows($result) > 0) {
-            $user = mysqli_fetch_assoc($result);
-            echo json_encode(['success' => true, 'user' => $user]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'User not found']);
-        }
-        break;
+    while ($row = $result->fetch_assoc()) {
+        $users[] = $row;
+    }
 
-    case 'get_club_memberships':
-        $clubID = isset($_GET['clubID']) ? (int)$_GET['clubID'] : 0;
-        if ($clubID <= 0) {
-            echo json_encode(['success' => false, 'message' => 'Invalid club ID']);
-            break;
-        }
-
-        $query = "SELECT cm.membershipID, u.userID, u.userName FROM clubmembership cm JOIN user u ON cm.userID = u.userID WHERE cm.clubID = $clubID ORDER BY u.userName";
-        $result = mysqli_query($link, $query);
-        if (!$result) {
-            echo json_encode(['success' => false, 'message' => 'Query failed: ' . mysqli_error($link)]);
-            break;
-        }
-
-        $memberships = [];
-        while ($row = mysqli_fetch_assoc($result)) {
-            $memberships[] = $row;
-        }
-
-        echo json_encode(['success' => true, 'memberships' => $memberships]);
-        break;
-
-    case 'get_committee_positions':
-        $result = mysqli_query($link, "SELECT DISTINCT commiteePosition FROM clubcommittee ORDER BY commiteePosition");
-        if (!$result) {
-            echo json_encode(['success' => false, 'message' => 'Query failed: ' . mysqli_error($link)]);
-            break;
-        }
-
-        $positions = [];
-        while ($row = mysqli_fetch_assoc($result)) {
-            if (!empty($row['commiteePosition'])) {
-                $positions[] = $row['commiteePosition'];
-            }
-        }
-
-        if (empty($positions)) {
-            $positions = ['President', 'Vice President', 'Secretary', 'Treasurer', 'Member'];
-        }
-
-        echo json_encode(['success' => true, 'positions' => $positions]);
-        break;
-
-    case 'assign_committee':
-        $membershipID = isset($_POST['membershipID']) ? (int)$_POST['membershipID'] : 0;
-        $committeePosition = isset($_POST['committeePosition']) ? mysqli_real_escape_string($link, trim($_POST['committeePosition'])) : '';
-
-        if ($membershipID <= 0 || empty($committeePosition)) {
-            echo json_encode(['success' => false, 'message' => 'Membership ID and position are required']);
-            break;
-        }
-
-        $membershipQuery = "SELECT userID FROM clubmembership WHERE membershipID = $membershipID LIMIT 1";
-        $membershipResult = mysqli_query($link, $membershipQuery);
-        if (!$membershipResult || mysqli_num_rows($membershipResult) === 0) {
-            echo json_encode(['success' => false, 'message' => 'Club membership not found']);
-            break;
-        }
-
-        $membershipRow = mysqli_fetch_assoc($membershipResult);
-        $userID = mysqli_real_escape_string($link, $membershipRow['userID']);
-
-        $checkQuery = "SELECT membershipID FROM clubcommittee WHERE membershipID = $membershipID LIMIT 1";
-        $checkResult = mysqli_query($link, $checkQuery);
-        if ($checkResult && mysqli_num_rows($checkResult) > 0) {
-            echo json_encode(['success' => false, 'message' => 'This member already has a committee assignment']);
-            break;
-        }
-
-        $insertQuery = "INSERT INTO clubcommittee (membershipID, commiteePosition) VALUES ($membershipID, '$committeePosition')";
-        if (!mysqli_query($link, $insertQuery)) {
-            echo json_encode(['success' => false, 'message' => 'Insert failed: ' . mysqli_error($link)]);
-            break;
-        }
-
-        $updateUserQuery = "UPDATE user SET roleID = 2 WHERE userID = '$userID'";
-        if (!mysqli_query($link, $updateUserQuery)) {
-            echo json_encode(['success' => false, 'message' => 'Failed to update user role: ' . mysqli_error($link)]);
-            break;
-        }
-
-        echo json_encode(['success' => true, 'message' => 'Committee assigned successfully']);
-        break;
-
-    case 'delete_user':
-        // Delete a user
-        $userID = isset($_POST['userID']) ? mysqli_real_escape_string($link, $_POST['userID']) : '';
-        
-        if (empty($userID)) {
-            echo json_encode(['success' => false, 'message' => 'User ID is required']);
-            break;
-        }
-        
-        // Prevent deleting self
-        if ($userID == $_SESSION['user_id']) {
-            echo json_encode(['success' => false, 'message' => 'Cannot delete your own account']);
-            break;
-        }
-        
-        $deleteQuery = "DELETE FROM user WHERE userID = '$userID'";
-        
-        if (mysqli_query($link, $deleteQuery)) {
-            echo json_encode(['success' => true, 'message' => 'User deleted successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Delete failed: ' . mysqli_error($link)]);
-        }
-        break;
-
-    case 'search_users':
-        // Search for users
-        $searchTerm = isset($_GET['searchTerm']) ? mysqli_real_escape_string($link, $_GET['searchTerm']) : '';
-        
-        if (strlen($searchTerm) < 1) {
-            echo json_encode(['success' => false, 'message' => 'Search term required']);
-            break;
-        }
-        
-        $query = "SELECT userID, userName, userEmail, userContact, roleID FROM user 
-                  WHERE userID LIKE '%$searchTerm%' OR userName LIKE '%$searchTerm%' OR userEmail LIKE '%$searchTerm%'
-                  ORDER BY userID ASC LIMIT 20";
-        $result = mysqli_query($link, $query);
-        
-        $users = [];
-        while ($row = mysqli_fetch_assoc($result)) {
-            $users[] = $row;
-        }
-        
-        echo json_encode(['success' => true, 'users' => $users]);
-        break;
-
-    default:
-        echo json_encode(['success' => false, 'message' => 'Invalid action']);
-        break;
+    echo json_encode([
+        'success' => true,
+        'users' => $users
+    ]);
+    exit;
 }
 
-mysqli_close($link);
-?>
+/* ================= GET USER ================= */
+if ($action === 'get_user') {
+
+    $userID = $_GET['userID'] ?? '';
+
+    $stmt = $conn->prepare("SELECT * FROM user WHERE userID=?");
+    $stmt->bind_param("s", $userID);
+    $stmt->execute();
+
+    $res = $stmt->get_result();
+    $user = $res->fetch_assoc();
+
+    echo json_encode([
+        'success' => (bool)$user,
+        'user' => $user
+    ]);
+    exit;
+}
+
+if ($action === 'get_next_user_id') {
+
+    $res = $conn->query("SELECT MAX(CAST(userID AS UNSIGNED)) AS maxID FROM user");
+    $row = $res->fetch_assoc();
+
+    $nextID = ($row['maxID'] ?? 0) + 1;
+
+    echo json_encode([
+        'success' => true,
+        'nextID' => $nextID
+    ]);
+    exit;
+}
+
+/* ================= ADD USER ================= */
+if ($action === 'add_user') {
+
+    $name = $_POST['userName'] ?? '';
+    $email = $_POST['userEmail'] ?? '';
+    $contact = $_POST['userContact'] ?? '';
+    $pass = password_hash($_POST['userPass'] ?? '', PASSWORD_DEFAULT);
+    $role = $_POST['roleID'] ?? 3;
+
+    // AUTO ID
+    $res = $conn->query("SELECT MAX(userID) AS maxID FROM user");
+    $row = $res->fetch_assoc();
+    $userID = ($row['maxID']) ? ((int)$row['maxID'] + 1) : 1;
+
+    // ================= PHOTO UPLOAD =================
+    $photoPath = null;
+
+    if (!empty($_FILES['userPhoto']['name'])) {
+
+        $uploadDir = "uploads/user/";
+
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        $fileName = time() . "_" . basename($_FILES['userPhoto']['name']);
+        $targetFile = $uploadDir . $fileName;
+
+        move_uploaded_file($_FILES['userPhoto']['tmp_name'], $targetFile);
+
+        $photoPath = $targetFile;
+    }
+
+    $stmt = $conn->prepare("
+        INSERT INTO user
+        (userID, userName, userEmail, userContact, userPass, roleID, userStatus, userPhoto)
+        VALUES (?, ?, ?, ?, ?, ?, 'Active', ?)
+    ");
+
+    $stmt->bind_param("issssis", $userID, $name, $email, $contact, $pass, $role, $photoPath);
+
+    echo json_encode([
+        'success' => $stmt->execute(),
+        'userID' => $userID,
+        'photo' => $photoPath
+    ]);
+    exit;
+}
+
+/* ================= UPDATE USER ================= */
+if ($action === 'update_user') {
+
+    $userID = $_POST['oldUserID'] ?? '';
+    $name = $_POST['userName'] ?? '';
+    $email = $_POST['userEmail'] ?? '';
+    $contact = $_POST['userContact'] ?? '';
+    $role = $_POST['roleID'] ?? 3;
+
+    // GET OLD PHOTO
+    $res = $conn->query("SELECT userPhoto FROM user WHERE userID='$userID'");
+    $old = $res->fetch_assoc();
+    $photoPath = $old['userPhoto'] ?? null;
+
+    // NEW PHOTO (optional replace)
+    if (!empty($_FILES['userPhoto']['name'])) {
+
+        $uploadDir = "uploads/user/";
+
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        $fileName = time() . "_" . basename($_FILES['userPhoto']['name']);
+        $targetFile = $uploadDir . $fileName;
+
+        move_uploaded_file($_FILES['userPhoto']['tmp_name'], $targetFile);
+
+        $photoPath = $targetFile;
+    }
+
+    $stmt = $conn->prepare("
+        UPDATE user 
+        SET userName=?, userEmail=?, userContact=?, roleID=?, userPhoto=?
+        WHERE userID=?
+    ");
+
+    $stmt->bind_param("ssisss", $name, $email, $contact, $role, $photoPath, $userID);
+
+    echo json_encode([
+        'success' => $stmt->execute()
+    ]);
+    exit;
+}
+
+/* ================= DELETE USER ================= */
+if ($action === 'delete_user') {
+
+    $userID = (int)($_POST['userID'] ?? 0);
+
+    // GET PHOTO FIRST
+    $res = $conn->query("SELECT userPhoto FROM user WHERE userID=$userID");
+    $row = $res->fetch_assoc();
+
+    if (!empty($row['userPhoto']) && file_exists($row['userPhoto'])) {
+        unlink($row['userPhoto']);
+    }
+
+    $stmt = $conn->prepare("DELETE FROM user WHERE userID=?");
+    $stmt->bind_param("s", $userID);
+
+    echo json_encode([
+        'success' => $stmt->execute()
+    ]);
+    exit;
+}
+
+/* ================= CLUB MEMBERS ================= */
+if ($action === 'get_club_memberships') {
+
+    $clubID = $_GET['clubID'] ?? '';
+
+    $stmt = $conn->prepare("
+        SELECT m.membershipID, u.userID, u.userName
+        FROM club_memberships m
+        JOIN user u ON u.userID = m.userID
+        WHERE m.clubID=?
+    ");
+
+    $stmt->bind_param("s", $clubID);
+    $stmt->execute();
+
+    $res = $stmt->get_result();
+    $data = [];
+
+    while ($row = $res->fetch_assoc()) {
+        $data[] = $row;
+    }
+
+    echo json_encode([
+        'success' => true,
+        'memberships' => $data
+    ]);
+    exit;
+}
+
+/* ================= POSITIONS ================= */
+if ($action === 'get_committee_positions') {
+
+    echo json_encode([
+        'success' => true,
+        'positions' => [
+            "President",
+            "Vice President",
+            "Secretary",
+            "Treasurer",
+            "Member"
+        ]
+    ]);
+    exit;
+}
+
+/* ================= ASSIGN COMMITTEE ================= */
+if ($action === 'assign_committee') {
+
+    $membershipID = $_POST['membershipID'] ?? '';
+    $position = $_POST['committeePosition'] ?? '';
+
+    $stmt = $conn->prepare("
+        UPDATE club_memberships
+        SET committeePosition=?
+        WHERE membershipID=?
+    ");
+
+    $stmt->bind_param("ss", $position, $membershipID);
+
+    echo json_encode([
+        'success' => $stmt->execute()
+    ]);
+    exit;
+}
+
+/* ================= DEFAULT ================= */
+echo json_encode([
+    'success' => false,
+    'message' => 'Invalid action'
+]);
