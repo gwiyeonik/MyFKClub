@@ -633,3 +633,61 @@ body {
     min-width: 100%;
   }
 }
+
+/* The dark, blurry backdrop covering the entire admin page view */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.4); /* Modern dark tint background overlay slant */
+  backdrop-filter: blur(6px);              /* This creates the beautiful blur effect from your example! */
+  -webkit-backdrop-filter: blur(6px);      /* Safari framework consistency support */
+  z-index: 99999;                          /* Guarantees it floats over sidebars and headers */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease-in-out;
+}
+
+/* The clean, white box centered precisely in the middle of the viewport */
+.modal-content {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;                    /* Clean rounded corners similar to modern popup designs */
+  width: 90%;
+  max-width: 460px;                       /* Comfortable width layout for form profiles */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Header customization layout formatting structure */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+/* X Close icon styling placement adjustment */
+.close-modal-btn {
+  font-size: 32px;
+  font-weight: 400;
+  color: #94a3b8;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.close-modal-btn:hover {
+  color: #475569;
+}

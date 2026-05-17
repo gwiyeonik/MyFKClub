@@ -31,7 +31,6 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
     </aside>
 
     <main class="dashboard-main">
-      <!-- Topbar stays flush to the sidebar -->
       <div class="topbar">
         <div class="topbar-left">
           <div class="topbar-title">FK Club Admin</div>
@@ -39,34 +38,28 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
         <a href="#profile" class="topbar-button">My Profile</a>
       </div>
 
-      <!-- NEW WRAPPER: This provides the 'breathing room' seen in image_2a6841.png -->
       <div class="content-area">
-        <section class="quick-links-row">
-          <div class="section-heading">Quick Admin Access</div>
-          <div class="stats-row">
-            <a href="admin_manage_users.php" class="stat-card" style="text-decoration:none;color:inherit;"><div class="stat-label">Manage Users</div></a>
-            <a href="admin_student_clubs.php" class="stat-card" style="text-decoration:none;color:inherit;"><div class="stat-label">Student Clubs</div></a>
-            <a href="admin_events.php" class="stat-card" style="text-decoration:none;color:inherit;"><div class="stat-label">Events</div></a>
-            <a href="admin_participation_reports.php" class="stat-card" style="text-decoration:none;color:inherit;"><div class="stat-label">Participation Reports</div></a>
-          </div>
-        </section>
-
+        
         <section class="stats-row">
-          <div class="stat-card"><div class="stat-label">Registered Students</div></div>
-          <div class="stat-card"><div class="stat-label">Active Clubs</div></div>
-          <div class="stat-card"><div class="stat-label">Upcoming Events</div></div>
-          <div class="stat-card"><div class="stat-label">Avg Attendance Rate</div></div>
+          <div class="stat-card"><div class="stat-label">Registered Students</div><strong id="metric-students" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong></div>
+          <div class="stat-card"><div class="stat-label">Active Clubs</div><strong id="metric-clubs" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong></div>
+          <div class="stat-card"><div class="stat-label">Upcoming Events</div><strong id="metric-events" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong></div>
+          <div class="stat-card"><div class="stat-label">Avg Attendance Rate</div><strong id="metric-attendance" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong></div>
         </section>
 
         <section class="charts-row">
           <div class="aside-cards">
             <div class="stat-card">
               <div class="stat-label">Club in Faculty</div>
+              <strong id="aside-clubs" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong>
             </div>
+            
             <div class="stat-card">
               <div class="stat-label">Student Join Club</div>
+              <strong id="aside-joined-students" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">0</strong>
             </div>
           </div>
+
           <div class="chart-group">
             <div class="chart-card chart-large">
               <div class="chart-title">Students per Club</div>
@@ -89,18 +82,63 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
                     <th>User ID</th>
                     <th>User Name</th>
                     <th>User Email</th>
-                    <th>RoleID</th>
+                    <th>Role ID</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr><td colspan="5" class="empty-cell">No recent registrations yet.</td></tr>
+                <tbody id="user-table-body">
+                  <tr><td colspan="4" class="empty-cell">Loading registrations...</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
         </section>
-      </div> <!-- End content-area -->
+      </div> 
     </main>
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Fetch data from backend api
+        fetch('admin_dashboard_api.php?action=get_dashboard_data')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 1. Inject real database numbers directly into your metric rows
+                    document.getElementById('metric-students').textContent = data.metrics.totalStudents;
+                    document.getElementById('metric-clubs').textContent = data.metrics.totalClubs;
+                    document.getElementById('metric-events').textContent = data.metrics.totalEvents;
+                    document.getElementById('metric-attendance').textContent = data.metrics.avgAttendance;
+                    document.getElementById('aside-clubs').textContent = data.metrics.totalClubs;
+
+                    // 2. Populate Recent Users Data Table Row
+                    const tableBody = document.getElementById('user-table-body');
+                    tableBody.innerHTML = ''; 
+
+                    if (data.recentUsers && data.recentUsers.length > 0) {
+                        data.recentUsers.forEach(user => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${escapeHTML(user.userID)}</td>
+                                <td>${escapeHTML(user.userName)}</td>
+                                <td>${escapeHTML(user.userEmail)}</td>
+                                <td>${escapeHTML(user.roleID)}</td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    } else {
+                        tableBody.innerHTML = '<tr><td colspan="4" class="empty-cell">No recent registrations yet.</td></tr>';
+                    }
+                } else {
+                    console.error("API Processing Error: " + data.message);
+                }
+            })
+            .catch(error => console.error("Fetch API Connection Error:", error));
+    });
+
+    // Simple XSS sanitizer to protect output rendering
+    function escapeHTML(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
 </body>
 </html>
