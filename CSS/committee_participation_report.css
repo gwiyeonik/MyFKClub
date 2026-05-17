@@ -27,75 +27,94 @@ body {
 
 /* Search and filters */
 .search-bar-wrap {
+  display: flex;
   align-items: center;
-  padding: 18px 24px;
+  padding: 0;
   background: transparent;
-  border-radius: 24px;
+  border-radius: 0;
   border: none;
   box-shadow: none;
+  margin-bottom: 16px;
 }
 
 .search-input {
-  min-height: 56px;
-  padding-left: 22px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 18px;
   border-radius: 999px;
-  box-shadow: inset 0 0 0 1px rgba(17, 53, 111, 0.08);
+  border: 1px solid rgba(17, 53, 111, 0.12);
+  background: #ffffff;
   font-family: inherit;
   font-size: 0.95rem;
   font-weight: 400;
+  color: #333333;
+}
+
+.search-input::placeholder {
+  color: #999999;
 }
 
 .filter-row {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
   width: 100%;
+  margin-bottom: 24px;
 }
 
 .filter-select,
 .secondary-pill {
-  min-height: 48px;
-  padding: 12px 20px;
-  font-size: 0.92rem;
+  min-height: 36px;
+  padding: 8px 16px;
+  font-size: 0.88rem;
   font-family: inherit;
 }
 
 .filter-select {
-  min-width: 150px;
+  min-width: 120px;
   border-radius: 999px;
   border: 1px solid rgba(17, 53, 111, 0.12);
-  background: #f6f9ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%233c4a6b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E") no-repeat right 18px center;
+  background: #f6f9ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%233c4a6b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E") no-repeat right 12px center;
   background-size: 10px 6px;
   color: var(--text);
-  font-weight: 400;
+  font-weight: 500;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
   cursor: pointer;
-  padding-right: 42px;
+  padding-right: 36px;
 }
 
 .filter-select option {
   font-weight: 400;
 }
 
+.secondary-pill {
+  border-radius: 999px;
+  border: none;
+  background: #00a988;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 /* Top summary cards */
 .committee-stats-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 18px;
   margin-bottom: 24px;
 }
 
 .committee-card {
   background: #ffffff;
-  border: 1px solid rgba(17, 53, 111, 0.1);
-  border-radius: 0;
-  padding: 16px 24px 24px;
-  min-height: 120px;
-  box-shadow: 0 12px 35px rgba(15, 63, 141, 0.08);
+  border: 1px solid rgba(17, 53, 111, 0.08);
+  border-radius: 8px;
+  padding: 20px 24px;
+  min-height: 100px;
+  box-shadow: 0 2px 8px rgba(15, 63, 141, 0.06);
 }
 
 .committee-card-title {
@@ -123,10 +142,10 @@ body {
 
 .chart-card {
   background: #ffffff;
-  border: 1px solid rgba(17, 53, 111, 0.1);
-  border-radius: 0;
-  padding: 26px;
-  box-shadow: 0 12px 35px rgba(15, 63, 141, 0.08);
+  border: 1px solid rgba(17, 53, 111, 0.08);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(15, 63, 141, 0.06);
 }
 
 .chart-title {
@@ -155,11 +174,11 @@ body {
 .table-panel {
   padding: 0;
   margin-bottom: 18px;
-  border-radius: 0;
+  border-radius: 8px;
   overflow: hidden;
   background: #ffffff;
-  border: 1px solid rgba(17, 53, 111, 0.1);
-  box-shadow: 0 12px 35px rgba(15, 63, 141, 0.08);
+  border: 1px solid rgba(17, 53, 111, 0.08);
+  box-shadow: 0 2px 8px rgba(15, 63, 141, 0.06);
 }
 
 .large-table-panel {
@@ -218,11 +237,11 @@ body {
 
 .engagement-card {
   background: #ffffff;
-  border: 1px solid rgba(17, 53, 111, 0.1);
-  border-radius: 0;
-  padding: 26px;
+  border: 1px solid rgba(17, 53, 111, 0.08);
+  border-radius: 8px;
+  padding: 24px;
   min-height: 150px;
-  box-shadow: 0 12px 35px rgba(15, 63, 141, 0.08);
+  box-shadow: 0 2px 8px rgba(15, 63, 141, 0.06);
 }
 
 .engagement-title {
@@ -288,109 +307,13 @@ body {
     width: 100%;
   }
 }
+.filter-pill,
+.primary-pill,
+.secondary-pill {
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
 /* ===== Search bar and button adjustment ===== */
 
-.search-bar-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 14px;
-  padding: 28px 24px 18px;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-
-/* Search input like the screenshot */
-.search-input {
-  width: 100%;
-  min-height: 42px;
-  padding: 0 22px 0 42px;
-  border-radius: 999px;
-  border: 1px solid rgba(17, 53, 111, 0.12);
-  background: #ffffff;
-  color: #333333;
-  font-size: 0.9rem;
-  font-family: inherit;
-  font-weight: 400;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14);
-  outline: none;
-}
-
-.search-input::placeholder {
-  color: #555555;
-  opacity: 0.85;
-}
-
-/* Put filters/buttons on the right side below search */
-.filter-row {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  flex-wrap: wrap;
-}
-
-/* Small rounded dropdowns like screenshot */
-.filter-select {
-  min-width: 78px;
-  height: 30px;
-  min-height: 30px;
-  padding: 0 28px 0 14px;
-  border-radius: 999px;
-  border: none;
-  background: #e9e9e9 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%23333333' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E") no-repeat right 12px center;
-  background-size: 8px 5px;
-  color: #111111;
-  font-size: 0.72rem;
-  font-family: inherit;
-  font-weight: 500;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  cursor: pointer;
-  box-shadow: none;
-}
-
-/* Export Report button */
-.secondary-pill {
-  height: 30px;
-  min-height: 30px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: none;
-  background: #00a99d;
-  color: #ffffff;
-  font-size: 0.72rem;
-  font-family: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: none;
-}
-
-/* My Profile button */
-.topbar-button {
-  background: #00a99d;
-  color: #ffffff;
-  padding: 10px 18px;
-  border-radius: 5px;
-  text-decoration: none;
-  font-size: 1rem;
-  font-family: inherit;
-  font-weight: 500;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.22);
-}
-
-/* Header alignment */
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.topbar-title {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: #ffffff;
-}

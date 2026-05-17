@@ -44,6 +44,7 @@ if ($clubResult) {
 
 mysqli_close($link);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
