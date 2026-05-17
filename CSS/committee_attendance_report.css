@@ -232,3 +232,125 @@ body {
     width: 100%;
   }
 }
+/* ===== Updated Manual Attendance Entry Layout ===== */
+
+.manual-entry-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 28px;
+  align-items: start;
+}
+
+.manual-form-left {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-group {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--blue);
+}
+
+.manual-input {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(17, 53, 111, 0.15);
+  background: #ffffff;
+  color: #003880;
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  box-shadow: 0 4px 18px rgba(15, 63, 141, 0.05);
+}
+
+.manual-input::placeholder {
+  color: #60708a;
+}
+
+.manual-input:focus {
+  border-color: #1f4e98;
+  box-shadow: 0 0 0 3px rgba(31, 78, 152, 0.12);
+}
+
+.readonly-input {
+  background: #f6f9ff;
+  color: #60708a;
+  cursor: not-allowed;
+}
+
+.manual-entry-layout .filter-select {
+  width: 100%;
+  height: 42px;
+  min-height: 42px;
+  border-radius: 999px;
+}
+
+/* Points preview at top right */
+.points-preview {
+  margin: 0;
+  max-width: 320px;
+  align-self: start;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid rgba(17, 53, 111, 0.08);
+  padding: 18px 20px;
+  box-shadow: 0 12px 35px rgba(15, 63, 141, 0.08);
+}
+
+.points-heading {
+  font-weight: 700;
+  color: var(--blue);
+  margin-bottom: 12px;
+}
+
+.points-result {
+  font-weight: 700;
+  color: var(--blue);
+  margin-bottom: 8px;
+}
+
+#total_points {
+  color: #00a988;
+}
+
+.points-preview ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #4a5871;
+  line-height: 1.8;
+  text-align: left;
+}
+
+.attendance-actions {
+  margin-top: 22px;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+  .manual-entry-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .points-preview {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .form-group {
+    grid-template-columns: 1fr;
+  }
+}
