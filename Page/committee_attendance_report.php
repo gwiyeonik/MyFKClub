@@ -61,107 +61,102 @@ session_start();
 
   <form class="manual-attendance-form" action="" method="POST">
 
-    <div class="manual-form-grid">
+    <div class="manual-entry-layout">
 
-      <div class="form-group">
-        <label for="student_search">Student Name</label>
-        <input 
-          type="text" 
-          id="student_search" 
-          name="student_search" 
-          class="manual-input"
-          placeholder="Enter student name"
-          required
-        >
+      <!-- LEFT SIDE: INPUT FORM -->
+      <div class="manual-form-left">
+
+        <div class="form-group">
+          <label for="student_search">Student ID / Name</label>
+          <input 
+            type="text" 
+            id="student_search" 
+            name="student_search" 
+            class="manual-input"
+            placeholder="Search student ID or name"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="event_name">Event Name</label>
+          <input 
+            type="text" 
+            id="event_name" 
+            name="event_name" 
+            class="manual-input"
+            placeholder="Search event name"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="event_date">Event Date</label>
+          <input 
+            type="date" 
+            id="event_date" 
+            name="event_date" 
+            class="manual-input"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="checkin_time">Check-in Time</label>
+          <input 
+            type="text" 
+            id="checkin_time" 
+            name="checkin_time" 
+            class="manual-input readonly-input"
+            readonly
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="attendance_status">Attendance Status</label>
+          <select id="attendance_status" name="attendance_status" class="filter-select" required>
+            <option value="">Select Status</option>
+            <option value="present">Present on time</option>
+            <option value="late">Late arrival</option>
+            <option value="absent">Absent without notice</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="is_volunteer">Volunteer / Helper</label>
+          <select id="is_volunteer" name="is_volunteer" class="filter-select">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+        </div>
+
       </div>
 
-      <div class="form-group">
-        <label for="student_search">Student ID</label>
-        <input 
-          type="text" 
-          id="student_search" 
-          name="student_search" 
-          class="manual-input"
-          placeholder="Enter student ID"
-          required
-        >
+      <!-- RIGHT SIDE: POINTS PREVIEW -->
+      <div class="points-preview">
+        <div class="points-heading">Points Preview</div>
+
+        <div class="points-result">
+          Total Points:
+          <span id="total_points">0</span>
+        </div>
+
+        <ul>
+          <li>Present on time : +10 Points</li>
+          <li>Late arrival : +5 Points</li>
+          <li>Absent without notice : -10 Points</li>
+          <li>Volunteer / helper : +5 Points</li>
+        </ul>
       </div>
 
-      <div class="form-group">
-        <label for="event_name">Event Name</label>
-        <input 
-          type="text" 
-          id="event_name" 
-          name="event_name" 
-          class="manual-input"
-          placeholder="Enter event name"
-          required
-        >
-      </div>
-
-      <div class="form-group">
-        <label for="event_date">Event Date</label>
-        <input 
-         type="date" 
-          id="event_date" 
-          name="event_date" 
-          class="manual-input"
-          required
-        >
-      </div>
-
-      <div class="form-group">
-        <label for="checkin_time">Check-in Time</label>
-        <input 
-          type="text" 
-          id="checkin_time" 
-          name="checkin_time" 
-          class="manual-input readonly-input"
-          value=""
-          readonly
-        >
-      </div>
-
-      <div class="form-group">
-        <label for="attendance_status">Attendance Status</label>
-        <select id="attendance_status" name="attendance_status" class="filter-select" required>
-          <option value="">Select Status</option>
-          <option value="present">Present on time</option>
-          <option value="late">Late arrival</option>
-          <option value="absent">Absent without notice</option>
-        </select>
-      </div>
-      
-
-      <div class="form-group">
-        <label for="is_volunteer">Volunteer / Helper</label>
-        <select id="is_volunteer" name="is_volunteer" class="filter-select">
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
-        </select>
-      </div>
-
-    </div>
-
-    <div class="points-preview">
-      <div class="points-heading">Points Preview</div>
-
-      <div class="points-result">
-        Total Points:
-        <span id="total_points">0</span>
-      </div>
-
-      <ul>
-        <li>Present on time : +10 Points</li>
-        <li>Late arrival : -5 Points</li>
-        <li>Absent without notice : -10 Points</li>
-        <li>Volunteer / helper : +5 Points</li>
-      </ul>
     </div>
 
     <div class="attendance-actions">
       <button class="primary-pill" type="submit">Save Attendance</button>
     </div>
+
+  </form>
+</div>
 
   </form>
 </div>
@@ -176,11 +171,10 @@ session_start();
               <table>
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>ID</th>
+                    <th>Name / ID</th>    
                     <th>Check-in Time</th>
                     <th>Status</th>
-                    <th>Volunteer</th>
+                    <th>Volunteer / Helper</th>
                     <th>Points</th>
                     <th>Action</th>
                   </tr>
