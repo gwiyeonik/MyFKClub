@@ -165,35 +165,51 @@ mysqli_close($link);
                 </div>
 
                 <div class="action-buttons">
-                  <button type="button" class="btn-delete">Delete</button>
-                  <button type="button" class="btn-update">Update</button>
+                  <button type="button" class="btn-delete" onclick="deleteClub()">Delete</button>
+                  <button type="button" class="btn-update" onclick="updateClub()">Update</button>
                 </div>
               </div>
           </section>
-
-          <section class="card committee-panel">
-            <div class="card-header">
-              <h3 class="section-title">Club Committee</h3>
-              <input type="text" placeholder="Search userName/userID/......" class="pill-search">
+        
+        <section class="card committee-panel">
+          <div class="card-header" style="display: flex; gap: 10px; align-items: center;">
+            <h3 class="section-title">Club Committee</h3>
+            
+            <div class="pill-container" style="position: relative; flex: 1;">
+              <input type="text" list="club-options-committee" id="club-choice" placeholder="Select Club (ID or Name)..." class="pill-search">
+              <datalist id="club-options-committee">
+                  <?php foreach ($clubList as $club): ?>
+                      <option value="<?= htmlspecialchars($club['clubID']) ?>">
+                          <?= htmlspecialchars($club['clubName']) ?>
+                      </option>
+                  <?php endforeach; ?>
+              </datalist>
             </div>
 
-            <div class="committee-table-content">
-              <div class="committee-grid-header">
-                <span>User ID</span>
-                <span>User Name</span>
-                <span>Committee Position</span>
-              </div>
-              <div class="committee-data-area">
-                <div class="empty-cell">No committee records available.</div>
-              </div>
-            </div>
+            <input type="text" id="committee-search" placeholder="Search member..." class="pill-search">
+          </div>
 
-            <div class="committee-actions">
-              <button class="btn-action btn-teal">Add</button>
-              <button class="btn-action btn-teal">Update</button>
-              <button class="btn-action btn-red">Delete</button>
+          <div class="committee-table-content">
+            <div class="committee-grid-header">
+              <span>Club ID</span>
+              <span>Membership ID</span>
+              <span>User ID</span>
+              <span>User Name</span>
+              <span>Committee Position</span>
+                <span>Assigned Date</span>
             </div>
-          </section>
+            
+            <div class="committee-data-area" id="committee-list-rows">
+              <div class="empty-cell">Select a club to view or manage committee members.</div>
+            </div>
+          </div>
+
+          <div class="committee-actions">
+          <button type="button" class="btn-action btn-teal" onclick="openAddModal()">Add</button>
+            <button type="button" class="btn-action btn-teal" onclick="openUpdateModal()">Update</button>
+            <button type="button" class="btn-action btn-red" onclick="openDeleteModal()">Delete</button>
+          </div>
+        </section>
 
           <section class="club-list-container">
               <h1 class="page-title">List of Clubs</h1>
@@ -203,7 +219,7 @@ mysqli_close($link);
                       <div class="club-details">
                           <div class="input-group">
                               <label><strong>Club Name/Club ID</strong></label>
-                              <input list="club-options" id="club-input" name="club-selection" placeholder="Select or type a club...">
+                              <input list="club-options" id="club-list-input" name="club-selection" placeholder="Select or type a club...">
                               <datalist id="club-options">
                                   <?php foreach ($clubList as $club): ?>
                                       <option value="<?= htmlspecialchars($club['clubID'] . ' - ' . $club['clubName']) ?>">
@@ -246,84 +262,700 @@ mysqli_close($link);
     <script src="admin_student_clubs.js"></script>
   </div>
 <script>
-    function fetchClubData(inputValue) {
-        if (!inputValue) return;
+    let selectedCommitteeMember = null;
 
-        const url = `admin_student_clubs_api.php?action=club_details&clubKey=${encodeURIComponent(inputValue)}`;
+    // --- 1. PAGE INITIALIZATION & SEARCH SYNC ---
+function updateCommitteeTable(committeeData) {
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const club = data.club;
+    const container = document.getElementById('committee-list-rows');
 
-                    // 1. SET THE HIDDEN ID VALUE
-                    document.getElementById('info-club-id').value = club.clubID;
+    container.innerHTML = '';
 
-                    document.getElementById('info-club-name').value = club.clubName;
-                    document.getElementById('info-club-desc').value = club.clubDesc;
-                    document.getElementById('info-club-advisor').value = club.clubAdvisor;
-                    document.getElementById('info-club-created').value = club.clubCreated;
+    selectedCommitteeMember = null;
 
-                    const status = club.clubStatus.toLowerCase();
-                    if (status === 'active') {
-                        document.querySelector('input[name="info_club_status"][value="active"]').checked = true;
-                    } else {
-                        document.querySelector('input[name="info_club_status"][value="inactive"]').checked = true;
-                    }
-                } else {
-                    console.log("Club not found in database.");
-                }
-            })
-            .catch(error => console.error('Error:', error));
+    if (committeeData.length === 0) {
+
+        container.innerHTML =
+            '<div class="empty-cell">No committee members found.</div>';
+
+        return;
     }
 
-    // UPDATE HANDLER
-    document.querySelector('.btn-update').addEventListener('click', function() {
-        const clubId = document.getElementById('info-club-id').value;
-        if (!clubId) {
-            alert("Please select a club first.");
+    committeeData.forEach(member => {
+
+        const row = document.createElement('div');
+
+        row.className = 'committee-data-row';
+
+        row.innerHTML = `
+            <span>${member.clubID}</span>
+            <span>${member.membershipID}</span>
+            <span>${member.userID}</span>
+            <span>${member.userName}</span>
+            <span>${member.committeePosition}</span>
+            <span>${member.committeeAssignedDate ?? '-'}</span>
+        `;
+
+        row.addEventListener('click', function () {
+
+            document.querySelectorAll('.committee-data-row')
+                .forEach(r => r.classList.remove('selected-row'));
+
+            row.classList.add('selected-row');
+
+            selectedCommitteeMember = {
+                clubID: member.clubID,
+                membershipID: member.membershipID,
+                userID: member.userID,
+                userName: member.userName,
+                committeePosition: member.committeePosition,
+                committeeAssignedDate: member.committeeAssignedDate,
+            };
+
+            console.log(selectedCommitteeMember);
+        });
+
+        container.appendChild(row);
+    });
+}
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    loadClubOptions();
+
+    const clubSearchPill = document.getElementById('club-choice');
+
+    if (clubSearchPill) {
+
+        clubSearchPill.addEventListener('input', function() {
+
+            const val = this.value;
+
+            const options =
+                document.getElementById('club-options-committee').options;
+
+            for (let i = 0; i < options.length; i++) {
+
+                if (options[i].value === val) {
+
+                    const cleanID = val.split(' - ')[0].trim();
+
+                    document.getElementById('info-club-id').value = cleanID;
+
+                    fetchClubData(cleanID);
+
+                    break;
+                }
+            }
+        });
+    }
+});
+
+
+
+function loadClubOptions() {
+
+    const fd = new FormData();
+
+    fd.append('action', 'get_clubs');
+
+    fetch('admin_student_clubs_api.php', {
+
+        method: 'POST',
+        body: fd
+
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.success) {
+
+            const datalist =
+                document.getElementById('club-options-committee');
+
+            datalist.innerHTML = '';
+
+            data.clubs.forEach(club => {
+
+                const option = document.createElement('option');
+
+                option.value =
+                    `${club.clubID} - ${club.clubName}`;
+
+                datalist.appendChild(option);
+            });
+        }
+    });
+}
+
+
+
+function fetchClubData(clubKey) {
+
+    fetch(`admin_student_clubs_api.php?action=club_details&clubKey=${encodeURIComponent(clubKey)}`)
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if (!data.success) {
+
+            alert(data.message);
+
             return;
         }
 
-        const formData = new FormData();
-        formData.append('club_id', clubId);
-        formData.append('info_club_name', document.getElementById('info-club-name').value);
-        formData.append('info_club_desc', document.getElementById('info-club-desc').value);
-        formData.append('info_club_advisor', document.getElementById('info-club-advisor').value);
-        
-        const statusEl = document.querySelector('input[name="info_club_status"]:checked');
-        formData.append('info_club_status', statusEl ? statusEl.value : 'active');
-        formData.append('info_club_created', document.getElementById('info-club-created').value);
+        const club = data.club;
 
-        fetch('admin_student_clubs_api.php?action=update_club', { method: 'POST', body: formData })
-            .then(r => r.json())
-            .then(data => { 
-                alert(data.message); 
-                if(data.success) location.reload(); 
-            });
+        document.getElementById('info-club-id').value =
+            club.clubID || '';
+
+        document.getElementById('info-club-name').value =
+            club.clubName || '';
+
+        document.getElementById('info-club-desc').value =
+            club.clubDesc || '';
+
+        document.getElementById('info-club-created').value =
+            club.clubCreated || '';
+
+        document.getElementById('info-club-advisor').value =
+            club.clubAdvisor || '';
+
+        const radios =
+            document.getElementsByName('info_club_status');
+
+        radios.forEach(radio => {
+
+            radio.checked =
+                (radio.value.toLowerCase() ===
+                 club.clubStatus.toLowerCase());
+        });
+
+        updateCommitteeTable(data.committee || []);
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Failed to fetch club details.");
+    });
+}
+
+
+
+function openAddModal() {
+
+    const clubID =
+        document.getElementById('info-club-id').value;
+
+    if (!clubID) {
+
+        alert("Please select a club first.");
+
+        return;
+    }
+
+    document.getElementById('add-userID').value = "";
+    document.getElementById('add-userName').value = "";
+    document.getElementById('add-position').selectedIndex = 0;
+
+    document.getElementById('add-clubID-display').value =
+        clubID;
+
+    fetch('admin_student_clubs_api.php?action=get_next_membership_id')
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if (data.success) {
+
+            document.getElementById('add-membershipID').value =
+                data.nextID;
+
+        } else {
+
+            document.getElementById('add-membershipID').value =
+                "";
+        }
     });
 
-    // DELETE HANDLER
-    document.querySelector('.btn-delete').addEventListener('click', function() {
-        const clubId = document.getElementById('info-club-id').value;
-        if (!clubId) {
-            alert("Please select a club first.");
+    document.getElementById('addCommitteeModal').style.display =
+        'flex';
+}
+
+
+
+function openUpdateModal() {
+
+    if (!selectedCommitteeMember) {
+
+        alert("Please select a member first!");
+
+        return;
+    }
+
+    document.getElementById('upd-userID').value =
+        selectedCommitteeMember.userID;
+
+    document.getElementById('upd-userName').value =
+        selectedCommitteeMember.userName;
+
+    document.getElementById('upd-clubID-display').value =
+        selectedCommitteeMember.clubID;
+
+    document.getElementById('upd-membershipID').value =
+        selectedCommitteeMember.membershipID;
+
+    document.getElementById('upd-position').value =
+        selectedCommitteeMember.committeePosition;
+
+    document.getElementById('updateCommitteeModal').style.display =
+        'flex';
+}
+
+
+
+function openDeleteModal() {
+
+    if (!selectedCommitteeMember) {
+
+        alert("Please select a member first!");
+
+        return;
+    }
+
+    document.getElementById('del-userID').value =
+        selectedCommitteeMember.userID;
+
+    document.getElementById('del-userName').value =
+        selectedCommitteeMember.userName;
+
+    document.getElementById('del-clubID').value =
+        selectedCommitteeMember.clubID;
+
+    document.getElementById('del-membershipID').value =
+        selectedCommitteeMember.membershipID;
+
+    document.getElementById('del-position').value =
+        selectedCommitteeMember.committeePosition;
+
+    document.getElementById('deleteCommitteeModal').style.display =
+        'flex';
+}
+
+
+
+function closeModal(id) {
+
+    document.getElementById(id).style.display = 'none';
+}
+
+
+
+function submitAddCommittee() {
+
+    const clubID =
+        document.getElementById('info-club-id').value;
+
+    const membershipID =
+        document.getElementById('add-membershipID').value;
+
+    const userID =
+        document.getElementById('add-userID').value;
+
+    const position =
+        document.getElementById('add-position').value;
+
+    const assignedDate =
+        new Date().toISOString().split('T')[0];
+
+    if (userID === '' || position === '') {
+
+        alert("Please fill all fields.");
+
+        return;
+    }
+
+    const fd = new FormData();
+
+    fd.append('clubID', clubID);
+    fd.append('membershipID', membershipID);
+    fd.append('userID', userID);
+    fd.append('position', position);
+    fd.append('assignedDate', assignedDate);
+
+    fetch('admin_student_clubs_api.php?action=add_committee', {
+
+        method: 'POST',
+        body: fd
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        alert(data.message);
+
+        if (data.success) {
+
+            closeModal('addCommitteeModal');
+
+            fetchClubData(clubID);
+        }
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Failed to add committee.");
+    });
+}
+
+
+
+function submitUpdateCommittee() {
+
+    const membershipID =
+        document.getElementById('upd-membershipID').value;
+
+    const position =
+        document.getElementById('upd-position').value;
+
+    if (membershipID === '' || position === '') {
+
+        alert("Please fill all fields.");
+        return;
+    }
+
+    const fd = new FormData();
+
+    fd.append('membershipID', membershipID);
+    fd.append('position', position);
+
+    fetch('admin_student_clubs_api.php?action=update_committee', {
+        method: 'POST',
+        body: fd
+    })
+
+    .then(response => response.text())
+
+    .then(text => {
+
+        console.log(text);
+
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        }
+        catch(e) {
+            alert("PHP returned invalid response. Check console.");
             return;
         }
 
-        if(!confirm("Are you sure you want to delete this club?")) return;
-        
-        const formData = new FormData();
-        formData.append('clubID', clubId);
+        alert(data.message);
 
-        fetch('admin_student_clubs_api.php?action=delete_club', { method: 'POST', body: formData })
-            .then(r => r.json())
-            .then(data => { 
-                alert(data.message); 
-                if(data.success) location.reload(); 
-            });
+        if (data.success) {
+
+            closeModal('updateCommitteeModal');
+
+            fetchClubData(
+                document.getElementById('info-club-id').value
+            );
+        }
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Update failed.");
     });
+}
+
+
+
+function submitDeleteCommittee() {
+
+    if (!confirm("Are you sure you want to delete this committee member?")) {
+
+        return;
+    }
+
+    const membershipID =
+        document.getElementById('del-membershipID').value;
+
+    const clubID =
+        document.getElementById('del-clubID').value;
+
+    const fd = new FormData();
+
+    fd.append('membershipID', membershipID);
+
+    fetch('admin_student_clubs_api.php?action=delete_committee', {
+
+        method: 'POST',
+        body: fd
+    })
+
+    .then(r => r.json())
+
+    .then(res => {
+
+        alert(res.message);
+
+        if (res.success) {
+
+            closeModal('deleteCommitteeModal');
+
+            fetchClubData(clubID);
+        }
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Delete failed.");
+    });
+}
+function updateClub() {
+
+    const clubID = document.getElementById('info-club-id').value;
+    const clubName = document.getElementById('info-club-name').value;
+    const clubDesc = document.getElementById('info-club-desc').value;
+    const clubAdvisor = document.getElementById('info-club-advisor').value;
+    const clubCreated = document.getElementById('info-club-created').value;
+
+    let clubStatus = '';
+    const radios = document.getElementsByName('info_club_status');
+
+    radios.forEach(radio => {
+        if (radio.checked) {
+            clubStatus = radio.value;
+        }
+    });
+
+    if (clubID === '') {
+        alert("Please select a club first.");
+        return;
+    }
+
+    const fd = new FormData();
+
+    fd.append('action', 'update_club');
+    fd.append('clubID', clubID);
+    fd.append('clubName', clubName);
+    fd.append('clubDesc', clubDesc);
+    fd.append('clubAdvisor', clubAdvisor);
+    fd.append('clubCreated', clubCreated);
+    fd.append('clubStatus', clubStatus);
+
+    fetch('admin_student_clubs_api.php', {
+        method: 'POST',
+        body: fd
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+
+        if (data.success) {
+            fetchClubData(clubID);
+        }
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Update failed.");
+    });
+}
+
+
+// ================= DELETE CLUB =================
+function deleteClub() {
+
+    const clubID = document.getElementById('info-club-id').value;
+
+    if (clubID === '') {
+        alert("Please select a club first.");
+        return;
+    }
+
+    if (!confirm("Are you sure you want to delete this club?")) {
+        return;
+    }
+
+    const fd = new FormData();
+
+    fd.append('action', 'delete_club');
+    fd.append('clubID', clubID);
+
+    fetch('admin_student_clubs_api.php', {
+        method: 'POST',
+        body: fd
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+
+        if (data.success) {
+
+            document.getElementById('info-club-id').value = '';
+            document.getElementById('info-club-name').value = '';
+            document.getElementById('info-club-desc').value = '';
+            document.getElementById('info-club-advisor').value = '';
+            document.getElementById('info-club-created').value = '';
+
+            document.querySelectorAll('input[name="info_club_status"]').forEach(r => {
+                r.checked = false;
+            });
+
+            document.getElementById('committee-list-rows').innerHTML =
+                '<div class="empty-cell">Club deleted.</div>';
+        }
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Delete failed.");
+    });
+}
+
+function submitDeleteCommittee() { if (!confirm("Are you sure you want to delete this committee member?")) { return; } const clubID = document.getElementById('del-clubID').value; const userID = document.getElementById('del-userID').value; const fd = new FormData(); fd.append('clubID', clubID); fd.append('userID', userID); fetch('admin_student_clubs_api.php?action=delete_committee', { method: 'POST', body: fd }) .then(r => r.json()) .then(res => { alert(res.message); if (res.success) { closeModal('deleteCommitteeModal'); fetchClubData(clubID); } }); }
 </script>
+<div id="addCommitteeModal" class="custom-modal" style="display:none;">
+    <div class="modal-content">
+
+        <h4 class="modal-title">Add Committee</h4>
+
+        <div class="form-group">
+            <label>User ID</label>
+            <input type="text" id="add-userID" oninput="autoFillName('add')">
+        </div>
+
+        <div class="form-group">
+            <label>User Name</label>
+            <input type="text" id="add-userName" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Club ID</label>
+            <input type="text" id="add-clubID-display" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Membership ID</label>
+            <input type="text" id="add-membershipID" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Committee Position</label>
+            <select id="add-position">
+                <option value="">Select Position</option>
+                <option value="President">President</option>
+                <option value="Vice President">Vice President</option>
+                <option value="Secretary">Secretary</option>
+                <option value="Treasurer">Treasurer</option>
+            </select>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-red" onclick="closeModal('addCommitteeModal')">Cancel</button>
+            <button class="btn-teal" onclick="submitAddCommittee()">Add</button>
+        </div>
+
+    </div>
+</div>
+
+<div id="updateCommitteeModal" class="custom-modal" style="display:none;">
+    <div class="modal-content">
+
+        <h4 class="modal-title">Update Committee</h4>
+
+        <div class="form-group">
+            <label>User ID</label>
+            <input type="text" id="upd-userID" oninput="autoFillName('upd')">
+        </div>
+
+        <div class="form-group">
+            <label>User Name</label>
+            <input type="text" id="upd-userName" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Club ID</label>
+            <input type="text" id="upd-clubID-display" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Membership ID</label>
+            <input type="text" id="upd-membershipID">
+        </div>
+
+        <div class="form-group">
+            <label>Committee Position</label>
+            <select id="upd-position">
+                <option value="">Select Position</option>
+                <option value="President">President</option>
+                <option value="Vice President">Vice President</option>
+                <option value="Secretary">Secretary</option>
+                <option value="Treasurer">Treasurer</option>
+            </select>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-red" onclick="closeModal('updateCommitteeModal')">Cancel</button>
+            <button class="btn-teal" onclick="submitUpdateCommittee()">Update</button>
+        </div>
+
+    </div>
+</div>
+
+<div id="deleteCommitteeModal" class="custom-modal" style="display:none;">
+    <div class="modal-content">
+
+        <h4 class="modal-title">Delete Committee</h4>
+
+        <div class="form-group">
+            <label>User ID</label>
+            <input type="text" id="del-userID" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>User Name</label>
+            <input type="text" id="del-userName" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Club ID</label>
+            <input type="text" id="del-clubID" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Membership ID</label>
+            <input type="text" id="del-membershipID" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Committee Position</label>
+            <select id="del-position" readonly>
+                <option value="">Select Position</option>
+                <option value="President">President</option>
+                <option value="Vice President">Vice President</option>
+                <option value="Secretary">Secretary</option>
+                <option value="Treasurer">Treasurer</option>
+            </select>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-red" onclick="closeModal('deleteCommitteeModal')">Cancel</button>
+            <button class="btn-teal" onclick="submitDeleteCommittee()">Delete</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

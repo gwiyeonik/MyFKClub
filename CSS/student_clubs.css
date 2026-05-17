@@ -705,6 +705,7 @@ background: #17418f; /* Dark blue color */
 
 .committee-panel {
   grid-column: 1 / -1;
+  height: 600px;
 }
 
 .card {
@@ -783,11 +784,7 @@ background: #17418f; /* Dark blue color */
 
 .committee-grid-header,
 .committee-data-row {
-  display: grid;
-  grid-template-columns: 0.3fr 0.4fr 0.4fr;
-  gap: 16px;
-  padding: 16px 18px;
-  align-items: center;
+display: grid; grid-template-columns: 0.2fr 0.3fr 0.2fr 0.5fr 0.3fr 0.2fr; gap: 16px; padding: 14px 18px; align-items: center; border-bottom: 1px solid #e8edf5; cursor: pointer; transition: 0.2s ease; background: #ffffff;
 }
 
 .committee-grid-header {
@@ -797,10 +794,15 @@ background: #17418f; /* Dark blue color */
 }
 
 .committee-data-area {
-  min-height: 180px;
+  min-height: 350px;
   background: var(--white);
   padding: 10px 0;
+    max-height: 350px; 
+    overflow-y: auto;
+    overflow-x: hidden;
 }
+
+.committee-data-row:hover { background: #f5f9ff; } .selected-row { background: #dbe9ff !important; } .committee-data-row span { font-size: 0.92rem; color: #17418f; }
 
 .committee-data-area .empty-cell {
   grid-column: 1 / -1;
@@ -877,7 +879,6 @@ background: #17418f; /* Dark blue color */
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 22px;
 }
 
 .btn-action,
@@ -1164,4 +1165,116 @@ background: #17418f; /* Dark blue color */
 
 #club-input:focus {
     border-color: #1a428a;
+}
+
+.custom-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Modal Box */
+.modal-content {
+    background: #ffffff;
+    width: 420px;
+    padding: 32px 35px;
+    border-radius: 4px;
+    border: 1px solid #e6e6e6;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* Title */
+.modal-title {
+    margin: 0 0 28px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #17418f;
+}
+
+/* Form Row */
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 18px;
+    gap: 18px;
+}
+
+/* Label */
+.form-group label {
+    width: 130px;
+    font-size: 0.92rem;
+    color: #444;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+/* Input & Select */
+.form-group input,
+.form-group select {
+    flex: 1;
+    height: 34px;
+    border: 1px solid #6f8fc7;
+    background: #ffffff;
+    padding: 0 10px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: 0.2s ease;
+}
+
+/* Focus Effect */
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #17418f;
+    box-shadow: 0 0 0 3px rgba(23, 65, 143, 0.08);
+}
+
+/* Buttons Container */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+/* Buttons */
+.modal-actions button {
+    min-width: 78px;
+    height: 34px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+/* Cancel Button */
+.btn-red {
+    background: #ff1e1e;
+    color: white;
+}
+
+.btn-red:hover {
+    background: #e00000;
+}
+
+/* Main Action Button */
+.btn-teal {
+    background: #00a7a7;
+    color: white;
+}
+
+.btn-teal:hover {
+    background: #008d8d;
+}
+
+/* Readonly Fields */
+input[readonly] {
+    background: #f8f8f8;
+    cursor: not-allowed;
 }
