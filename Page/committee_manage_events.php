@@ -23,7 +23,7 @@ $idRow = $idResult->fetch_assoc();
 $nextID = $idRow['Auto_increment'];
 
 $eventResult = $conn->query($eventQuery);
-$sql = "SELECT * FROM event ORDER BY eventDate ASC";
+$sql = "SELECT * FROM event ORDER BY eventDateStart ASC";
 $result = $conn->query($sql);
 
 if ($eventResult && $eventResult->num_rows > 0) {
@@ -108,7 +108,7 @@ if ($eventResult && $eventResult->num_rows > 0) {
                                 data-id="<?= $row['eventID'] ?>"
                                 data-title="<?= htmlspecialchars($row['eventTitle']) ?>"
                                 data-venue="<?= htmlspecialchars($row['eventVenue']) ?>"
-                                data-date="<?= $row['eventDate'] ?>"
+                                data-date="<?= $row['eventDateStart'] ?>"
                                 data-date-start="<?= $row['eventDateStart'] ?>"
                                 data-date-end="<?= $row['eventDateEnd'] ?>"
                                 data-status="<?= $row['eventStatus'] ?>"
@@ -184,7 +184,7 @@ if ($eventResult && $eventResult->num_rows > 0) {
                         </label>
                     </div>
                     <div id="single-date">
-                        <input type="date" name="eventDate" id="eventDate">
+                        <input type="date" name="eventDateStart" id="eventDateStart">
                     </div>
                     <div id="range-date" style="display:none; gap: 10px; align-items: center;">
                         <input type="date" name="eventDateStart" id="eventDateStart">
@@ -435,14 +435,12 @@ if ($eventResult && $eventResult->num_rows > 0) {
     if (type === 'single') {
         single.style.display = 'block';
         range.style.display = 'none';
-        document.getElementById('eventDate').required = true;
-        document.getElementById('eventDateStart').required = false;
+        document.getElementById('eventDateStart').required = true;
         document.getElementById('eventDateEnd').required = false;
     } else {
         single.style.display = 'none';
         range.style.display = 'flex';
-        document.getElementById('eventDate').required = false;
-        document.getElementById('eventDateStart').required = true;
+        document.getElementById('eventDateStart').required = false;
         document.getElementById('eventDateEnd').required = true;
     }
 }
