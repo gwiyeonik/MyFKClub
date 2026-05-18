@@ -342,6 +342,53 @@ if ($action === 'get_events') {
 }
 
 /* ======================================================
+   GET CLUB MEMBERS
+====================================================== */
+if ($action === 'get_club_members') {
+
+    $clubID = $_GET['clubID'] ?? '';
+
+    $clubID = (int)$clubID;
+
+    if ($clubID <= 0) {
+
+        echo json_encode([
+            'success' => false,
+            'message' => 'Invalid club ID.'
+        ]);
+
+        exit;
+    }
+
+    $members = [];
+
+    $query = "
+        SELECT
+            cm.membershipID,
+            cm.userID,
+            u.userName
+        FROM clubmembership cm
+        JOIN user u
+            ON cm.userID = u.userID
+        WHERE cm.clubID = $clubID
+        ORDER BY cm.membershipID ASC
+    ";
+
+    $result = mysqli_query($link, $query);
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $members[] = $row;
+    }
+
+    echo json_encode([
+        'success' => true,
+        'members' => $members
+    ]);
+
+    exit;
+}
+
+/* ======================================================
    ADD COMMITTEE
 ====================================================== */
 if ($action === 'add_committee') {
@@ -393,53 +440,49 @@ if ($action === 'add_committee') {
 
     mysqli_begin_transaction($link);
 
-    $stmt = mysqli_prepare($link, "SELECT clubID, userID FROM clubmembership WHERE membershipID = ?");
-    mysqli_stmt_bind_param($stmt, "i", $membershipID);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_store_result($stmt);
-    $membershipExists = mysqli_stmt_num_rows($stmt) > 0;
+$stmt = mysqli_prepare($link, "
+    SELECT clubID, userID
+    FROM clubmembership
+    WHERE membershipID = ?
+");
 
-    if ($membershipExists) {
-        mysqli_stmt_bind_result($stmt, $existingClubID, $existingUserID);
-        mysqli_stmt_fetch($stmt);
+mysqli_stmt_bind_param($stmt, "i", $membershipID);
 
-        if ($existingClubID !== $clubID || $existingUserID !== $userID) {
-            mysqli_stmt_close($stmt);
-            mysqli_rollback($link);
-            echo json_encode([
-                "success" => false,
-                "message" => "Membership ID already exists with a different club or user."
-            ]);
-            exit;
-        }
+mysqli_stmt_execute($stmt);
 
-        mysqli_stmt_close($stmt);
-    } else {
-        mysqli_stmt_close($stmt);
+mysqli_stmt_store_result($stmt);
 
-        $stmt = mysqli_prepare($link, "INSERT INTO clubmembership (membershipID, clubID, userID) VALUES (?, ?, ?)");
-        if (!$stmt) {
-            mysqli_rollback($link);
-            echo json_encode([
-                "success" => false,
-                "message" => "Prepare failed: " . mysqli_error($link)
-            ]);
-            exit;
-        }
+if (mysqli_stmt_num_rows($stmt) === 0) {
 
-        mysqli_stmt_bind_param($stmt, "iii", $membershipID, $clubID, $userID);
-        if (!mysqli_stmt_execute($stmt)) {
-            mysqli_stmt_close($stmt);
-            mysqli_rollback($link);
-            echo json_encode([
-                "success" => false,
-                "message" => "Failed to create club membership: " . mysqli_stmt_error($stmt)
-            ]);
-            exit;
-        }
+    mysqli_stmt_close($stmt);
 
-        mysqli_stmt_close($stmt);
-    }
+    mysqli_rollback($link);
+
+    echo json_encode([
+        "success" => false,
+        "message" => "This user is not a club member."
+    ]);
+
+    exit;
+}
+
+mysqli_stmt_bind_result($stmt, $existingClubID, $existingUserID);
+
+mysqli_stmt_fetch($stmt);
+
+mysqli_stmt_close($stmt);
+
+if ($existingClubID != $clubID || $existingUserID != $userID) {
+
+    mysqli_rollback($link);
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Membership does not belong to this club/user."
+    ]);
+
+    exit;
+}
 
     $stmt = mysqli_prepare($link, "SELECT membershipID FROM clubcommittee WHERE membershipID = ?");
     mysqli_stmt_bind_param($stmt, "i", $membershipID);

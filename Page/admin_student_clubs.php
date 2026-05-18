@@ -871,29 +871,67 @@ function openAddModal() {
     document.getElementById('add-clubID-display').value =
         clubID;
 
-    fetch('admin_student_clubs_api.php?action=get_next_membership_id')
 
-    .then(response => response.json())
 
-    .then(data => {
+fetch(`admin_student_clubs_api.php?action=get_club_members&clubID=${clubID}`)
 
-        if (data.success) {
+.then(response => response.json())
 
-            document.getElementById('add-membershipID').value =
-                data.nextID;
+.then(data => {
 
-        } else {
+    const select =
+        document.getElementById('add-member-select');
 
-            document.getElementById('add-membershipID').value =
-                "";
-        }
-    });
+    select.innerHTML =
+        '<option value="">Select Member</option>';
+
+    if (data.success && data.members.length > 0) {
+
+        data.members.forEach(member => {
+
+            select.innerHTML += `
+                <option
+                    value="${member.membershipID}"
+                    data-userid="${member.userID}"
+                    data-username="${member.userName}"
+                >
+                    ${member.membershipID} - ${member.userName}
+                </option>
+            `;
+        });
+    }
+});
 
     document.getElementById('addCommitteeModal').style.display =
         'flex';
 }
 
+function selectMemberForCommittee() {
 
+    const select =
+        document.getElementById('add-member-select');
+
+    const option =
+        select.options[select.selectedIndex];
+
+    if (!option.value) {
+
+        document.getElementById('add-membershipID').value = '';
+        document.getElementById('add-userID').value = '';
+        document.getElementById('add-userName').value = '';
+
+        return;
+    }
+
+    document.getElementById('add-membershipID').value =
+        option.value;
+
+    document.getElementById('add-userID').value =
+        option.dataset.userid;
+
+    document.getElementById('add-userName').value =
+        option.dataset.username;
+}
 
 function openUpdateModal() {
 
@@ -1392,14 +1430,22 @@ function submitDeleteCommittee() {
         });
     }
     </script>
-    <div id="addCommitteeModal" class="custom-modal" style="display:none;">
-        <div class="modal-content">
+<div id="addCommitteeModal" class="custom-modal" style="display:none;">
+    <div class="modal-content">
 
-            <h4 class="modal-title">Add Committee</h4>
+        <h4 class="modal-title">Add Committee</h4>
+
+        <div class="form-group">
+            <label>Select Member</label>
+
+            <select id="add-member-select" onchange="selectMemberForCommittee()">
+                <option value="">Select Member</option>
+            </select>
+        </div>
 
         <div class="form-group">
             <label>User ID</label>
-            <input type="text" id="add-userID" oninput="autoFillName('add')">
+            <input type="text" id="add-userID" readonly>
         </div>
 
         <div class="form-group">
@@ -1419,6 +1465,7 @@ function submitDeleteCommittee() {
 
         <div class="form-group">
             <label>Committee Position</label>
+
             <select id="add-position">
                 <option value="">Select Position</option>
                 <option value="President">President</option>
@@ -1429,8 +1476,13 @@ function submitDeleteCommittee() {
         </div>
 
         <div class="modal-actions">
-            <button class="btn-red" onclick="closeModal('addCommitteeModal')">Cancel</button>
-            <button class="btn-teal" onclick="submitAddCommittee()">Add</button>
+            <button class="btn-red" onclick="closeModal('addCommitteeModal')">
+                Cancel
+            </button>
+
+            <button class="btn-teal" onclick="submitAddCommittee()">
+                Add
+            </button>
         </div>
 
     </div>
