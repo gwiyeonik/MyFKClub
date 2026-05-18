@@ -303,7 +303,7 @@ mysqli_close($link);
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Clubs | MyFKClub Admin</title>
+  <title>Student Clubs | Admin</title>
   <link rel="stylesheet" href="../CSS/student_clubs.css">
 </head>
 <body>
@@ -1020,7 +1020,8 @@ function submitAddCommittee() {
 
             closeModal('addCommitteeModal');
 
-            fetchClubData(clubID);
+            fetchCommitteeData(clubID);
+            fetchClubListPanel(clubID);
         }
     })
 
@@ -1045,16 +1046,20 @@ function submitUpdateCommittee() {
     if (membershipID === '' || position === '') {
 
         alert("Please fill all fields.");
+
         return;
     }
 
     const fd = new FormData();
 
     fd.append('membershipID', membershipID);
+
     fd.append('position', position);
 
     fetch('admin_student_clubs_api.php?action=update_committee', {
+
         method: 'POST',
+
         body: fd
     })
 
@@ -1067,10 +1072,13 @@ function submitUpdateCommittee() {
         let data;
 
         try {
+
             data = JSON.parse(text);
         }
         catch(e) {
+
             alert("PHP returned invalid response. Check console.");
+
             return;
         }
 
@@ -1080,9 +1088,17 @@ function submitUpdateCommittee() {
 
             closeModal('updateCommitteeModal');
 
-            fetchClubData(
-                document.getElementById('info-club-id').value
-            );
+            const clubID =
+                document.getElementById('info-club-id').value;
+
+            // Refresh committee management table
+            fetchCommitteeData(clubID);
+
+            // Refresh club list panel
+            fetchClubListPanel(clubID);
+
+            // Refresh right-side club info
+            fetchClubInfo(clubID);
         }
     })
 
@@ -1139,7 +1155,8 @@ function updateClub() {
         if (data.success) {
 
             // Refresh club data
-            fetchClubData(clubID);
+            fetchCommitteeData(clubID);
+            fetchClubListPanel(clubID);
 
             // Reload datalist
             loadClubOptions();
@@ -1365,19 +1382,20 @@ function submitDeleteCommittee() {
         alert(res.message);
         if (res.success) {
             closeModal('deleteCommitteeModal');
-            fetchClubData(clubID);
-        }
-    })
-    .catch(error => {
-        console.error(error);
-        alert('Failed to delete committee member.');
-    });
-}
-</script>
-<div id="addCommitteeModal" class="custom-modal" style="display:none;">
-    <div class="modal-content">
+            fetchCommitteeData(clubID);
+            fetchClubListPanel(clubID);
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            alert('Failed to delete committee member.');
+        });
+    }
+    </script>
+    <div id="addCommitteeModal" class="custom-modal" style="display:none;">
+        <div class="modal-content">
 
-        <h4 class="modal-title">Add Committee</h4>
+            <h4 class="modal-title">Add Committee</h4>
 
         <div class="form-group">
             <label>User ID</label>

@@ -68,11 +68,11 @@ if ($eventResult && $eventResult->num_rows > 0) {
         <img src="../Image/fkclub.jpg" alt="FKClub logo">
       </div>
       <nav class="sidebar-nav">
-        <a href="#" class="sidebar-link">Home</a>
-        <a href="#" class="sidebar-link">Manage Clubs</a>
+        <a href="committee_dashboard.php" class="sidebar-link">Home</a>
+        <a href="committee_view_clubs.php" class="sidebar-link">Manage Clubs</a>
         <a href="committee_manage_events.php" class="sidebar-link active">Manage Events</a>
-        <a href="#" class="sidebar-link">Members</a>
-        <a href="#" class="sidebar-link">Attendance</a>
+        <a href="committee_manage_members.php" class="sidebar-link">Members</a>
+        <a href="committee_attendance.php" class="sidebar-link">Attendance</a>
         <a href="committee_participation_report.php" class="sidebar-link">Reports</a>
       </nav>
     </aside>

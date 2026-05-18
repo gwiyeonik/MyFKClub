@@ -1108,7 +1108,7 @@ display: grid; grid-template-columns: 0.1fr 0.2fr 0.1fr 0.5fr 0.3fr 0.2fr; gap: 
     flex: 1;
     border: 1px solid var(--border);
     padding: 18px;
-    min-height: 150px;
+    min-height: 350px;
     margin-top: 0;
 }
 
@@ -1474,4 +1474,12 @@ input[readonly] {
     flex-direction: column;
     width: 100%;
     margin-top: -70px;
+}
+
+.clublist-area {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: -40px;
 }

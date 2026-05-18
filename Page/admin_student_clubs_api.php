@@ -320,7 +320,7 @@ if ($action === 'get_events') {
             eventParticipants,
             eventMaxParticipants,
             eventDesc
-        FROM tblevent
+        FROM event
         ORDER BY eventDateStart DESC
     ";
 
@@ -586,8 +586,16 @@ if ($action === 'get_club_events') {
 
     $events = [];
 
-    $evtQuery = "SELECT eventID, eventTitle, eventVenue, eventDateStart, eventDateEnd FROM event WHERE clubID = $clubID ORDER BY eventDateStart DESC";
+    $evtQuery = "SELECT eventID, eventTitle, eventVenue, eventDateStart, eventDateEnd, eventStatus, eventParticipants, eventMaxParticipants, eventDesc FROM event WHERE clubID = $clubID ORDER BY eventDateStart DESC";
     $evtResult = mysqli_query($link, $evtQuery);
+
+    if (!$evtResult) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Event query failed: ' . mysqli_error($link)
+        ]);
+        exit;
+    }
 
     while ($row = mysqli_fetch_assoc($evtResult)) {
         $events[] = $row;

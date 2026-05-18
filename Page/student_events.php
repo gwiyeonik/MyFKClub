@@ -68,7 +68,8 @@ $result = $conn->query($sql);
         </div>
         <nav class="sidebar-nav">
             <a href="student_dashboard.php" class="sidebar-link">Home</a>
-            <a href="student_clubs.php" class="sidebar-link">Clubs</a>
+            <a href="student_myclubs.php" class="sidebar-link">My Clubs</a>
+            <a href="student_clublist.php" class="sidebar-link">Club List</a>
             <a href="student_events.php" class="sidebar-link active">Events</a>
             <a href="student_participation.php" class="sidebar-link">Participation</a>
         </nav>

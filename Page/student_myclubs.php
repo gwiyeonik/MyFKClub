@@ -1,0 +1,263 @@
+<?php
+// student_myclubs.php
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$link = mysqli_connect("localhost", "root", "", "myfkclub");
+if (!$link) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$userID = intval($_SESSION['user_id']);
+$clubList = [];
+$stmt = mysqli_prepare($link, "SELECT c.clubID, c.clubName FROM clubmembership m JOIN club c ON m.clubID = c.clubID WHERE m.userID = ? ORDER BY c.clubName ASC");
+if ($stmt) {
+    mysqli_stmt_bind_param($stmt, 'i', $userID);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    while ($row = mysqli_fetch_assoc($result)) {
+        $clubList[] = $row;
+    }
+    mysqli_stmt_close($stmt);
+}
+
+mysqli_close($link);
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Clubs | Student</title>
+  <link rel="stylesheet" href="../CSS/student_clublist.css">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="dashboard-sidebar">
+      <div class="brand-panel">
+        <img src="../Image/fkclub.jpg" alt="FKClub logo">
+      </div>
+      <nav class="sidebar-nav">
+        <a href="student_dashboard.php" class="sidebar-link">Home</a>
+        <a href="student_myclubs.php" class="sidebar-link active">My Clubs</a>
+        <a href="student_clublist.php" class="sidebar-link">Club List</a>
+        <a href="student_events.php" class="sidebar-link">Events</a>
+        <a href="student_participation.php" class="sidebar-link">Participation</a>
+      </nav>
+    </aside>
+
+    <main class="dashboard-main">
+      <div class="topbar">
+        <div class="topbar-left"><div class="topbar-title">My Clubs</div></div>
+      </div>
+
+      <div class="clublist-area">
+        <section class="club-list-container">
+          <div class="main-card">
+            <div class="top-row">
+              <div class="club-details">
+                <div class="input-group">
+                  <label><strong>Select your club</strong></label>
+                  <input
+                      id="club-list-input"
+                      list="club-options-list"
+                      name="club-selection"
+                      class="pill-search-input"
+                      placeholder="Select your club..."
+                  >
+                  <datalist id="club-options-list">
+                    <?php foreach ($clubList as $club): ?>
+                      <option value="<?= htmlspecialchars($club['clubID'] . ' - ' . $club['clubName']) ?>">
+                    <?php endforeach; ?>
+                  </datalist>
+                </div>
+                <div class="info-field"><strong>Club Desc</strong><p id="list-club-desc" class="info-value">Select a club to view details</p></div>
+                <div class="info-field"><strong>Club Advisor</strong><p id="list-club-advisor" class="info-value">Select a club to view details</p></div>
+                <div class="info-field"><strong>Club Status</strong><p id="list-club-status" class="info-value">Select a club to view details</p></div>
+                <div class="info-field"><strong>Date Created</strong><p id="list-club-created" class="info-value">Select a club to view details</p></div>
+              </div>
+
+              <div class="committee-card">
+                <h3>Club Committee</h3>
+                <div class="committee-content" id="list-committee-content">
+                  <table class="committee-table">
+                    <thead>
+                      <tr>
+                        <th>userID</th>
+                        <th>userName</th>
+                        <th>committeePosition</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td colspan="3" class="empty-cell">Select a club to load committee members.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="top-row">
+              <div class="committee-card">
+                <h3>Club Members</h3>
+                <div class="committee-content" id="list-members-content">
+                  <table class="committee-table">
+                    <thead>
+                      <tr>
+                        <th>membershipID</th>
+                        <th>userName</th>
+                        <th>clubJoinDate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td colspan="3" class="empty-cell">Select a club to load members.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-title">Club Events</div>
+              <div class="table-wrapper">
+                <table class="event-data-table">
+                  <thead>
+                    <tr>
+                      <th>Event ID</th>
+                      <th>Event Title</th>
+                      <th>Event Venue</th>
+                      <th>Event Date</th>
+                      <th>Event Status</th>
+                      <th>Participants</th>
+                    </tr>
+                  </thead>
+                  <tbody id="event-table-body">
+                    <tr>
+                      <td colspan="6" class="empty-cell">Select a club to load events.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+<script>
+function fetchClubDetails(clubID) {
+    if (!clubID) return;
+    fetch(`student_myclubs_api.php?action=get_club_details&clubID=${encodeURIComponent(clubID)}`)
+    .then(r => r.json())
+    .then(data => {
+        if (!data.success) return;
+        const club = data.club || {};
+        document.getElementById('list-club-desc').textContent = club.clubDesc || 'Not available yet';
+        document.getElementById('list-club-advisor').textContent = club.clubAdvisor || 'Not available yet';
+        document.getElementById('list-club-status').textContent = club.clubStatus || 'Not available yet';
+        document.getElementById('list-club-created').textContent = club.clubCreated || 'Not available yet';
+    })
+    .catch(err => console.error(err));
+}
+
+function loadClubMembers(clubID) {
+    const container = document.getElementById('list-members-content');
+    if (!clubID) return;
+    fetch(`student_myclubs_api.php?action=get_club_members&clubID=${encodeURIComponent(clubID)}`)
+    .then(r => r.json())
+    .then(data => {
+        if (!data.success || !data.members || data.members.length === 0) {
+            container.innerHTML = '<div class="empty-cell">No club members found.</div>';
+            return;
+        }
+        let html = '<table class="committee-table"><thead><tr><th>membershipID</th><th>userName</th><th>clubJoinDate</th></tr></thead><tbody>';
+        data.members.forEach(member => {
+            html += `<tr><td>${member.membershipID}</td><td>${member.userName}</td><td>${member.clubJoinDate || ''}</td></tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    })
+    .catch(err => console.error(err));
+}
+
+function loadClubCommittee(clubID) {
+    const container = document.getElementById('list-committee-content');
+    if (!clubID) return;
+    fetch(`student_myclubs_api.php?action=get_club_committee&clubID=${encodeURIComponent(clubID)}`)
+    .then(r => r.json())
+    .then(data => {
+        if (!data.success || !data.committee || data.committee.length === 0) {
+            container.innerHTML = '<div class="empty-cell">No committee members found.</div>';
+            return;
+        }
+        let html = '<table class="committee-table"><thead><tr><th>userID</th><th>userName</th><th>committeePosition</th></tr></thead><tbody>';
+        data.committee.forEach(member => {
+            html += `<tr><td>${member.userID}</td><td>${member.userName}</td><td>${member.committeePosition || ''}</td></tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    })
+    .catch(err => console.error(err));
+}
+
+function loadEventsForClub(clubID) {
+    const tbody = document.getElementById('event-table-body');
+    tbody.innerHTML = '';
+    if (!clubID) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-cell">Select a club to load events.</td></tr>';
+        return;
+    }
+    fetch(`student_myclubs_api.php?action=get_club_events&clubID=${encodeURIComponent(clubID)}`)
+    .then(r => r.json())
+    .then(data => {
+        if (!data.success || !data.events || data.events.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-cell">No events found.</td></tr>';
+            return;
+        }
+        let html = '';
+        data.events.forEach(event => {
+            const start = event.eventDateStart || '';
+            const end = event.eventDateEnd || '';
+            const eventDate = (start === end || !end) ? formatDate(start) : `${formatDate(start)} - ${formatDate(end)}`;
+            html += `<tr><td>${event.eventID}</td><td><strong>${event.eventTitle}</strong></td><td>${event.eventVenue || ''}</td><td>${eventDate}</td><td><span class="status-badge ${event.eventStatus.toLowerCase()}">${event.eventStatus}</span></td><td>${event.eventParticipants || 0} / ${event.eventMaxParticipants || 0}</td></tr>`;
+        });
+        tbody.innerHTML = html;
+    })
+    .catch(err => {
+        console.error(err);
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-cell">Unable to load events.</td></tr>';
+    });
+}
+
+function formatDate(d) {
+    if (!d) return '';
+    const dt = new Date(d);
+    return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('club-list-input');
+    input.addEventListener('change', function () {
+        const val = this.value || '';
+        let id = null;
+        const m = val.match(/^(\d+)\s*-/);
+        if (m) id = m[1];
+        else {
+            const m2 = val.match(/^(\d+)\b/);
+            if (m2) id = m2[1];
+        }
+        if (id) {
+            fetchClubDetails(id);
+            loadClubMembers(id);
+            loadClubCommittee(id);
+            loadEventsForClub(id);
+        }
+    });
+});
+</script>
+</body>
+</html>
