@@ -290,7 +290,7 @@ if ($action === 'club_details') {
         JOIN clubmembership cm ON cc.membershipID = cm.membershipID
         JOIN user u ON cm.userID = u.userID
         WHERE cm.clubID = $clubID
-        ORDER BY u.userID ASC
+        ORDER BY u.userName ASC
     ";
 
     $committeeResult = mysqli_query($link, $committeeQuery);
@@ -322,7 +322,7 @@ if ($action === 'get_events') {
             eventMaxParticipants,
             eventDesc
         FROM event
-        ORDER BY eventDateStart DESC
+        ORDER BY eventName DESC
     ";
 
     $result = mysqli_query($link, $sql);
