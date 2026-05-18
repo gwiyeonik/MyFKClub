@@ -226,3 +226,26 @@ html, body {
   .dashboard-sidebar { height: auto; position: relative; }
   .dashboard-grid, .manage-grid { grid-template-columns: 1fr !important; }
 }
+/* --- TOPBAR BUTTON STYLING --- */
+.topbar {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.topbar-button {
+    background-color: var(--teal-btn) !important; /* Uses your teal color #00a988 */
+    color: var(--white) !important;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    border: none;
+}
+
+.topbar-button:hover {
+    background-color: var(--teal-hover) !important; /* Uses your hover teal #008f73 */
+    color: var(--white);
+}
