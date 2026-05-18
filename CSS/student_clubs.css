@@ -279,7 +279,7 @@ background: #17418f; /* Dark blue color */
   background: var(--white);
   border-radius: 0px;
   border: 1px solid var(--border);
-  padding: 30px;
+  padding: 28px;
   box-shadow: var(--shadow);
   display: flex;
   gap: 20px;
@@ -389,7 +389,7 @@ background: #17418f; /* Dark blue color */
   font-weight: 700;
   cursor: pointer;
   font-size: 0.95rem;
-  margin-top: 8px;
+  margin-top: auto;
   transition: background 180ms ease;
   font-family: inherit;
 }
@@ -448,7 +448,7 @@ background: #17418f; /* Dark blue color */
   background: var(--white);
   border-radius: 0px;
   border: 1px solid var(--border);
-  padding: 24px;
+  padding: 28px;
   box-shadow: var(--shadow);
 }
 
@@ -461,7 +461,7 @@ background: #17418f; /* Dark blue color */
 .action-buttons {
   display: flex;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: auto;
 }
 
 .btn-delete,
@@ -503,7 +503,7 @@ background: #17418f; /* Dark blue color */
   display: flex;
   justify-content: flex-end; /* Aligns them to the right side of the panel */
   gap: 12px;                 /* Space between the two buttons */
-  margin-top: 25px;
+  margin-top: auto;
 }
 
 /* Recent Registrations Panel */
@@ -703,9 +703,32 @@ background: #17418f; /* Dark blue color */
   margin-bottom: 24px;
 }
 
+/* Ensure left/right panels match height and stretch to the tallest column */
+.clubs-grid {
+  align-items: stretch;
+}
+
+.club-form,
+.club-info-panel {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+/* Make inner form grids grow to fill available height so cards look balanced */
+.club-form .form-grid,
+.club-info-panel .form-grid {
+  flex: 1 1 auto;
+}
+
 .committee-panel {
   grid-column: 1 / -1;
-  height: 600px;
+  /* Use a responsive minimum height instead of a fixed height so the panel
+     adapts to content and lets sibling columns stretch to match. */
+  min-height: 420px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .card {
@@ -1443,4 +1466,12 @@ input[readonly] {
 
 .event-data-table .empty-cell {
     padding: 28px 0;
+}
+
+.event-area {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: -70px;
 }
