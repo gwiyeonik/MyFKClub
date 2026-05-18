@@ -45,13 +45,17 @@ if (isset($_POST['signup_btn'])) {
 
     // ================= SECURE INSERT =================
     $hashedPass = password_hash($password, PASSWORD_DEFAULT);
-    $roleID = 2;
+    
+    // ✅ FIXED: Changed role ID to 3 so they register as a Student instead of Committee
+    $roleID = 3; 
 
+    // ✅ FIXED: Changed column 'userPhoto' to 'userProfile' to resolve the database crash
     $stmt = $link->prepare("
-        INSERT INTO user (userName, userEmail, userContact, userPhoto, userPass, roleID)
+        INSERT INTO user (userName, userEmail, userContact, userProfile, userPass, roleID)
         VALUES (?, ?, ?, ?, ?, ?)
     ");
 
+    // This stays exactly the same as before
     $stmt->bind_param(
         "sssssi",
         $userName,
@@ -74,6 +78,7 @@ if (isset($_POST['signup_btn'])) {
         exit();
     }
 
+    $stmt->close();
     mysqli_close($link);
 }
 ?>

@@ -15,6 +15,19 @@ if (!$conn) {
     exit;
 }
 
+function ensureRegistrationRequestsTable($conn) {
+    $conn->query("CREATE TABLE IF NOT EXISTS registration_requests (
+        requestID INT AUTO_INCREMENT PRIMARY KEY,
+        userName VARCHAR(255) NOT NULL,
+        userEmail VARCHAR(255) NOT NULL,
+        userContact VARCHAR(100),
+        userProfile VARCHAR(255),
+        userPass VARCHAR(255) NOT NULL,
+        roleID INT NOT NULL DEFAULT 3,
+        requestedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+}
+
 /* ================= SECURITY ================= */
 if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) != 1) {
     echo json_encode([
@@ -27,13 +40,14 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) != 1) {
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 /* ================= GET USERS ================= */
-if ($action === 'get_users') {
+if ($action === 'get_users' || $action === 'fetch_users_list') {
 
-$result = $conn->query("
-    SELECT userID, userName, userEmail, userContact, roleID, userStatus 
-    FROM user
-    ORDER BY userID ASC
-");
+    // ✅ FIXED: Completely removed 'userStatus' so it matches your 7 schema columns perfectly!
+    $result = $conn->query("
+        SELECT userID, userName, userEmail, userContact, roleID, userProfile 
+        FROM user
+        ORDER BY userID ASC
+    ");
 
     if (!$result) {
         echo json_encode([
@@ -46,6 +60,14 @@ $result = $conn->query("
     $users = [];
 
     while ($row = $result->fetch_assoc()) {
+        // Automatically inject human-readable names for your frontend script to render
+        if ($row['roleID'] == 1) {
+            $row['roleName'] = 'Admin';
+        } elseif ($row['roleID'] == 2) {
+            $row['roleName'] = 'Committee';
+        } else {
+            $row['roleName'] = 'Student';
+        }
         $users[] = $row;
     }
 
@@ -89,6 +111,41 @@ if ($action === 'get_next_user_id') {
     exit;
 }
 
+if ($action === 'get_requests') {
+    ensureRegistrationRequestsTable($conn);
+
+    $result = $conn->query("SELECT requestID, userName, userEmail, userContact, roleID, requestedAt FROM registration_requests ORDER BY requestedAt DESC");
+    if (!$result) {
+        echo json_encode(['success' => false, 'message' => $conn->error]);
+        exit;
+    }
+
+    $requests = [];
+    while ($row = $result->fetch_assoc()) {
+        $requests[] = $row;
+    }
+
+    echo json_encode(['success' => true, 'requests' => $requests]);
+    exit;
+}
+
+if ($action === 'reject_request') {
+    ensureRegistrationRequestsTable($conn);
+
+    $requestID = $_POST['requestID'] ?? '';
+    if (empty($requestID)) {
+        echo json_encode(['success' => false, 'message' => 'Missing request ID']);
+        exit;
+    }
+
+    $stmt = $conn->prepare("DELETE FROM registration_requests WHERE requestID = ?");
+    $stmt->bind_param("i", $requestID);
+    $success = $stmt->execute();
+
+    echo json_encode(['success' => $success, 'message' => $success ? 'Request rejected' : $stmt->error]);
+    exit;
+}
+
 /* ================= ADD USER ================= */
 if ($action === 'add_user') {
 
@@ -97,41 +154,54 @@ if ($action === 'add_user') {
     $contact = $_POST['userContact'] ?? '';
     $pass = password_hash($_POST['userPass'] ?? '', PASSWORD_DEFAULT);
     $role = $_POST['roleID'] ?? 3;
+    $userID = trim($_POST['userID'] ?? '');
+    $requestID = $_POST['requestID'] ?? null;
 
-    // AUTO ID
-    $res = $conn->query("SELECT MAX(userID) AS maxID FROM user");
-    $row = $res->fetch_assoc();
-    $userID = ($row['maxID']) ? ((int)$row['maxID'] + 1) : 1;
+    if ($userID === '') {
+        $res = $conn->query("SELECT MAX(CAST(userID AS UNSIGNED)) AS maxID FROM user");
+        $row = $res->fetch_assoc();
+        $userID = ($row['maxID'] ?? 0) + 1;
+    }
 
-    // ================= PHOTO UPLOAD =================
+    $checkStmt = $conn->prepare("SELECT userID FROM user WHERE userID = ?");
+    $checkStmt->bind_param("s", $userID);
+    $checkStmt->execute();
+    $checkStmt->store_result();
+    if ($checkStmt->num_rows > 0) {
+        echo json_encode(['success' => false, 'message' => 'User ID already exists. Please choose a different ID.']);
+        exit;
+    }
+    $checkStmt->close();
+
     $photoPath = null;
+    $photoFile = $_FILES['userProfile'] ?? $_FILES['userPhoto'] ?? null;
 
-    if (!empty($_FILES['userPhoto']['name'])) {
-
+    if ($photoFile && !empty($photoFile['name'])) {
         $uploadDir = "uploads/user/";
-
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
 
-        $fileName = time() . "_" . basename($_FILES['userPhoto']['name']);
+        $fileName = time() . "_" . basename($photoFile['name']);
         $targetFile = $uploadDir . $fileName;
-
-        move_uploaded_file($_FILES['userPhoto']['tmp_name'], $targetFile);
-
+        move_uploaded_file($photoFile['tmp_name'], $targetFile);
         $photoPath = $targetFile;
     }
 
-    $stmt = $conn->prepare("
-        INSERT INTO user
-        (userID, userName, userEmail, userContact, userPass, roleID, userStatus, userPhoto)
-        VALUES (?, ?, ?, ?, ?, ?, 'Active', ?)
-    ");
+    $stmt = $conn->prepare("INSERT INTO user (userID, userName, userEmail, userContact, userPass, roleID, userProfile) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssis", $userID, $name, $email, $contact, $pass, $role, $photoPath);
+    $success = $stmt->execute();
 
-    $stmt->bind_param("issssis", $userID, $name, $email, $contact, $pass, $role, $photoPath);
+    if ($success && !empty($requestID)) {
+        $rejectStmt = $conn->prepare("DELETE FROM registration_requests WHERE requestID = ?");
+        $rejectStmt->bind_param("i", $requestID);
+        $rejectStmt->execute();
+        $rejectStmt->close();
+    }
 
     echo json_encode([
-        'success' => $stmt->execute(),
+        'success' => $success,
+        'message' => $success ? 'User added successfully' : $stmt->error,
         'userID' => $userID,
         'photo' => $photoPath
     ]);
@@ -140,68 +210,89 @@ if ($action === 'add_user') {
 
 /* ================= UPDATE USER ================= */
 if ($action === 'update_user') {
+    $userID = $_POST['userID'] ?? null;
+    $userName = $_POST['userName'] ?? null;
+    $userEmail = $_POST['userEmail'] ?? null;
+    $userContact = $_POST['userContact'] ?? null;
+    $roleID = $_POST['roleID'] ?? null;
 
-    $userID = $_POST['oldUserID'] ?? '';
-    $name = $_POST['userName'] ?? '';
-    $email = $_POST['userEmail'] ?? '';
-    $contact = $_POST['userContact'] ?? '';
-    $role = $_POST['roleID'] ?? 3;
-
-    // GET OLD PHOTO
-    $res = $conn->query("SELECT userPhoto FROM user WHERE userID='$userID'");
-    $old = $res->fetch_assoc();
-    $photoPath = $old['userPhoto'] ?? null;
-
-    // NEW PHOTO (optional replace)
-    if (!empty($_FILES['userPhoto']['name'])) {
-
-        $uploadDir = "uploads/user/";
-
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-
-        $fileName = time() . "_" . basename($_FILES['userPhoto']['name']);
-        $targetFile = $uploadDir . $fileName;
-
-        move_uploaded_file($_FILES['userPhoto']['tmp_name'], $targetFile);
-
-        $photoPath = $targetFile;
+    if (!$userID || !$userName || !$userEmail) {
+        echo json_encode(['success' => false, 'message' => 'Required fields missing']);
+        exit;
     }
 
-    $stmt = $conn->prepare("
-        UPDATE user 
-        SET userName=?, userEmail=?, userContact=?, roleID=?, userPhoto=?
-        WHERE userID=?
-    ");
+    // Check if a new profile image was uploaded
+    $photoFile = null;
+    if (isset($_FILES['userProfile']) && $_FILES['userProfile']['error'] === UPLOAD_ERR_OK) {
+        $photoFile = $_FILES['userProfile'];
+    } elseif (isset($_FILES['userPhoto']) && $_FILES['userPhoto']['error'] === UPLOAD_ERR_OK) {
+        $photoFile = $_FILES['userPhoto'];
+    }
 
-    $stmt->bind_param("ssisss", $name, $email, $contact, $role, $photoPath, $userID);
+    if ($photoFile) {
+        $targetDir = "uploads/";
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+        $fileName = time() . '_' . basename($photoFile['name']);
+        $targetFilePath = $targetDir . $fileName;
 
-    echo json_encode([
-        'success' => $stmt->execute()
-    ]);
+        if (move_uploaded_file($photoFile['tmp_name'], $targetFilePath)) {
+            $stmt = $conn->prepare("UPDATE user SET userName=?, userEmail=?, userContact=?, roleID=?, userProfile=? WHERE userID=?");
+            $stmt->bind_param("ssssis", $userName, $userEmail, $userContact, $roleID, $targetFilePath, $userID);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to save uploaded image']);
+            exit;
+        }
+    } else {
+        $stmt = $conn->prepare("UPDATE user SET userName=?, userEmail=?, userContact=?, roleID=? WHERE userID=?");
+        $stmt->bind_param("sssis", $userName, $userEmail, $userContact, $roleID, $userID);
+    }
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'User updated successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => $stmt->error]);
+    }
+    $stmt->close();
     exit;
 }
 
 /* ================= DELETE USER ================= */
 if ($action === 'delete_user') {
 
-    $userID = (int)($_POST['userID'] ?? 0);
+    $userID = trim($_POST['userID'] ?? '');
 
-    // GET PHOTO FIRST
-    $res = $conn->query("SELECT userPhoto FROM user WHERE userID=$userID");
-    $row = $res->fetch_assoc();
-
-    if (!empty($row['userPhoto']) && file_exists($row['userPhoto'])) {
-        unlink($row['userPhoto']);
+    if ($userID === '') {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Invalid or missing User ID.'
+        ]);
+        exit;
     }
 
-    $stmt = $conn->prepare("DELETE FROM user WHERE userID=?");
+    $stmt = $conn->prepare("SELECT userProfile FROM user WHERE userID = ?");
     $stmt->bind_param("s", $userID);
+    $stmt->execute();
+    $res = $stmt->get_result();
+
+    if ($res && $row = $res->fetch_assoc()) {
+        if (!empty($row['userProfile']) && file_exists($row['userProfile'])) {
+            unlink($row['userProfile']);
+        }
+    }
+    $stmt->close();
+
+    $stmt = $conn->prepare("DELETE FROM user WHERE userID = ?");
+    $stmt->bind_param("s", $userID);
+    $success = $stmt->execute();
 
     echo json_encode([
-        'success' => $stmt->execute()
+        'success' => $success,
+        'message' => $success ? 'User deleted successfully' : $stmt->error
     ]);
+    
+    $stmt->close();
     exit;
 }
 

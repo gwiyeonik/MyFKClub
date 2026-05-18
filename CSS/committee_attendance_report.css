@@ -354,3 +354,30 @@ body {
     grid-template-columns: 1fr;
   }
 }
+.table-select {
+  min-width: 120px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(17, 53, 111, 0.15);
+  background: #ffffff;
+  color: #003880;
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.update-btn {
+  background: #00a988;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.update-btn:hover {
+  background: #008f78;
+}

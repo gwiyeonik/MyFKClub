@@ -236,6 +236,10 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
       <div class="section-header">
         User Registration
       </div>
+      
+      <!-- Dummy hidden fields to prevent browser autofill -->
+      <input type="text" name="fakeusernameremembered" autocomplete="username" style="position:absolute; left:-9999px; top:-9999px; opacity:0;" />
+      <input type="password" name="fakepasswordremembered" autocomplete="new-password" style="position:absolute; left:-9999px; top:-9999px; opacity:0;" />
 
       <div class="form-grid">
 
@@ -245,6 +249,7 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
           <input 
             type="text"
             id="inputUserID"
+            autocomplete="off"
             readonly
             style="background:#f1f5f9; cursor:not-allowed;"
           >
@@ -257,16 +262,18 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
           <input 
             type="password"
             id="inputPassword"
+            autocomplete="new-password"
           >
         </div>
 
         <!-- NAME -->
         <div class="form-field">
-          <label>Full Name</label>
+          <label>Username</label>
 
           <input 
             type="text"
             id="inputName"
+            autocomplete="off"
           >
         </div>
 
@@ -277,6 +284,7 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
           <input 
             type="email"
             id="inputEmail"
+            autocomplete="off"
           >
         </div>
 
@@ -316,7 +324,7 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
           <input 
             type="text"
             id="inputContact"
-
+            autocomplete="off"
           >
         </div>
 
@@ -368,6 +376,7 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
     type="file" 
     id="inputUserPhoto" 
     accept="image/*"
+    autocomplete="off"
     onchange="previewUserPhoto(event)"
     style="display:none;"
   >
@@ -481,7 +490,7 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
       </div>
 
       <div class="form-group" style="margin-bottom: 16px;">
-        <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155; text-align: left;">Full Name</label>
+        <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155; text-align: left;">User Name</label>
         <input type="text" id="modalName" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box;">
       </div>
 
@@ -536,18 +545,88 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
 
   <script>
     // System maps used by your layout template
-    const roleMap = {
-      '1': 'Admin',
-      '2': 'Committee',
-      '3': 'Student'
-    };
-
+   
     // Load users and initialize search tracker on page load
     document.addEventListener('DOMContentLoaded', function() {
       loadUsers();
       initializeSearchFilter(); // Triggers the real-time matching engine
       initializeCommitteeAssignSection();
     });
+
+    // Automatically fetch requests when the dashboard loads
+document.addEventListener("DOMContentLoaded", function() {
+    loadRegistrationRequests();
+});
+
+function loadRegistrationRequests() {
+    fetch('admin_manage_users_api.php?action=get_requests')
+        .then(response => response.json())
+        .then(data => {
+            // Target your exact <div class="request-list"> container
+            const container = document.querySelector('.request-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (!data.success || data.requests.length === 0) {
+                container.innerHTML = '<p style="color:gray; padding:15px; font-size:14px; text-align:center;">No pending requests.</p>';
+                return;
+            }
+
+            data.requests.forEach(req => {
+                const card = document.createElement('div');
+                
+                // Row container style matching your layout
+                card.style = "display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #eee; background: #fff;";
+                
+                // Safely read role name from your system mapping
+                const displayRole = roleMap[req.roleID] || 'Pending User';
+
+                // Package the raw row data securely as a JSON string attribute
+                const rowData = JSON.stringify(req)
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+
+                // ✅ UNIVERSAL: Displays the Name, Email, and their requested System Role
+                card.innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <span style="font-size: 15px; color: #333; font-weight: 600;">${escapeHtml(req.userName)}</span>
+                        <span style="font-size: 13px; color: #777; font-weight: 500;">
+                            ${escapeHtml(req.userEmail)} • <strong style="color: #007bff;">${displayRole}</strong>
+                        </span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" onclick="rejectRequest(${req.requestID})" style="background: #e0e0e0; color: #333; border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 500;">Reject</button>
+                        <button type="button" onclick="autofillRegistrationForm('${rowData}')" style="background: #00a896; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 500;">Accept</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        });
+}
+
+// 🚀 Core Auto-Fill Logic updated for all roles
+function autofillRegistrationForm(jsonData) {
+    const userObj = JSON.parse(jsonData);
+    
+    // Autofill text inputs
+    if (document.getElementById('userName')) document.getElementById('userName').value = userObj.userName;
+    if (document.getElementById('userEmail')) document.getElementById('userEmail').value = userObj.userEmail;
+    if (document.getElementById('userContact')) document.getElementById('userContact').value = userObj.userContact || '';
+    
+    if (document.getElementById('userPass')) {
+        document.getElementById('userPass').value = '';
+        document.getElementById('userPass').placeholder = "Create a account password";
+    }
+
+    // ✅ DYNAMIC ROLE CHECK: Automatically selects Admin, Committee, or Student radio bubble
+    const targetedRadio = document.querySelector(`input[name="roleID"][value="${userObj.roleID}"]`);
+    if (targetedRadio) {
+        targetedRadio.checked = true;
+    }
+
+    // Smooth scroll straight to the form
+    document.getElementById('userRegistrationForm').scrollIntoView({ behavior: 'smooth' });
+}
 
     // =========================================================
     // COMMITTEE ASSIGNMENT DATA LOADERS
@@ -803,7 +882,11 @@ document.addEventListener('DOMContentLoaded', loadNextUserID);
         });
       }
     }
-
+  const roleMap = {
+    1: 'Admin',
+    2: 'Committee',
+    3: 'Student'
+};
     // Load all users from API
     function loadUsers() {
       fetch('admin_manage_users_api.php?action=get_users')
@@ -820,6 +903,13 @@ document.addEventListener('DOMContentLoaded', loadNextUserID);
           showError('Error loading users');
         });
     }
+    function showError(message) {
+    console.error(message);
+    const tableBody = document.getElementById('userTableBody');
+    if (tableBody) {
+        tableBody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center; padding:20px;">⚠️ ${message}</td></tr>`;
+    }
+}
 
     // Populate user table with data
     function populateUserTable(users) {
