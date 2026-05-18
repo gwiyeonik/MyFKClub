@@ -34,25 +34,7 @@ session_start();
         <a href="#profile" class="topbar-button">My Profile</a>
       </div>
       <div class="content-area">
-        <div class="search-bar-wrap">
-          <input class="search-input" type="search" placeholder="Search Events/EventID">
-          <div class="filter-row">
-            <select class="filter-select" name="club_filter">
-              <option value="">Filter by club</option>
-              <option value="club_a">Club A</option>
-              <option value="club_b">Club B</option>
-              <option value="club_c">Club C</option>
-            </select>
-            <select class="filter-select" name="semester_filter">
-              <option value="">Semester</option>
-              <option value="sem1">1st Semester</option>
-              <option value="sem2">2nd Semester</option>
-              <option value="sem3">3rd Semester</option>
-            </select>
-            <button class="primary-pill" type="button">Apply Filter</button>
-            <button class="secondary-pill" type="button">Export Report</button>
-          </div>
-        </div>
+ 
         <section class="stats-row">
           <div class="stat-card"><div class="stat-label">Total Events</div></div>
           <div class="stat-card"><div class="stat-label">Total Participation</div></div>

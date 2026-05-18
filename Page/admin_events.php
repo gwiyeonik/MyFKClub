@@ -66,29 +66,6 @@ $popResult = $conn->query($popQuery);
 
     <div class="content-area">
 
-     <div class="search-bar-wrap">
-        <input type="text" class="search-input" placeholder="Search Event/EventID">
-        <div class="filter-row">
-            <select class="filter-select" name="filter_club">
-                <option value="">Filter by club</option>
-                <option value="club_a">Club A</option>
-            </select>
-            
-            <select class="filter-select" name="filter_semester">
-                <option value="">Semester</option>
-                <option value="sem1">1st Semester</option>
-            </select>
-            
-            <select class="filter-select" name="filter_status">
-                <option value="">Event Status</option>
-                <option value="active">Active</option>
-            </select>
-            
-            <button class="primary-pill" type="button">Apply Filter</button>
-            <button class="secondary-pill" type="button">Export Report</button>
-        </div>
-    </div>
-
       <section class="stats-row">
         <div class="stat-card">
           <div class="stat-label">Total Events</div>
