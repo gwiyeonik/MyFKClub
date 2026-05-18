@@ -421,3 +421,34 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   width: 100%;
 }
+    /* Styling for the Sidebar Logout Button */
+    .sidebar-footer {
+        margin-top: auto; /* Pushes button to the bottom of the sidebar */
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-logout-sidebar {
+        background-color: #00a896; /* The teal color from your image */
+        color: white;
+        text-decoration: none;
+        padding: 10px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: background 0.3s ease;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .btn-logout-sidebar:hover {
+        background-color: #00897b;
+        color: white;
+    }
+
+    /* Ensure sidebar can push items to the bottom */
+    .dashboard-sidebar {
+        display: flex;
+        flex-direction: column;
+    }

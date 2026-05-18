@@ -174,29 +174,34 @@ if ($roleID === 2) {
 
   <div class="dashboard-shell">
     <aside class="dashboard-sidebar">
-      <div class="brand-panel">
+    <div class="brand-panel">
         <img src="../Image/fkclub.jpg" alt="FKClub logo">
-      </div>
-      <nav class="sidebar-nav">
+    </div>
+    
+    <nav class="sidebar-nav">
         <?php if ($roleID === 1): ?>
-          <a href="admin_dashboard.php" class="sidebar-link">Home</a>
-          <a href="admin_manage_users.php" class="sidebar-link">Manage Users</a>
-          <a href="admin_student_clubs.php" class="sidebar-link">Student Clubs</a>
-          <a href="admin_events.php" class="sidebar-link">Events</a>
-          <a href="admin_participation_reports.php" class="sidebar-link">Participation Reports</a>
+            <a href="admin_dashboard.php" class="sidebar-link">Home</a>
+            <a href="admin_manage_users.php" class="sidebar-link">Manage Users</a>
+            <a href="admin_student_clubs.php" class="sidebar-link">Student Clubs</a>
+            <a href="admin_events.php" class="sidebar-link">Events</a>
+            <a href="admin_participation_reports.php" class="sidebar-link">Participation Reports</a>
         <?php elseif ($roleID === 2): ?>
-          <a href="committee_dashboard.php" class="sidebar-link">Home</a>
-          <a href="#" class="sidebar-link">My Club Panel</a>
-          <a href="#" class="sidebar-link">Organize Events</a>
-          <a href="#" class="sidebar-link">Attendance Logs</a>
+            <a href="committee_dashboard.php" class="sidebar-link">Home</a>
+            <a href="#" class="sidebar-link">My Club Panel</a>
+            <a href="#" class="sidebar-link">Organize Events</a>
+            <a href="#" class="sidebar-link">Attendance Logs</a>
         <?php else: ?>
-          <a href="student_dashboard.php" class="sidebar-link">Home</a>
-          <a href="#" class="sidebar-link">Clubs</a>
-          <a href="#" class="sidebar-link">Events</a>
-          <a href="#" class="sidebar-link">Participation</a>
+            <a href="student_dashboard.php" class="sidebar-link">Home</a>
+            <a href="#" class="sidebar-link">Clubs</a>
+            <a href="#" class="sidebar-link">Events</a>
+            <a href="#" class="sidebar-link">Participation</a>
         <?php endif; ?>
-      </nav>
-    </aside>
+    </nav>
+
+    <div class="sidebar-footer">
+        <a href="logout.php" class="btn-logout-sidebar">Log Out</a>
+    </div>
+</aside>
 
     <main class="dashboard-main">
       <div class="topbar">
