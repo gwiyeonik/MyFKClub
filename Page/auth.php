@@ -7,9 +7,9 @@ if (isset($_POST['login_btn'])) {
     $link = mysqli_connect("localhost", "root", "", "myfkclub");
     if (!$link) { die("Connection failed: " . mysqli_connect_error()); }
 
-    // 2. Get Data from Login Form
-    $userId   = mysqli_real_escape_string($link, $_POST['userId']);
-    $password = $_POST['password']; // Don't escape the password yet, we need the raw string to verify it
+    // 2. ✅ UPDATED: Get User Name from Login Form instead of User ID
+    $userName = mysqli_real_escape_string($link, $_POST['userName']);
+    $password = $_POST['password']; // Raw string needed for verification
     $roleType = $_POST['role'];     // 'admin', 'student', or 'committee'
 
     // 3. Map the role string to the numerical ID (1, 2, 3)
@@ -20,8 +20,8 @@ if (isset($_POST['login_btn'])) {
     ];
     $roleID = $roleMap[$roleType] ?? 3;
 
-    // 4. Query the database for the user
-    $query = "SELECT * FROM user WHERE userID = '$userId' AND roleID = '$roleID'";
+    // 4. ✅ UPDATED: Query the database checking userName column instead of userID
+    $query = "SELECT * FROM user WHERE userName = '$userName' AND roleID = '$roleID'";
     $result = mysqli_query($link, $query);
 
     if (mysqli_num_rows($result) === 1) {
@@ -31,15 +31,14 @@ if (isset($_POST['login_btn'])) {
         if (password_verify($password, $user['userPass'])) {
             
             // Set Session variables
-            $_SESSION['user_id']   = $user['userID'];
+            $_SESSION['user_id']   = $user['userID']; // Still save ID for database relational keys
             $_SESSION['user_name'] = $user['userName'];
             
-            // FIX: Force cast the database value to an Integer to pass strict dashboard checks
+            // Force cast the database value to an Integer to pass strict dashboard checks
             $_SESSION['role_id']   = (int)$user['roleID']; 
             $_SESSION['role']      = $roleType;
 
             // 6. Redirect to dashboard securely
-            // Clean up comparison to ensure integer mapping matches
             if ($_SESSION['role_id'] === 1 || $roleType === 'admin') {
                 header('Location: admin_dashboard.php');
             } else {
@@ -52,7 +51,8 @@ if (isset($_POST['login_btn'])) {
             exit();
         }
     } else {
-        header("Location: login.php?error=User ID not found or Role mismatch");
+        // ✅ UPDATED: Clean error message referencing User Name
+        header("Location: login.php?error=User Name not found or Role mismatch");
         exit();
     }
 

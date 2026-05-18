@@ -50,7 +50,7 @@ if (isset($_POST['signup_btn'])) {
 
     // INSERT using prepared statement
     $stmt = $link->prepare("
-        INSERT INTO user (userName, userEmail, userContact, userPhoto, userPass, roleID)
+        INSERT INTO user (userName, userEmail, userContact, userProfile, userPass, roleID)
         VALUES (?, ?, ?, ?, ?, ?)
     ");
 

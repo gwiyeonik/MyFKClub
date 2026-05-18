@@ -26,8 +26,9 @@
         <!-- Form action points to auth.php -->
         <form class="login-form" action="auth.php" method="post">
           <label class="form-group">
-            <span>User ID</span>
-            <input type="text" name="userId" placeholder="User ID..." autocomplete="username" required>
+            <label style="font-weight: 600; color: #333;">Username</label>
+<input type="text" id="userName" name="userName" placeholder="Enter your User Name..." required 
+       style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; margin-top: 6px;">
           </label>
 
           <label class="form-group">

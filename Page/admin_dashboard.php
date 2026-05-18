@@ -1,6 +1,8 @@
 <?php
 // admin_dashboard.php
 session_start();
+
+// 1. SECURITY CONTROL GATE: Protect page from unauthenticated sessions or invalid roles
 if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
     header('Location: login.php');
     exit;
@@ -34,8 +36,8 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
       <div class="topbar">
         <div class="topbar-left">
           <div class="topbar-title">FK Club Admin</div>
-        </div>
-        <a href="#profile" class="topbar-button">My Profile</a>
+         </div>
+        <a href="myProfile.php" class="topbar-button">My Profile</a>
       </div>
 
       <div class="content-area">
@@ -56,7 +58,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
             
             <div class="stat-card">
               <div class="stat-label">Student Join Club</div>
-              <strong id="aside-joined-students" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">0</strong>
+              <strong id="aside-joined-students" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong>
             </div>
           </div>
 
@@ -109,6 +111,9 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
                     document.getElementById('metric-events').textContent = data.metrics.totalEvents;
                     document.getElementById('metric-attendance').textContent = data.metrics.avgAttendance;
                     document.getElementById('aside-clubs').textContent = data.metrics.totalClubs;
+                    
+                    // FIXED: Dynamic data integration link for total students joined
+                    document.getElementById('aside-joined-students').textContent = data.metrics.totalStudentsJoined || data.metrics.totalStudents;
 
                     // 2. Populate Recent Users Data Table Row
                     const tableBody = document.getElementById('user-table-body');

@@ -1,3 +1,15 @@
+<?php
+session_start();
+
+// Security Check: If the user is not logged in, kick them back to the login page
+if (!isset($_SESSION['user_name'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Get the logged-in user's name from the session
+$current_user = $_SESSION['user_name'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,19 +25,23 @@
         <img src="../Image/fkclub.jpg" alt="FKClub logo">
       </div>
 
-      <nav class="#">
-        <a href="#" class="sidebar-link active">Home</a>
-        <a href="#" class="sidebar-link">Clubs</a>
-        <a href="#" class="sidebar-link">Events</a>
-        <a href="#" class="sidebar-link">Participation</a>
-      </nav>
+      <nav class="sidebar-nav">
+        <a href="student_dashboard.php" class="sidebar-link active">Home</a>
+        <a href="student_clubs.php" class="sidebar-link">Clubs</a>
+        <a href="student_events.php" class="sidebar-link">Events</a>
+        <a href="student_participation.php" class="sidebar-link">Participation</a>
+        
     </aside>
 
     <main class="dashboard-main">
-      <!-- Topbar stays flush to the sidebar -->
       <div class="topbar">
         <div class="topbar-left">
-          <div class="topbar-title">Welcome back, John Doe</div>
+          <div class="topbar-title">Welcome back, <?php echo htmlspecialchars($current_user); ?></div>
         </div>
-        <a href="#profile" class="topbar-button">My Profile</a>
+        <a href="myProfile.php" class="topbar-button">My Profile</a>
       </div>
+
+      </main>
+  </div>
+</body>
+</html>
