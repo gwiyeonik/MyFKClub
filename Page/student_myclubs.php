@@ -61,19 +61,33 @@ mysqli_close($link);
             <div class="top-row">
               <div class="club-details">
                 <div class="input-group">
-                  <label><strong>Select your club</strong></label>
-                  <input
-                      id="club-list-input"
-                      list="club-options-list"
-                      name="club-selection"
-                      class="pill-search-input"
-                      placeholder="Select your club..."
-                  >
-                  <datalist id="club-options-list">
-                    <?php foreach ($clubList as $club): ?>
-                      <option value="<?= htmlspecialchars($club['clubID'] . ' - ' . $club['clubName']) ?>">
-                    <?php endforeach; ?>
-                  </datalist>
+
+                <?php if (count($clubList) > 0): ?>
+
+                    <label><strong>Select your club</strong></label>
+
+                    <input
+                        id="club-list-input"
+                        list="club-options-list"
+                        name="club-selection"
+                        class="pill-search-input"
+                        placeholder="Select your club..."
+                    >
+
+                    <datalist id="club-options-list">
+                        <?php foreach ($clubList as $club): ?>
+                            <option value="<?= htmlspecialchars($club['clubID'] . ' - ' . $club['clubName']) ?>">
+                        <?php endforeach; ?>
+                    </datalist>
+
+                <?php else: ?>
+
+                    <div class="no-club-message">
+                        Please join clubs first.
+                    </div>
+
+                <?php endif; ?>
+
                 </div>
                 <div class="info-field"><strong>Club Desc</strong><p id="list-club-desc" class="info-value">Select a club to view details</p></div>
                 <div class="info-field"><strong>Club Advisor</strong><p id="list-club-advisor" class="info-value">Select a club to view details</p></div>
@@ -142,6 +156,11 @@ mysqli_close($link);
                 </table>
               </div>
             </div>
+            <div class="club-actions">
+                <button type="button" class="btn-unjoin" onclick="unjoinClub()">
+                    Unjoin Club
+                </button>
+            </div>
           </div>
         </section>
       </div>
@@ -182,6 +201,90 @@ function loadClubMembers(clubID) {
         container.innerHTML = html;
     })
     .catch(err => console.error(err));
+}
+
+function unjoinClub() {
+
+    const input = document.getElementById('club-list-input').value;
+
+    if (!input) {
+        alert('Please select a club first.');
+        return;
+    }
+
+    let clubID = '';
+
+    const match = input.match(/^(\d+)\s*-/);
+
+    if (match) {
+        clubID = match[1];
+    }
+
+    if (!clubID) {
+        alert('Invalid club selected.');
+        return;
+    }
+
+    if (!confirm('Are you sure you want to unjoin this club?')) {
+        return;
+    }
+
+    const fd = new FormData();
+    fd.append('clubID', clubID);
+
+fetch('student_myclubs_api.php?action=unjoin_club', {
+    method: 'POST',
+    body: fd
+})
+.then(response => response.text())
+.then(text => {
+
+    console.log(text);
+
+    let data;
+
+    try {
+        data = JSON.parse(text);
+    }
+    catch(e) {
+        alert('Invalid JSON response. Check PHP errors.');
+        return;
+    }
+
+    alert(data.message);
+
+    if (data.success) {
+
+        document.getElementById('club-list-input').value = '';
+
+        document.getElementById('list-club-desc').textContent =
+            'Select a club to view details';
+
+        document.getElementById('list-club-advisor').textContent =
+            'Select a club to view details';
+
+        document.getElementById('list-club-status').textContent =
+            'Select a club to view details';
+
+        document.getElementById('list-club-created').textContent =
+            'Select a club to view details';
+
+        document.getElementById('list-committee-content').innerHTML =
+            '<div class="empty-cell">Select a club to load committee members.</div>';
+
+        document.getElementById('list-members-content').innerHTML =
+            '<div class="empty-cell">Select a club to load members.</div>';
+
+        document.getElementById('event-table-body').innerHTML =
+            '<tr><td colspan="6" class="empty-cell">Select a club to load events.</td></tr>';
+
+        location.reload();
+    }
+})
+.catch(err => {
+    console.error(err);
+    alert('Failed to unjoin club.');
+});
 }
 
 function loadClubCommittee(clubID) {

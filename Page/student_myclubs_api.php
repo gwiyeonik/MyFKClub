@@ -122,4 +122,83 @@ if ($action === 'get_club_events') {
     exit;
 }
 
+// ================= UNJOIN CLUB =================
+if (isset($_GET['action']) && $_GET['action'] === 'unjoin_club') {
+
+    header('Content-Type: application/json');
+
+    $userID = intval($_SESSION['user_id'] ?? 0);
+    $clubID = intval($_POST['clubID'] ?? 0);
+
+    if ($userID <= 0) {
+
+        echo json_encode([
+            'success' => false,
+            'message' => 'User not logged in.'
+        ]);
+
+        exit;
+    }
+
+    if ($clubID <= 0) {
+
+        echo json_encode([
+            'success' => false,
+            'message' => 'Invalid club.'
+        ]);
+
+        exit;
+    }
+
+    $link = mysqli_connect("localhost", "root", "", "myfkclub");
+
+    if (!$link) {
+
+        echo json_encode([
+            'success' => false,
+            'message' => 'Database connection failed.'
+        ]);
+
+        exit;
+    }
+
+    $stmt = mysqli_prepare(
+        $link,
+        "DELETE FROM clubmembership 
+         WHERE userID = ? AND clubID = ?"
+    );
+
+    if (!$stmt) {
+
+        echo json_encode([
+            'success' => false,
+            'message' => 'SQL prepare failed.'
+        ]);
+
+        exit;
+    }
+
+    mysqli_stmt_bind_param($stmt, "ii", $userID, $clubID);
+
+    if (mysqli_stmt_execute($stmt)) {
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Successfully unjoined club.'
+        ]);
+
+    } else {
+
+        echo json_encode([
+            'success' => false,
+            'message' => 'Failed to unjoin club.'
+        ]);
+    }
+
+    mysqli_stmt_close($stmt);
+    mysqli_close($link);
+
+    exit;
+}
+
 echo json_encode(['success' => false, 'error' => 'Unknown action']);
