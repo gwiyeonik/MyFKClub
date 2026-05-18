@@ -184,10 +184,10 @@ if ($eventResult && $eventResult->num_rows > 0) {
                         </label>
                     </div>
                     <div id="single-date">
-                        <input type="date" name="eventDateStart" id="eventDateStart">
+                        <input type="date" name="eventDateStart" id="singleEventDate" required>
                     </div>
                     <div id="range-date" style="display:none; gap: 10px; align-items: center;">
-                        <input type="date" name="eventDateStart" id="eventDateStart">
+                        <input type="date" name="eventDateStartRange" id="rangeEventDateStart">
                         <span>to</span>
                         <input type="date" name="eventDateEnd" id="eventDateEnd">
                     </div>
@@ -407,25 +407,39 @@ if ($eventResult && $eventResult->num_rows > 0) {
         }
     }
 
-    function toggleUpdateDateType() {
-    const type = document.querySelector('input[name="update_date_type"]:checked').value;
-    const single = document.getElementById('update-single-date');
-    const range  = document.getElementById('update-range-date');
+    function toggleDateType() {
+    const type = document.querySelector('input[name="date_type"]:checked').value;
+
+    const single = document.getElementById('single-date');
+    const range = document.getElementById('range-date');
+
+    const singleDate = document.getElementById('singleEventDate');
+    const rangeStart = document.getElementById('rangeEventDateStart');
+    const rangeEnd = document.getElementById('eventDateEnd');
 
     if (type === 'single') {
         single.style.display = 'block';
-        range.style.display  = 'none';
-        document.getElementById('info-event-date').required       = true;
-        document.getElementById('info-event-date-start').required = false;
-        document.getElementById('info-event-date-end').required   = false;
+        range.style.display = 'none';
+
+        singleDate.required = true;
+        rangeStart.required = false;
+        rangeEnd.required = false;
+
+        // Clear range values
+        rangeStart.value = '';
+        rangeEnd.value = '';
     } else {
         single.style.display = 'none';
-        range.style.display  = 'flex';
-        document.getElementById('info-event-date').required       = false;
-        document.getElementById('info-event-date-start').required = true;
-        document.getElementById('info-event-date-end').required   = true;
+        range.style.display = 'flex';
+
+        singleDate.required = false;
+        rangeStart.required = true;
+        rangeEnd.required = true;
+
+        // Clear single value
+        singleDate.value = '';
     }
-    }
+}
 
     function toggleDateType() {
     const type = document.querySelector('input[name="date_type"]:checked').value;
