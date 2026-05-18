@@ -186,7 +186,7 @@ if ($eventResult && $eventResult->num_rows > 0) {
                     <div id="single-date">
                         <input type="date" name="eventDateStart" id="singleEventDate" required>
                     </div>
-                    <div id="range-date" style="display:none; gap: 10px; align-items: center;">
+                    <div id="range-date" style="display:none; gap:10px; align-items:center; width:100%;">
                         <input type="date" name="eventDateStartRange" id="rangeEventDateStart">
                         <span>to</span>
                         <input type="date" name="eventDateEnd" id="eventDateEnd">
@@ -261,10 +261,11 @@ if ($eventResult && $eventResult->num_rows > 0) {
                     <div id="update-single-date">
                         <input id="info-event-date" type="date" name="event_date" style="width:100%; box-sizing:border-box;">
                     </div>
-                    <div id="update-range-date" style="display:none; gap: 10px; align-items: center;">
-                        <input id="info-event-date-start" type="date" name="event_date_start" style="flex:1; box-sizing:border-box;">
+                    <div id="update-range-date"
+                        style="display:none; gap:10px; align-items:center; width:100%;">
+                        <input id="info-event-date-start"type="date"name="event_date_start"style="flex:1; width:auto; box-sizing:border-box;">
                         <span>to</span>
-                        <input id="info-event-date-end" type="date" name="event_date_end" style="flex:1; box-sizing:border-box;">
+                        <input id="info-event-date-end" type="date" name="event_date_end"style="flex:1; width:auto; box-sizing:border-box;">
                     </div>
                   </div>
 
@@ -407,6 +408,7 @@ if ($eventResult && $eventResult->num_rows > 0) {
         }
     }
 
+
     function toggleDateType() {
     const type = document.querySelector('input[name="date_type"]:checked').value;
 
@@ -425,7 +427,6 @@ if ($eventResult && $eventResult->num_rows > 0) {
         rangeStart.required = false;
         rangeEnd.required = false;
 
-        // Clear range values
         rangeStart.value = '';
         rangeEnd.value = '';
     } else {
@@ -436,34 +437,53 @@ if ($eventResult && $eventResult->num_rows > 0) {
         rangeStart.required = true;
         rangeEnd.required = true;
 
-        // Clear single value
         singleDate.value = '';
     }
 }
 
-    function toggleDateType() {
-    const type = document.querySelector('input[name="date_type"]:checked').value;
-    const single = document.getElementById('single-date');
-    const range = document.getElementById('range-date');
+    function toggleUpdateDateType() {
+    const type = document.querySelector('input[name="update_date_type"]:checked').value;
+
+    const single = document.getElementById('update-single-date');
+    const range = document.getElementById('update-range-date');
+
+    const singleDate = document.getElementById('info-event-date');
+    const rangeStart = document.getElementById('info-event-date-start');
+    const rangeEnd = document.getElementById('info-event-date-end');
 
     if (type === 'single') {
         single.style.display = 'block';
         range.style.display = 'none';
-        document.getElementById('eventDateStart').required = true;
-        document.getElementById('eventDateEnd').required = false;
+
+        singleDate.required = true;
+        rangeStart.required = false;
+        rangeEnd.required = false;
+
+        rangeStart.value = '';
+        rangeEnd.value = '';
     } else {
         single.style.display = 'none';
         range.style.display = 'flex';
-        document.getElementById('eventDateStart').required = false;
-        document.getElementById('eventDateEnd').required = true;
+
+        singleDate.required = false;
+        rangeStart.required = true;
+        rangeEnd.required = true;
+
+        singleDate.value = '';
     }
 }
+
+// Initialize both forms when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+    toggleDateType();
+    toggleUpdateDateType();
 
     document.querySelectorAll('input[type="date"]').forEach(dateInput => {
         dateInput.addEventListener('click', function () {
             if (this.showPicker) this.showPicker();
         });
     });
+});
 </script>
 
 
