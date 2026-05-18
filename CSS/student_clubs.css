@@ -1483,3 +1483,20 @@ input[readonly] {
     width: 100%;
     margin-top: -40px;
 }
+
+.form-group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    width: 160px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+    width: 250px;
+}
