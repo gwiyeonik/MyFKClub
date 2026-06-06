@@ -90,7 +90,7 @@ function fetchClubListPanel(clubKey) {
 
                     tableHTML += `
                         <tr>
-                            <td>${member.userID || ''}</td>
+                            <td>${formatID('US', member.userID) || ''}</td>
                             <td>${member.userName || ''}</td>
                             <td>${member.committeePosition || ''}</td>
                         </tr>
@@ -180,7 +180,7 @@ function fetchClubListPanel(clubKey) {
                         data-desc="${event.eventDesc || ''}"
                     >
 
-                        <td>${event.eventID}</td>
+                        <td>${formatID('EV', event.eventID)}</td>
 
                         <td>
                             <strong>

@@ -28,12 +28,13 @@
         <form class="login-form" action="auth.php" method="post">
 
           <label class="form-group">
-            <span>Username</span>
+            <span>User ID</span>
             <input 
               type="text" 
-              id="userName" 
-              name="userName" 
-              placeholder="Enter your User Name..." 
+              id="userID" 
+              name="userID" 
+              placeholder="Enter your User ID (e.g. US0001)..." 
+              autocomplete="username"
               required>
           </label>
 

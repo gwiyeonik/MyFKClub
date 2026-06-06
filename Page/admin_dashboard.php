@@ -4,7 +4,7 @@ session_start();
 
 
 // 1. SECURITY CONTROL GATE: Protect page from unauthenticated sessions or invalid roles
-// Security checks
+// Security check
 if (
     !isset($_SESSION['user_id']) ||
     !isset($_SESSION['role']) ||
@@ -15,8 +15,6 @@ if (
 }
 
 ?>
-
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,6 +23,29 @@ if (
   <title>Admin Dashboard | MyFKClub</title>
   <link rel="stylesheet" href="../CSS/dashboard.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .chart-card canvas {
+      display: block;
+      width: 100% !important;
+      height: 320px !important;
+      max-height: 320px;
+    }
+
+    .charts-row.charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+
+    .chart-card.chart-large {
+      min-height: 360px;
+    }
+
+    .chart-card .chart-title {
+      margin-bottom: 16px;
+    }
+  </style>
 </head>
 <body>
   <div class="dashboard-shell">
@@ -59,39 +80,20 @@ if (
           </div>
         </section>
 
-        <section class="charts-row">
-          <div class="aside-cards">
-            <div class="stat-card">
-              <div class="stat-label">Avg Attendance Rate</div>
-              <strong id="metric-attendance" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong>
-            </div>
-            
-            <div class="stat-card">
-              <div class="stat-label">Club in Faculty</div>
-              <strong id="aside-clubs" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong>
-            </div>
-            
-            <div class="stat-card">
-              <div class="stat-label">Student Join Club</div>
-              <strong id="aside-joined-students" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong>
-            </div>
+        <section class="charts-row charts-grid">
+          <div class="chart-card chart-large">
+            <div class="chart-title">Club Participation Summary</div>
+            <canvas id="clubMetricsChart"></canvas>
           </div>
-
-          <div class="chart-group">
-            <div class="chart-card chart-large">
-              <div class="chart-title">Students per Club</div>
-              <div class="chart-placeholder">&lt;&lt; chart &gt;&gt;</div>
-            </div>
-            <div class="chart-card chart-small">
-              <div class="chart-title">Role Distribution</div>
-              <div class="chart-placeholder">&lt;&lt; pie chart &gt;&gt;</div>
-            </div>
+          <div class="chart-card chart-large">
+            <div class="chart-title">Student Distribution Across Clubs</div>
+            <canvas id="studentsPerClubChart"></canvas>
           </div>
         </section>
 
         <section class="table-section">
           <div class="table-panel">
-            <div class="table-heading">Recent Registrations</div>
+            <div class="table-heading">Recent Registrations (Latest 5)</div>
             <div class="table-wrapper">
               <table>
                 <thead>
@@ -99,7 +101,7 @@ if (
                     <th>User ID</th>
                     <th>User Name</th>
                     <th>User Email</th>
-                    <th>Role ID</th>
+                    <th>Role</th>
                   </tr>
                 </thead>
                 <tbody id="user-table-body">
@@ -115,24 +117,40 @@ if (
 
   <script>
     let metricsChart = null;
+    let clubMetricsChart = null;
+    let studentsPerClubChart = null;
 
     document.addEventListener("DOMContentLoaded", function() {
         // Fetch data from backend api
-        fetch('admin_dashboard_api.php?action=get_dashboard_data')
-            .then(response => response.json())
+        const apiUrl = window.location.origin + window.location.pathname.replace(/\/admin_dashboard\.php$/, '/admin_dashboard_api.php') + '?action=get_dashboard_data';
+        fetch(apiUrl, { credentials: 'same-origin' })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status + ' ' + response.statusText);
+                }
+                return response.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch (err) {
+                        throw new Error('Invalid JSON response: ' + text);
+                    }
+                });
+            })
             .then(data => {
                 if (data.success) {
                     // 1. Create Bar Chart with metrics
                     createMetricsChart(data.metrics);
 
-                    // Set additional metrics
-                    document.getElementById('metric-attendance').textContent = data.metrics.avgAttendance;
-                    document.getElementById('aside-clubs').textContent = data.metrics.totalClubs;
+                    // 2. Create club participation charts
+                    createClubMetricsChart(data.metrics);
+                    createStudentsPerClubChart(data.studentsPerClub || []);
 
-                    // FIXED: Dynamic data integration link for total students joined
-                    document.getElementById('aside-joined-students').textContent = data.metrics.totalStudentsJoined || data.metrics.totalStudents;
+                    // Set additional metrics safely if the elements exist
+                    safeSetText('metric-attendance', data.metrics.avgAttendance);
+                    safeSetText('aside-clubs', data.metrics.totalClubs);
+                    safeSetText('aside-joined-students', data.metrics.totalStudentsInClubs || data.metrics.totalStudents);
 
-                    // 2. Populate Recent Users Data Table Row
+                    // 3. Populate Recent Users Data Table Row
                     const tableBody = document.getElementById('user-table-body');
                     tableBody.innerHTML = ''; 
 
@@ -143,7 +161,7 @@ if (
                                 <td>${escapeHTML(user.userID)}</td>
                                 <td>${escapeHTML(user.userName)}</td>
                                 <td>${escapeHTML(user.userEmail)}</td>
-                                <td>${escapeHTML(user.roleID)}</td>
+                                <td>${escapeHTML(getRoleLabel(user.roleID))}</td>
                             `;
                             tableBody.appendChild(row);
                         });
@@ -152,10 +170,23 @@ if (
                     }
                 } else {
                     console.error("API Processing Error: " + data.message);
+                    const tableBody = document.getElementById('user-table-body');
+                    tableBody.innerHTML = `<tr><td colspan="4" class="empty-cell">Unable to load registrations: ${escapeHTML(data.message || 'Unknown error')}</td></tr>`;
                 }
             })
-            .catch(error => console.error("Fetch API Connection Error:", error));
+            .catch(error => {
+                console.error("Fetch API Connection Error:", error);
+                const tableBody = document.getElementById('user-table-body');
+                tableBody.innerHTML = `<tr><td colspan="4" class="empty-cell">Unable to load registrations: ${escapeHTML(error.message)}</td></tr>`;
+            });
     });
+
+    function safeSetText(id, text) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.textContent = text;
+        }
+    }
 
     // Create bar chart for metrics
     function createMetricsChart(metrics) {
@@ -209,7 +240,6 @@ if (
                 scales: {
                     y: {
                         beginAtZero: true,
-                        max: 25,
                         ticks: {
                             stepSize: 5,
                             callback: function(value) {
@@ -237,9 +267,120 @@ if (
         });
     }
 
+    function createClubMetricsChart(metrics) {
+        const ctx = document.getElementById('clubMetricsChart').getContext('2d');
+        if (clubMetricsChart) {
+            clubMetricsChart.destroy();
+        }
+
+        clubMetricsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Total Clubs', 'Active Clubs', 'Students in Clubs'],
+                datasets: [{
+                    label: 'Count',
+                    data: [
+                        metrics.totalClubs || 0,
+                        metrics.totalActiveClubs || 0,
+                        metrics.totalStudentsInClubs || 0
+                    ],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(255, 193, 7, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(255, 193, 7, 1)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    barPercentage: 0.5,
+                    categoryPercentage: 0.8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 5
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function createStudentsPerClubChart(studentsPerClub) {
+        const ctx = document.getElementById('studentsPerClubChart').getContext('2d');
+        if (studentsPerClubChart) {
+            studentsPerClubChart.destroy();
+        }
+
+        const labels = studentsPerClub.length > 0 ? studentsPerClub.map(item => item.clubName) : ['No clubs yet'];
+        const data = studentsPerClub.length > 0 ? studentsPerClub.map(item => item.members) : [1];
+        const colors = [
+            '#007bff', '#6610f2', '#6f42c1', '#e83e8c', '#fd7e14', '#ffc107', '#20c997', '#17a2b8'
+        ];
+
+        studentsPerClubChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: labels.map((_, index) => colors[index % colors.length]),
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                return `${label}: ${value} student${value === 1 ? '' : 's'}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     // Simple XSS sanitizer to protect output rendering
     function escapeHTML(str) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function getRoleLabel(roleID) {
+        switch (String(roleID)) {
+            case '1': return 'Admin';
+            case '2': return 'Committee';
+            case '3': return 'Student';
+            default: return 'Unknown';
+        }
     }
   </script>
 </body>

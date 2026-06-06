@@ -193,9 +193,9 @@ function loadClubMembers(clubID) {
             container.innerHTML = '<div class="empty-cell">No club members found.</div>';
             return;
         }
-        let html = '<table class="committee-table"><thead><tr><th>membershipID</th><th>userName</th><th>clubJoinDate</th></tr></thead><tbody>';
+        let html = '<table class="committee-table"><thead><tr><th>Membership ID</th><th>User Name</th><th>Join Date</th></tr></thead><tbody>';
         data.members.forEach(member => {
-            html += `<tr><td>${member.membershipID}</td><td>${member.userName}</td><td>${member.clubJoinDate || ''}</td></tr>`;
+            html += `<tr><td>${formatID('MM', member.membershipID)}</td><td>${member.userName}</td><td>${member.clubJoinDate || ''}</td></tr>`;
         });
         html += '</tbody></table>';
         container.innerHTML = html;
@@ -291,9 +291,9 @@ function loadClubCommittee(clubID) {
             container.innerHTML = '<div class="empty-cell">No committee members found.</div>';
             return;
         }
-        let html = '<table class="committee-table"><thead><tr><th>userID</th><th>userName</th><th>committeePosition</th></tr></thead><tbody>';
+        let html = '<table class="committee-table"><thead><tr><th>User ID</th><th>User Name</th><th>Committee Position</th></tr></thead><tbody>';
         data.committee.forEach(member => {
-            html += `<tr><td>${member.userID}</td><td>${member.userName}</td><td>${member.committeePosition || ''}</td></tr>`;
+            html += `<tr><td>${formatID('US', member.userID)}</td><td>${member.userName}</td><td>${member.committeePosition || ''}</td></tr>`;
         });
         html += '</tbody></table>';
         container.innerHTML = html;
@@ -320,7 +320,7 @@ function loadEventsForClub(clubID) {
             const start = event.eventDateStart || '';
             const end = event.eventDateEnd || '';
             const eventDate = (start === end || !end) ? formatDate(start) : `${formatDate(start)} - ${formatDate(end)}`;
-            html += `<tr><td>${event.eventID}</td><td><strong>${event.eventTitle}</strong></td><td>${event.eventVenue || ''}</td><td>${eventDate}</td><td><span class="status-badge ${event.eventStatus.toLowerCase()}">${event.eventStatus}</span></td><td>${event.eventParticipants || 0} / ${event.eventMaxParticipants || 0}</td></tr>`;
+            html += `<tr><td>${formatID('EV', event.eventID)}</td><td><strong>${event.eventTitle}</strong></td><td>${event.eventVenue || ''}</td><td>${eventDate}</td><td><span class="status-badge ${event.eventStatus.toLowerCase()}">${event.eventStatus}</span></td><td>${event.eventParticipants || 0} / ${event.eventMaxParticipants || 0}</td></tr>`;
         });
         tbody.innerHTML = html;
     })
@@ -334,6 +334,13 @@ function formatDate(d) {
     if (!d) return '';
     const dt = new Date(d);
     return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function formatID(prefix, id) {
+    if (id === null || id === undefined || id === '') return '';
+    const num = parseInt(String(id).replace(/\D+/g, ''), 10);
+    if (Number.isNaN(num)) return String(id);
+    return prefix + String(num).padStart(4, '0');
 }
 
 function parseClubID(value) {

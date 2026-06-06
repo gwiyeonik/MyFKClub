@@ -150,7 +150,7 @@ function fetchClubDetails(clubKey) {
         if (data.committee && data.committee.length) {
             let tbl = '<table class="committee-table"><thead><tr><th>User ID</th><th>User Name</th><th>Committee Position</th></tr></thead><tbody>';
             data.committee.forEach(member => {
-                tbl += `<tr><td>${member.userID || ''}</td><td>${member.userName || ''}</td><td>${member.committeePosition || ''}</td></tr>`;
+                tbl += `<tr><td>${formatID('US', member.userID) || ''}</td><td>${member.userName || ''}</td><td>${member.committeePosition || ''}</td></tr>`;
             });
             tbl += '</tbody></table>';
             listCommittee.innerHTML = tbl;
@@ -178,7 +178,7 @@ function loadEventsForClub(clubID) {
             const eventDate = (start === end || !end) ? formatDate(start) : `${formatDate(start)} - ${formatDate(end)}`;
             const row = `
                 <tr>
-                    <td>${event.eventID}</td>
+                    <td>${formatID('EV', event.eventID)}</td>
                     <td><strong>${event.eventTitle}</strong></td>
                     <td>${event.eventVenue || ''}</td>
                     <td>${eventDate}</td>

@@ -145,7 +145,7 @@ function fetchClubDetails(clubKey) {
         if (data.committee && data.committee.length) {
             let tbl = '<table class="committee-table"><thead><tr><th>User ID</th><th>User Name</th><th>Committee Position</th></tr></thead><tbody>';
             data.committee.forEach(member => {
-                tbl += `<tr><td>${member.userID || ''}</td><td>${member.userName || ''}</td><td>${member.committeePosition || ''}</td></tr>`;
+                tbl += `<tr><td>${formatID('US', member.userID) || ''}</td><td>${member.userName || ''}</td><td>${member.committeePosition || ''}</td></tr>`;
             });
             tbl += '</tbody></table>';
             listCommittee.innerHTML = tbl;
@@ -173,7 +173,7 @@ function loadEventsForClub(clubID) {
             const eventDate = (start === end || !end) ? formatDate(start) : `${formatDate(start)} - ${formatDate(end)}`;
             const row = `
                 <tr>
-                    <td>${event.eventID}</td>
+                    <td>${formatID('EV', event.eventID)}</td>
                     <td><strong>${event.eventTitle}</strong></td>
                     <td>${event.eventVenue || ''}</td>
                     <td>${eventDate}</td>
@@ -191,6 +191,13 @@ function formatDate(d) {
     if (!d) return '';
     const dt = new Date(d);
     return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function formatID(prefix, id) {
+    if (id === null || id === undefined || id === '') return '';
+    const num = parseInt(String(id).replace(/\D+/g, ''), 10);
+    if (Number.isNaN(num)) return String(id);
+    return prefix + String(num).padStart(4, '0');
 }
 
 function parseClubID(value) {

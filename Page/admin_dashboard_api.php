@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
     exit;
 }
 
-// 2. Database Connections
+// 2. Database Connection
 $link = mysqli_connect("localhost", "root", "", "myfkclub");
 if (!$link) {
     echo json_encode(['success' => false, 'message' => 'Database connection failed: ' . mysqli_connect_error()]);
@@ -22,19 +22,27 @@ $action = $_GET['action'] ?? '';
 if ($action === 'get_dashboard_data') {
     
     // Count total students (roleID = 3)
-    $studentCountResult = mysqli_query($link, "SELECT COUNT(*) as total FROM user WHERE roleID = 3"); 
+    $studentCountResult = mysqli_query($link, "SELECT COUNT(*) as total FROM user WHERE roleID = 3");
     if (!$studentCountResult) {
         $studentCountResult = mysqli_query($link, "SELECT COUNT(*) as total FROM user");
     }
-    $totalStudents = $studentCountResult ? mysqli_fetch_assoc($studentCountResult)['total'] : 0;
+    $totalStudents = $studentCountResult ? (int)mysqli_fetch_assoc($studentCountResult)['total'] : 0;
+
+    // Count all clubs in faculty
+    $clubTotalResult = mysqli_query($link, "SELECT COUNT(*) as total FROM club");
+    $totalClubs = $clubTotalResult ? (int)mysqli_fetch_assoc($clubTotalResult)['total'] : 0;
 
     // Count active clubs
-    $clubCountResult = mysqli_query($link, "SELECT COUNT(*) as total FROM club WHERE clubStatus = 'Active'");
-    $totalClubs = $clubCountResult ? mysqli_fetch_assoc($clubCountResult)['total'] : 0;
+    $activeClubResult = mysqli_query($link, "SELECT COUNT(*) as total FROM club WHERE LOWER(TRIM(clubStatus)) = 'active'");
+    $totalActiveClubs = $activeClubResult ? (int)mysqli_fetch_assoc($activeClubResult)['total'] : 0;
+
+    // Count students involved in clubs
+    $studentsInClubsResult = mysqli_query($link, "SELECT COUNT(DISTINCT userID) as total FROM clubmembership");
+    $totalStudentsInClubs = $studentsInClubsResult ? (int)mysqli_fetch_assoc($studentsInClubsResult)['total'] : 0;
 
     // Count upcoming events
     $eventCountResult = mysqli_query($link, "SELECT COUNT(*) as total FROM event WHERE eventStatus = 'Upcoming'");
-    $totalEvents = $eventCountResult ? mysqli_fetch_assoc($eventCountResult)['total'] : 0;
+    $totalEvents = $eventCountResult ? (int)mysqli_fetch_assoc($eventCountResult)['total'] : 0;
 
     // --- FIXED: DYNAMIC ATTENDANCE RATE CALCULATION LOGIC ---
     // Updated to use your exact column name: attendanceStatus
@@ -57,6 +65,24 @@ if ($action === 'get_dashboard_data') {
     }
     // --- END OF DYNAMIC LOGIC ---
 
+    // Build distribution data for students-per-club chart
+    $distributionQuery = "SELECT c.clubName, COUNT(cm.userID) AS members
+                          FROM club c
+                          LEFT JOIN clubmembership cm ON c.clubID = cm.clubID
+                          GROUP BY c.clubID, c.clubName
+                          ORDER BY members DESC, c.clubName ASC";
+    $distributionResult = mysqli_query($link, $distributionQuery);
+
+    $studentsPerClub = [];
+    if ($distributionResult) {
+        while ($row = mysqli_fetch_assoc($distributionResult)) {
+            $studentsPerClub[] = [
+                'clubName' => $row['clubName'] ?: 'Unnamed Club',
+                'members' => (int)$row['members']
+            ];
+        }
+    }
+
     // Fetch recent 5 registrations
     $recentUsersQuery = "SELECT userID, userName, userEmail, roleID FROM user ORDER BY userID DESC LIMIT 5";
     $recentUsersResult = mysqli_query($link, $recentUsersQuery);
@@ -76,10 +102,13 @@ if ($action === 'get_dashboard_data') {
         'success' => true,
         'metrics' => [
             'totalStudents' => $totalStudents,
-            'totalClubs'    => $totalClubs,
-            'totalEvents'   => $totalEvents,
-            'avgAttendance' => $avgAttendance 
+            'totalClubs' => $totalClubs,
+            'totalActiveClubs' => $totalActiveClubs,
+            'totalStudentsInClubs' => $totalStudentsInClubs,
+            'totalEvents' => $totalEvents,
+            'avgAttendance' => $avgAttendance
         ],
+        'studentsPerClub' => $studentsPerClub,
         'recentUsers' => $recentUsers
     ]);
     exit;

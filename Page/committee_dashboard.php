@@ -60,7 +60,7 @@ $userName = $_SESSION['user_name'] ?? 'User';
             </div>
 
             <nav class="sidebar-nav">
-                <a href="committee_dashboard.php" class="sidebar-link active">Home</a>
+                <a href="committee_dashboard.php" class="sidebar-link active">My Profile</a>
                 <a href="committee_view_clubs.php" class="sidebar-link">View Clubs</a>
                 <a href="committee_manage_events.php" class="sidebar-link">Manage Events</a>
                 <a href="#" class="sidebar-link">Members</a>

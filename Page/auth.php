@@ -7,12 +7,34 @@ if (isset($_POST['login_btn'])) {
     $link = mysqli_connect("localhost", "root", "", "myfkclub");
     if (!$link) { die("Connection failed: " . mysqli_connect_error()); }
 
-    $userName = mysqli_real_escape_string($link, $_POST['userName']);
-    $password = $_POST['password']; 
-    $roleType = $_POST['role'];     
+    $rawInput = trim($_POST['userID'] ?? '');
+    $password = $_POST['password'];
+    $roleType = $_POST['role'];
 
-    // 2. Query the database based on username
-    $query = "SELECT * FROM user WHERE userName = '$userName'";
+    if ($rawInput === '') {
+        header("Location: login.php?error=User ID is required");
+        exit();
+    }
+
+    $digitsOnly = preg_replace('/\D+/', '', $rawInput);
+    if ($digitsOnly === '') {
+        header("Location: login.php?error=Invalid User ID");
+        exit();
+    }
+
+    $numericID = ltrim($digitsOnly, '0');
+    if ($numericID === '') {
+        $numericID = '0';
+    }
+
+    $paddedID = str_pad($numericID, 4, '0', STR_PAD_LEFT);
+    $prefixedID = 'US' . $paddedID;
+    $safeNumericID = mysqli_real_escape_string($link, $numericID);
+    $safePaddedID = mysqli_real_escape_string($link, $paddedID);
+    $safePrefixedID = mysqli_real_escape_string($link, $prefixedID);
+
+    // 2. Query the database based on possible user ID formats
+    $query = "SELECT * FROM user WHERE userID IN ('$safeNumericID', '$safePaddedID', '$safePrefixedID') LIMIT 1";
     $result = mysqli_query($link, $query);
 
     if (mysqli_num_rows($result) === 1) {
@@ -79,7 +101,7 @@ if (isset($_POST['login_btn'])) {
             exit();
         }
     } else {
-        header("Location: login.php?error=Username not found");
+        header("Location: login.php?error=User ID not found");
         exit();
     }
     mysqli_close($link);
