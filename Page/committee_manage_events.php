@@ -17,6 +17,16 @@ if ($conn->connect_error) {
 $eventList = [];
 $eventQuery = "SELECT eventID, eventTitle FROM event ORDER BY eventTitle ASC";
 
+// FETCH CLUBS FOR DROPDOWN
+$clubList = [];
+$clubQuery = "SELECT clubID, clubName FROM club ORDER BY clubName ASC";
+$clubResult = $conn->query($clubQuery);
+if ($clubResult && $clubResult->num_rows > 0) {
+    while($row = $clubResult->fetch_assoc()) {
+        $clubList[] = $row;
+    }
+}
+
 $idQuery = "SHOW TABLE STATUS LIKE 'event'";
 $idResult = $conn->query($idQuery);
 $idRow = $idResult->fetch_assoc();
@@ -69,7 +79,7 @@ if ($eventResult && $eventResult->num_rows > 0) {
       </div>
       <nav class="sidebar-nav">
         <a href="committee_dashboard.php" class="sidebar-link">Home</a>
-        <a href="committee_view_clubs.php" class="sidebar-link">Manage Clubs</a>
+        <a href="committee_view_clubs.php" class="sidebar-link">View Clubs</a>
         <a href="committee_manage_events.php" class="sidebar-link active">Manage Events</a>
         <a href="committee_manage_members.php" class="sidebar-link">Members</a>
         <a href="committee_attendance.php" class="sidebar-link">Attendance</a>
@@ -158,8 +168,15 @@ if ($eventResult && $eventResult->num_rows > 0) {
                     <input type="text" value="<?= $nextID ?>" readonly>
                   </div>
                   <div class="form-field">
-                    <label>Club ID</label>
-                    <input type="number" name="clubID" required placeholder="Enter Club ID">
+                    <label>Club</label>
+                    <select name="clubID" required>
+                      <option value="">-- Select a Club --</option>
+                      <?php foreach ($clubList as $club): ?>
+                        <option value="<?php echo $club['clubID']; ?>">
+                          <?php echo htmlspecialchars($club['clubName']); ?>
+                        </option>
+                      <?php endforeach; ?>
+                    </select>
                   </div>
                   <div class="form-field">
                     <label>Event Title</label>
