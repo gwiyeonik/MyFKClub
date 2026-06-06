@@ -41,21 +41,6 @@ body {
   padding: 60px 24px 40px;
 }
 
-.login-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.header-logo {
-  width: 58px;
-  height: 58px;
-  border-radius: 18px;
-  object-fit: contain;
-}
-
 .login-stage {
   width: 100%;
   display: grid;
@@ -72,12 +57,37 @@ body {
   box-shadow: var(--shadow);
 }
 
+.login-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.header-logo {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  object-fit: contain;
+}
+
 .login-card h1 {
   margin: 0;
   text-align: center;
   font-size: clamp(32px, 4vw, 40px);
   font-weight: 800;
   color: #133d85;
+}
+
+.error-msg {
+  color: #d9534f;
+  background: #f2dede;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 14px;
 }
 
 .login-form {
@@ -120,6 +130,31 @@ body {
   box-shadow: 0 0 0 4px rgba(31, 79, 163, 0.12);
 }
 
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-container input {
+  width: 100%;
+  padding-right: 52px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #5c6d8a;
+  font-size: 18px;
+  z-index: 10;
+}
+
+.toggle-password:hover {
+  color: var(--button);
+}
+
 .select-group select {
   appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, #5c6d8a 50%),
@@ -151,7 +186,7 @@ body {
 .utility-row {
   display: flex;
   justify-content: flex-end;
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 .text-link {
@@ -181,12 +216,6 @@ body {
 }
 
 @media (max-width: 900px) {
-  .topbar {
-    margin-top: 16px;
-    border-radius: 22px;
-    padding: 0 18px;
-  }
-
   .login-card {
     padding: 34px 28px 30px;
     border-radius: 40px;
@@ -198,14 +227,18 @@ body {
     padding: 0 16px 24px;
   }
 
-  .topbar {
-    height: 82px;
-    border-radius: 18px;
-  }
-
   .login-card {
     width: 100%;
     padding: 28px 20px 26px;
     border-radius: 34px;
+  }
+
+  .login-card-header {
+    gap: 12px;
+  }
+
+  .header-logo {
+    width: 52px;
+    height: 52px;
   }
 }
