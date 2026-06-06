@@ -76,7 +76,7 @@ mysqli_close($link);
 
                     <datalist id="club-options-list">
                         <?php foreach ($clubList as $club): ?>
-                            <option value="<?= htmlspecialchars($club['clubID'] . ' - ' . $club['clubName']) ?>">
+                            <option value="<?= htmlspecialchars(sprintf('CB%04d - %s', $club['clubID'], $club['clubName'])) ?>">
                         <?php endforeach; ?>
                     </datalist>
 
@@ -212,13 +212,7 @@ function unjoinClub() {
         return;
     }
 
-    let clubID = '';
-
-    const match = input.match(/^(\d+)\s*-/);
-
-    if (match) {
-        clubID = match[1];
-    }
+    const clubID = parseClubID(input);
 
     if (!clubID) {
         alert('Invalid club selected.');
@@ -342,17 +336,21 @@ function formatDate(d) {
     return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+function parseClubID(value) {
+    if (!value) return '';
+    const cleaned = String(value).trim();
+    let match = cleaned.match(/^CB0*(\d+)\s*(?:-|$)/i);
+    if (match) return match[1];
+    match = cleaned.match(/^0*(\d+)\s*(?:-|$)/);
+    if (match) return match[1];
+    return '';
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('club-list-input');
     input.addEventListener('change', function () {
         const val = this.value || '';
-        let id = null;
-        const m = val.match(/^(\d+)\s*-/);
-        if (m) id = m[1];
-        else {
-            const m2 = val.match(/^(\d+)\b/);
-            if (m2) id = m2[1];
-        }
+        const id = parseClubID(val);
         if (id) {
             fetchClubDetails(id);
             loadClubMembers(id);
