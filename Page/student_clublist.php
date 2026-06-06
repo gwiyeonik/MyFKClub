@@ -66,7 +66,7 @@ mysqli_close($link);
                                   >
                               <datalist id="club-options-list">
                                   <?php foreach ($clubList as $club): ?>
-                                      <option value="<?= htmlspecialchars($club['clubID'] . ' - ' . $club['clubName']) ?>">
+                                      <option value="<?= htmlspecialchars(sprintf('CB%04d - %s', $club['clubID'], $club['clubName'])) ?>">
                                   <?php endforeach; ?>
                               </datalist>
                           </div>
@@ -198,15 +198,22 @@ function formatDate(d) {
     return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+function formatID(prefix, id) {
+    if (!id && id !== 0) return '';
+    const num = parseInt(String(id).replace(/[^0-9]/g, ''), 10);
+    if (Number.isNaN(num)) return String(id);
+    return prefix + String(num).padStart(4, '0');
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('club-list-input');
     input.addEventListener('change', function () {
         const val = this.value || '';
         let id = null;
-        const m = val.match(/^(\d+)\s*-/);
+        const m = val.match(/^(?:CB\s*0*)?(\d+)\s*-/i);
         if (m) id = m[1];
         else {
-            const m2 = val.match(/^(\d+)\b/);
+            const m2 = val.match(/^(?:CB\s*0*)?(\d+)\b/i);
             if (m2) id = m2[1];
         }
         if (id) {
@@ -220,9 +227,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function getSelectedClubID() {
         const val = input.value || '';
-        const m = val.match(/^(\d+)\s*-/);
+        const m = val.match(/^(?:CB\s*0*)?(\d+)\s*-/i);
         if (m) return m[1];
-        const m2 = val.match(/^(\d+)\b/);
+        const m2 = val.match(/^(?:CB\s*0*)?(\d+)\b/i);
         return m2 ? m2[1] : null;
     }
 
@@ -247,10 +254,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 if (data.message && data.message.toLowerCase().includes('already')) {
-                    membershipResult.textContent = `You already joined this club. Membership ID: ${data.membershipID} | Joined: ${data.clubJoinDate || 'N/A'}`;
+                    membershipResult.textContent = `You already joined this club. Membership ID: ${formatID('MM', data.membershipID)} | Joined: ${data.clubJoinDate || 'N/A'}`;
                     membershipResult.style.color = '#b82a1f';
                 } else {
-                    membershipResult.textContent = `Joined club! Membership ID: ${data.membershipID} | Joined: ${data.clubJoinDate || 'N/A'}`;
+                    membershipResult.textContent = `Joined club! Membership ID: ${formatID('MM', data.membershipID)} | Joined: ${data.clubJoinDate || 'N/A'}`;
                     membershipResult.style.color = '#006f6f';
                 }
             })

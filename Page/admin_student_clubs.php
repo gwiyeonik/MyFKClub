@@ -266,6 +266,17 @@ function formatID(prefix, id) {
     }
     return prefix + String(num).padStart(4, '0');
 }
+
+function parseID(prefix, idString) {
+    if (!idString) {
+        return '';
+    }
+    const cleaned = String(idString).trim();
+    if (cleaned.toUpperCase().startsWith(prefix.toUpperCase())) {
+        return cleaned.slice(prefix.length).replace(/^0+/, '') || '0';
+    }
+    return cleaned.replace(/[^0-9]/g, '');
+}
 </script>
 <?php
 
@@ -940,7 +951,7 @@ function selectMemberForCommittee() {
     }
 
     document.getElementById('add-membershipID').value =
-        option.value;
+        formatID('MM', option.value);
 
     document.getElementById('add-userID').value =
         option.dataset.userid;
@@ -968,7 +979,7 @@ function openUpdateModal() {
         formatID('CB', selectedCommitteeMember.clubID);
 
     document.getElementById('upd-membershipID').value =
-        selectedCommitteeMember.membershipID;
+        formatID('MM', selectedCommitteeMember.membershipID);
 
     document.getElementById('upd-position').value =
         selectedCommitteeMember.committeePosition;
@@ -998,7 +1009,7 @@ function openDeleteModal() {
         formatID('CB', selectedCommitteeMember.clubID);
 
     document.getElementById('del-membershipID').value =
-        selectedCommitteeMember.membershipID;
+        formatID('MM', selectedCommitteeMember.membershipID);
 
     document.getElementById('del-position').value =
         selectedCommitteeMember.committeePosition;
@@ -1021,8 +1032,10 @@ function submitAddCommittee() {
     const clubID =
         document.getElementById('info-club-id').value;
 
-    const membershipID =
+    let membershipID =
         document.getElementById('add-membershipID').value;
+
+    membershipID = parseID('MM', membershipID);
 
     const userID =
         document.getElementById('add-userID').value;
@@ -1091,8 +1104,10 @@ function submitAddCommittee() {
 
 function submitUpdateCommittee() {
 
-    const membershipID =
+    let membershipID =
         document.getElementById('upd-membershipID').value;
+
+    membershipID = parseID('MM', membershipID);
 
     const position =
         document.getElementById('upd-position').value;
@@ -1416,8 +1431,10 @@ function submitDeleteCommittee() {
         return;
     }
 
-    const membershipID = document.getElementById('del-membershipID').value;
+    let membershipID = document.getElementById('del-membershipID').value;
     const clubID = document.getElementById('del-clubID').value;
+
+    membershipID = parseID('MM', membershipID);
 
     if (!membershipID) {
         alert('No committee membership selected.');
