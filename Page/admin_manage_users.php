@@ -1055,7 +1055,7 @@ function addNewUser() {
       alert('User added successfully!');
       clearUserForm();
       loadUsers();
-      loadNextUserID(); // Refresh the next available user ID in the form
+      loadNextUserID(); // Refresh the next available user ID in the forms
     } else {
       alert('Error: ' + data.message);
     }
