@@ -4,7 +4,7 @@ session_start();
 
 
 // 1. SECURITY CONTROL GATE: Protect page from unauthenticated sessions or invalid roles
-// Security check
+// Security checks
 if (
     !isset($_SESSION['user_id']) ||
     !isset($_SESSION['role']) ||

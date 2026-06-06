@@ -43,7 +43,7 @@ function ensureRegistrationRequestsTable($conn) {
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
-/* ================= GET USERS ================= */
+/* ================= GET USERs ================= */
 if ($action === 'get_users' || $action === 'fetch_users_list') {
 
     // ✅ FIXED: Completely removed 'userStatus' so it matches your 7 schema columns perfectly!

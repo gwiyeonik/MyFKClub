@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
     exit;
 }
 
-// 2. Database Connection
+// 2. Database Connections
 $link = mysqli_connect("localhost", "root", "", "myfkclub");
 if (!$link) {
     echo json_encode(['success' => false, 'message' => 'Database connection failed: ' . mysqli_connect_error()]);
