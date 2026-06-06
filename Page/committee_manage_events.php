@@ -31,6 +31,7 @@ $idQuery = "SHOW TABLE STATUS LIKE 'event'";
 $idResult = $conn->query($idQuery);
 $idRow = $idResult->fetch_assoc();
 $nextID = $idRow['Auto_increment'];
+$formattedEventID = "EV" . str_pad($nextID, 4, '0', STR_PAD_LEFT);
 
 $eventResult = $conn->query($eventQuery);
 $sql = "SELECT * FROM event ORDER BY eventDateStart ASC";
@@ -164,8 +165,9 @@ if ($eventResult && $eventResult->num_rows > 0) {
               <form action="save_event.php" method="POST" enctype="multipart/form-data">
                 <div class="form-grid">
                   <div class="form-field">
-                    <label>Event ID (generated)</label>
-                    <input type="text" value="<?= $nextID ?>" readonly>
+                    <label>Event ID </label>
+                    <input type="text" value="<?= $formattedEventID ?>" readonly>
+                    <input type="hidden" name="eventID" value="<?= $nextID ?>">
                   </div>
                   <div class="form-field">
                     <label>Club</label>
