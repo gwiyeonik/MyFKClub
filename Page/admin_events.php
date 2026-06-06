@@ -92,7 +92,6 @@ $participantCountsJson = json_encode($participantCounts);
         <div class="topbar-left">
           <div class="topbar-title">Events</div>
         </div>
-        <a href="#profile" class="topbar-button">My Profile</a>
       </div>
 
     <div class="content-area">
