@@ -1040,7 +1040,7 @@ function addNewUser() {
   formData.append('userPass', password);
   formData.append('roleID', roleID);
 
-  // ✅ THIS IS WHERE YOU PUT IT
+  // ✅ THIS IS WHERE YOU PUT ITs
   if (photoFile) {
     formData.append('userPhoto', photoFile);
   }
