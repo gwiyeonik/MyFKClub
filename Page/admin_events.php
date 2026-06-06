@@ -30,6 +30,36 @@ $totalParticipants = ($resParticipants) ? $resParticipants->fetch_assoc()['total
 // 3. FETCH POPULAR EVENTS FOR TABLE (Using eventTitle and eventParticipants)
 $popQuery = "SELECT eventTitle, eventParticipants FROM event ORDER BY eventParticipants DESC LIMIT 5";
 $popResult = $conn->query($popQuery);
+
+// 4. FETCH DATA FOR CHARTS
+// Events by Club
+$clubQuery = "SELECT c.clubName, COUNT(e.eventID) as eventCount FROM club c LEFT JOIN event e ON c.clubID = e.clubID GROUP BY c.clubID, c.clubName";
+$clubResult = $conn->query($clubQuery);
+$clubNames = [];
+$clubCounts = [];
+if ($clubResult && $clubResult->num_rows > 0) {
+    while($row = $clubResult->fetch_assoc()) {
+        $clubNames[] = $row['clubName'];
+        $clubCounts[] = $row['eventCount'];
+    }
+}
+
+// Participants by Event
+$eventPartQuery = "SELECT eventTitle, eventParticipants FROM event ORDER BY eventParticipants DESC";
+$eventPartResult = $conn->query($eventPartQuery);
+$eventTitles = [];
+$participantCounts = [];
+if ($eventPartResult && $eventPartResult->num_rows > 0) {
+    while($row = $eventPartResult->fetch_assoc()) {
+        $eventTitles[] = $row['eventTitle'];
+        $participantCounts[] = $row['eventParticipants'];
+    }
+}
+
+$clubNamesJson = json_encode($clubNames);
+$clubCountsJson = json_encode($clubCounts);
+$eventTitlesJson = json_encode($eventTitles);
+$participantCountsJson = json_encode($participantCounts);
 ?>
 
 <!DOCTYPE html>
@@ -40,6 +70,7 @@ $popResult = $conn->query($popQuery);
   <title>Events | MyFKClub</title>
   <link rel="stylesheet" href="../CSS/dashboard.css">
   <link rel="stylesheet" href="../CSS/events.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="dashboard-shell">
@@ -88,14 +119,17 @@ $popResult = $conn->query($popQuery);
         </div>
       </section>
 
-      <section class="events-grid-main">
-        <div class="chart-card ">
-          <div class="chart-title">Number of Events Organized by Each Club</div>
-          <div class="chart-placeholder">&lt;&lt; bar chart &gt;&gt;</div>
+      <section style="width: calc(100% + 60px); margin-left: 0px; margin-right: 0px; padding: 0; margin-bottom: 30px;">
+        <div class="chart-card" style="width: 90%; padding: 30px; border-radius: 0; margin: 0;">
+          <div class="chart-title" style="margin-bottom: 20px;">Number of Events Organized by Each Club</div>
+          <canvas id="clubEventsChart" style="height: 350px; max-height: 350px;"></canvas>
         </div>
-        <div class="chart-card">
-          <div class="chart-title">Number of Participants for Each Events</div>
-          <div class="chart-placeholder">&lt;&lt; bar chart &gt;&gt;</div>
+      </section>
+
+      <section style="width: calc(100% + 60px); margin-left: 0px; margin-right: 0px; padding: 0; margin-bottom: 30px;">
+        <div class="chart-card" style="width: 90%; padding: 30px; border-radius: 0; margin: 0;">
+          <div class="chart-title" style="margin-bottom: 20px;">Number of Participants for Each Events</div>
+          <canvas id="participantsChart" style="height: 350px; max-height: 350px;"></canvas>
         </div>
       </section>
 
@@ -127,13 +161,113 @@ $popResult = $conn->query($popQuery);
             </table>
           </div>
         </div>
-        <div class="chart-card">
-          <div class="chart-title">Number of Participants for Each Events</div>
-          <div class="chart-placeholder">&lt;&lt; line graph &gt;&gt;</div>
+      </section>
+
+      <section style="width: calc(100% + 60px); margin-left: 0px; margin-right: 0px; padding: 0; margin-bottom: 30px;">
+        <div class="chart-card" style="width: 90%; padding: 30px; border-radius: 0; margin: 0;">
+          <div class="chart-title" style="margin-bottom: 20px;">Participants Trend</div>
+          <canvas id="lineChart" style="height: 350px; max-height: 350px;"></canvas>
         </div>
       </section>
     </div>
     </main>
   </div>
+
+  <script>
+    // Club Events Bar Chart
+    const clubEventsCtx = document.getElementById('clubEventsChart').getContext('2d');
+    new Chart(clubEventsCtx, {
+      type: 'bar',
+      data: {
+        labels: <?php echo $clubNamesJson; ?>,
+        datasets: [{
+          label: 'Number of Events',
+          data: <?php echo $clubCountsJson; ?>,
+          backgroundColor: 'rgba(54, 162, 235, 0.7)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+    // Participants Bar Chart
+    const participantsCtx = document.getElementById('participantsChart').getContext('2d');
+    new Chart(participantsCtx, {
+      type: 'bar',
+      data: {
+        labels: <?php echo $eventTitlesJson; ?>,
+        datasets: [{
+          label: 'Number of Participants',
+          data: <?php echo $participantCountsJson; ?>,
+          backgroundColor: 'rgba(75, 192, 75, 0.7)',
+          borderColor: 'rgba(75, 192, 75, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+    // Line Chart for Participants Trend
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    new Chart(lineCtx, {
+      type: 'line',
+      data: {
+        labels: <?php echo $eventTitlesJson; ?>,
+        datasets: [{
+          label: 'Participants Trend',
+          data: <?php echo $participantCountsJson; ?>,
+          borderColor: 'rgba(153, 102, 255, 1)',
+          backgroundColor: 'rgba(153, 102, 255, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
 </body>
 </html>
