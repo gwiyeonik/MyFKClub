@@ -277,6 +277,16 @@ function parseID(prefix, idString) {
     }
     return cleaned.replace(/[^0-9]/g, '');
 }
+
+function parseClubID(value) {
+    if (!value) return '';
+    const cleaned = String(value).trim();
+    let match = cleaned.match(/^CB0*(\d+)\s*(?:-|$)/i);
+    if (match) return match[1];
+    match = cleaned.match(/^0*(\d+)\s*(?:-|$)/);
+    if (match) return match[1];
+    return '';
+}
 </script>
 <?php
 
@@ -415,7 +425,7 @@ mysqli_close($link);
                     >
                     <datalist id="club-options">
                         <?php foreach ($clubList as $club): ?>
-                            <option value="<?= htmlspecialchars($club['clubID'] . ' - ' . $club['clubName']) ?>">
+                            <option value="<?= htmlspecialchars(formatPrefixedID('CB', $club['clubID']) . ' - ' . $club['clubName']) ?>">
                         <?php endforeach; ?>
                     </datalist>
                 </div>
@@ -456,9 +466,7 @@ mysqli_close($link);
               <input type="text" list="club-options-committee" id="club-choice" placeholder="Select Club (ID or Name)..." class="pill-search">
               <datalist id="club-options-committee">
                   <?php foreach ($clubList as $club): ?>
-                      <option value="<?= htmlspecialchars($club['clubID']) ?>">
-                          <?= htmlspecialchars($club['clubName']) ?>
-                      </option>
+                      <option value="<?= htmlspecialchars(formatPrefixedID('CB', $club['clubID']) . ' - ' . $club['clubName']) ?>">
                   <?php endforeach; ?>
               </datalist>
             </div>
@@ -505,7 +513,7 @@ mysqli_close($link);
                                   >
                               <datalist id="club-options-list">
                                   <?php foreach ($clubList as $club): ?>
-                                      <option value="<?= htmlspecialchars($club['clubID'] . ' - ' . $club['clubName']) ?>">
+                                      <option value="<?= htmlspecialchars(formatPrefixedID('CB', $club['clubID']) . ' - ' . $club['clubName']) ?>">
                                   <?php endforeach; ?>
                               </datalist>
                           </div>
@@ -636,23 +644,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
         clubSearchPill.addEventListener('input', function() {
 
-            const val = this.value;
+            const val = this.value.trim();
+            let clubID = parseClubID(val);
 
-            const options =
-                document.getElementById('club-options-committee').options;
-
-            for (let i = 0; i < options.length; i++) {
-
-                if (options[i].value === val) {
-
-                    const cleanID = val.split(' - ')[0].trim();
-
-                    document.getElementById('info-club-id').value = cleanID;
-
-                    fetchCommitteeData(cleanID);
-
-                    break;
+            if (!clubID) {
+                const options = document.getElementById('club-options-committee').options;
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].value === val) {
+                        clubID = parseClubID(options[i].value);
+                        break;
+                    }
                 }
+            }
+
+            if (clubID) {
+                document.getElementById('info-club-id').value = clubID;
+                fetchCommitteeData(clubID);
             }
         });
     }
@@ -670,43 +677,20 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        let clubID = '';
+        let clubID = parseClubID(value);
 
-        // If format is: 1 - Photography Club
-        if (value.includes('-')) {
-
-            clubID = value.split('-')[0].trim();
-        }
-
-        // If user types only ID
-        else if (!isNaN(value)) {
-
-            clubID = value;
-        }
-
-        // If user types club name
-        else {
-
-            const options =
-                document.getElementById('club-options').options;
-
+        if (!clubID) {
+            const options = document.getElementById('club-options').options;
             for (let i = 0; i < options.length; i++) {
-
                 const optionValue = options[i].value;
-
-                if (
-                    optionValue.toLowerCase().includes(value.toLowerCase())
-                ) {
-
-                    clubID = optionValue.split('-')[0].trim();
-
+                if (optionValue.toLowerCase().includes(value.toLowerCase())) {
+                    clubID = parseClubID(optionValue);
                     break;
                 }
             }
         }
 
         if (clubID !== '') {
-
             fetchClubInfo(clubID);
         }
     });
@@ -717,14 +701,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const listInput = document.getElementById('club-list-input');
     if (listInput) {
         const handleListValue = (val) => {
-            val = val || '';
-            let id = null;
-            const m = val.match(/^(\d+)\s*-/);
-            if (m) id = m[1];
-            else {
-                const m2 = val.match(/^(\d+)\b/);
-                if (m2) id = m2[1];
-            }
+            const id = parseClubID(val || '');
 
             if (id) {
                 fetchClubListPanel(id);
@@ -776,7 +753,7 @@ function loadClubOptions() {
                 infoDatalist.innerHTML = '';
                 data.clubs.forEach(club => {
                     const option = document.createElement('option');
-                    option.value = `${club.clubID} - ${club.clubName}`; // info panel uses ID and name
+                    option.value = `${formatID('CB', club.clubID)} - ${club.clubName}`; // info panel uses CB-prefixed ID and name
                     infoDatalist.appendChild(option);
                 });
             }
@@ -785,7 +762,7 @@ function loadClubOptions() {
                 listDatalist.innerHTML = '';
                 data.clubs.forEach(club => {
                     const option = document.createElement('option');
-                    option.value = `${club.clubID} - ${club.clubName}`; // list panel shows ID - Name
+                    option.value = `${formatID('CB', club.clubID)} - ${club.clubName}`; // list panel shows CB-prefixed ID - Name
                     listDatalist.appendChild(option);
                 });
             }
@@ -794,7 +771,7 @@ function loadClubOptions() {
                 committeeDatalist.innerHTML = '';
                 data.clubs.forEach(club => {
                     const option = document.createElement('option');
-                    option.value = `${club.clubID} - ${club.clubName}`; // committee search: ID - Name
+                    option.value = `${formatID('CB', club.clubID)} - ${club.clubName}`; // committee search: CB-prefixed ID - Name
                     committeeDatalist.appendChild(option);
                 });
             }
