@@ -191,10 +191,11 @@ if ($roleID === 2) {
             <a href="#" class="sidebar-link">Organize Events</a>
             <a href="#" class="sidebar-link">Attendance Logs</a>
         <?php else: ?>
-            <a href="student_dashboard.php" class="sidebar-link">Home</a>
-            <a href="#" class="sidebar-link">Clubs</a>
-            <a href="#" class="sidebar-link">Events</a>
-            <a href="#" class="sidebar-link">Participation</a>
+            <a href="myProfile.php" class="sidebar-link active">My Profile</a>
+            <a href="student_myclubs.php" class="sidebar-link">My Clubs</a>
+            <a href="student_clublist.php" class="sidebar-link">Club List</a>
+            <a href="student_events.php" class="sidebar-link">Events</a>
+            <a href="student_participation.php" class="sidebar-link">Participation</a>
         <?php endif; ?>
     </nav>
 
@@ -206,9 +207,8 @@ if ($roleID === 2) {
     <main class="dashboard-main">
       <div class="topbar">
         <div class="topbar-left">
-          <div class="topbar-title"><?php echo htmlspecialchars($roleName); ?> Profile</div>
+          <div class="topbar-title">Welcome back, <?php echo htmlspecialchars($currentUserData['userName']); ?></div>
         </div>
-        <a href="myProfile.php" class="topbar-button active">My Profile</a>
       </div>
 
       <div class="profile-content-area">

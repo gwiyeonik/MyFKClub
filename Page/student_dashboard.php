@@ -26,7 +26,7 @@ $current_user = $_SESSION['user_name'];
       </div>
 
       <nav class="sidebar-nav">
-            <a href="student_dashboard.php" class="sidebar-link active">Home</a>
+            <a href="myProfile.php" class="sidebar-link active">My Profile</a>
             <a href="student_myclubs.php" class="sidebar-link">My Clubs</a>
             <a href="student_clublist.php" class="sidebar-link">Club List</a>
             <a href="student_events.php" class="sidebar-link">Events</a>
@@ -39,7 +39,7 @@ $current_user = $_SESSION['user_name'];
         <div class="topbar-left">
           <div class="topbar-title">Welcome back, <?php echo htmlspecialchars($current_user); ?></div>
         </div>
-        <a href="myProfile.php" class="topbar-button">My Profile</a>
+       
       </div>
 
       </main>

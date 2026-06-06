@@ -88,7 +88,7 @@ if (isset($_POST['login_btn'])) {
                 if ($roleType === 'admin') {
                     header('Location: admin_dashboard.php');
                 } else {
-                    header('Location: student_dashboard.php');
+                    header('Location: myProfile.php');
                 }
                 exit();
             } else {

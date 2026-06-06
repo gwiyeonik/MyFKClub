@@ -31,7 +31,6 @@ mysqli_close($link);
         <img src="../Image/fkclub.jpg" alt="FKClub logo">
       </div>
       <nav class="sidebar-nav">
-        <a href="committee_dashboard.php" class="sidebar-link">Home</a>
         <a href="committee_view_clubs.php" class="sidebar-link active">View Clubs</a>
         <a href="committee_manage_events.php" class="sidebar-link">Manage Events</a>
         <a href="#" class="sidebar-link">Members</a>
