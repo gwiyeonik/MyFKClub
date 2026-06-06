@@ -4,8 +4,8 @@ session_start();
 header('Content-Type: application/json');
 
 // 1. Authentication Check
-if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+    header('Location: login.php');
     exit;
 }
 

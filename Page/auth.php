@@ -40,10 +40,11 @@ if (isset($_POST['login_btn'])) {
                     $commData = mysqli_fetch_assoc($commResult);
                     
                     // Success: Student is recognized as committee
-                    $_SESSION['user_id']   = $userID;
-                    $_SESSION['user_name'] = $user['userName'];
-                    $_SESSION['role']      = 'committee';
-                    $_SESSION['position']  = $commData['committeePosition']; // e.g., President [cite: 6]
+                $_SESSION['user_id']   = $userID;
+                $_SESSION['user_name'] = $user['userName'];
+                $_SESSION['role']      = 'committee';
+                $_SESSION['roleID']    = $dbRoleID;
+                $_SESSION['position']  = $commData['committeePosition'];
                     
                     header('Location: committee_dashboard.php');
                     exit();
@@ -61,7 +62,7 @@ if (isset($_POST['login_btn'])) {
                 $_SESSION['user_id']   = $userID;
                 $_SESSION['user_name'] = $user['userName'];
                 $_SESSION['role']      = $roleType;
-
+                $_SESSION['roleID']    = $dbRoleID;
                 if ($roleType === 'admin') {
                     header('Location: admin_dashboard.php');
                 } else {

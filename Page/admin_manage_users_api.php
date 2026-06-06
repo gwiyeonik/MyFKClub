@@ -2,6 +2,18 @@
 header('Content-Type: application/json; charset=utf-8');
 session_start();
 
+if (
+    !isset($_SESSION['user_id']) ||
+    !isset($_SESSION['role']) ||
+    strtolower(trim($_SESSION['role'])) !== 'admin'
+) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Unauthorized access',
+        'session' => $_SESSION
+    ]);
+    exit;
+}
 error_reporting(0);
 ini_set('display_errors', 0);
 
@@ -28,14 +40,6 @@ function ensureRegistrationRequestsTable($conn) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 }
 
-/* ================= SECURITY ================= */
-if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) != 1) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Unauthorized access'
-    ]);
-    exit;
-}
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 

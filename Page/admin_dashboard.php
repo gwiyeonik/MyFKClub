@@ -2,11 +2,20 @@
 // admin_dashboard.php
 session_start();
 
+
 // 1. SECURITY CONTROL GATE: Protect page from unauthenticated sessions or invalid roles
-if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
+// Security check
+if (
+    !isset($_SESSION['user_id']) ||
+    !isset($_SESSION['role']) ||
+    strtolower(trim($_SESSION['role'])) !== 'admin'
+) {
     header('Location: login.php');
     exit;
 }
+
+?>
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
