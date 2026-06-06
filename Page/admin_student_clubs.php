@@ -255,8 +255,24 @@ function formatDate(dateString) {
         year: 'numeric'
     });
 }
+
+function formatID(prefix, id) {
+    if (id === null || id === undefined || id === '') {
+        return '';
+    }
+    const num = parseInt(String(id).replace(/[^0-9]/g, ''), 10);
+    if (Number.isNaN(num)) {
+        return String(id);
+    }
+    return prefix + String(num).padStart(4, '0');
+}
 </script>
 <?php
+
+function formatPrefixedID($prefix, $value, $width = 4) {
+    $num = is_numeric($value) ? (int)$value : 0;
+    return $prefix . str_pad($num, $width, '0', STR_PAD_LEFT);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['club_name'])) {
     $clubName = trim($_POST['club_name']);
@@ -342,7 +358,7 @@ mysqli_close($link);
               <div class="form-grid club-info-grid">
               <div class="form-field">
                 <label for="club-id">Club ID</label>
-                <input id="club-id" type="text" name="club_id" value="<?= isset($nextID) ? htmlspecialchars($nextID) : '' ?>" readonly required>
+                <input id="club-id" type="text" name="club_id" value="<?= htmlspecialchars(formatPrefixedID('CB', $nextID)) ?>" readonly required>
               </div>
               <div class="form-field">
                 <label for="club-name">Club Name</label>
@@ -566,9 +582,9 @@ function updateCommitteeTable(committeeData) {
         row.className = 'committee-data-row';
 
         row.innerHTML = `
-            <span>${member.clubID}</span>
-            <span>${member.membershipID}</span>
-            <span>${member.userID}</span>
+            <span>${formatID('CB', member.clubID)}</span>
+            <span>${formatID('MM', member.membershipID)}</span>
+            <span>${formatID('US', member.userID)}</span>
             <span>${member.userName}</span>
             <span>${member.committeePosition}</span>
             <span>${member.committeeAssignedDate ?? '-'}</span>
@@ -869,7 +885,7 @@ function openAddModal() {
     document.getElementById('add-position').selectedIndex = 0;
 
     document.getElementById('add-clubID-display').value =
-        clubID;
+        formatID('CB', clubID);
 
 
 
@@ -895,7 +911,7 @@ fetch(`admin_student_clubs_api.php?action=get_club_members&clubID=${clubID}`)
                     data-userid="${member.userID}"
                     data-username="${member.userName}"
                 >
-                    ${member.membershipID} - ${member.userName}
+                    ${formatID('MM', member.membershipID)} - ${member.userName}
                 </option>
             `;
         });
@@ -949,7 +965,7 @@ function openUpdateModal() {
         selectedCommitteeMember.userName;
 
     document.getElementById('upd-clubID-display').value =
-        selectedCommitteeMember.clubID;
+        formatID('CB', selectedCommitteeMember.clubID);
 
     document.getElementById('upd-membershipID').value =
         selectedCommitteeMember.membershipID;
@@ -979,7 +995,7 @@ function openDeleteModal() {
         selectedCommitteeMember.userName;
 
     document.getElementById('del-clubID').value =
-        selectedCommitteeMember.clubID;
+        formatID('CB', selectedCommitteeMember.clubID);
 
     document.getElementById('del-membershipID').value =
         selectedCommitteeMember.membershipID;

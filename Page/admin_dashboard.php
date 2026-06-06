@@ -24,6 +24,7 @@ if (
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard | MyFKClub</title>
   <link rel="stylesheet" href="../CSS/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="dashboard-shell">
@@ -51,15 +52,20 @@ if (
 
       <div class="content-area">
         
-        <section class="stats-row">
-          <div class="stat-card"><div class="stat-label">Registered Students</div><strong id="metric-students" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong></div>
-          <div class="stat-card"><div class="stat-label">Active Clubs</div><strong id="metric-clubs" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong></div>
-          <div class="stat-card"><div class="stat-label">Upcoming Events</div><strong id="metric-events" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong></div>
-          <div class="stat-card"><div class="stat-label">Avg Attendance Rate</div><strong id="metric-attendance" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong></div>
+        <section style="width: calc(100% + 60px); margin-left: 0px; margin-right: 0px; padding: 0; margin-bottom: 30px;">
+          <div class="chart-card" style="width: 90%; padding: 30px; border-radius: 0; margin: 0;">
+            <div class="chart-title" style="margin-bottom: 20px;">System Overview</div>
+            <canvas id="metricsChart" style="height: 350px; max-height: 350px;"></canvas>
+          </div>
         </section>
 
         <section class="charts-row">
           <div class="aside-cards">
+            <div class="stat-card">
+              <div class="stat-label">Avg Attendance Rate</div>
+              <strong id="metric-attendance" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong>
+            </div>
+            
             <div class="stat-card">
               <div class="stat-label">Club in Faculty</div>
               <strong id="aside-clubs" style="font-size: 24px; display: block; margin-top: 5px; color: #1a365d;">...</strong>
@@ -108,19 +114,21 @@ if (
   </div>
 
   <script>
+    let metricsChart = null;
+
     document.addEventListener("DOMContentLoaded", function() {
         // Fetch data from backend api
         fetch('admin_dashboard_api.php?action=get_dashboard_data')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // 1. Inject real database numbers directly into your metric rows
-                    document.getElementById('metric-students').textContent = data.metrics.totalStudents;
-                    document.getElementById('metric-clubs').textContent = data.metrics.totalClubs;
-                    document.getElementById('metric-events').textContent = data.metrics.totalEvents;
+                    // 1. Create Bar Chart with metrics
+                    createMetricsChart(data.metrics);
+
+                    // Set additional metrics
                     document.getElementById('metric-attendance').textContent = data.metrics.avgAttendance;
                     document.getElementById('aside-clubs').textContent = data.metrics.totalClubs;
-                    
+
                     // FIXED: Dynamic data integration link for total students joined
                     document.getElementById('aside-joined-students').textContent = data.metrics.totalStudentsJoined || data.metrics.totalStudents;
 
@@ -148,6 +156,86 @@ if (
             })
             .catch(error => console.error("Fetch API Connection Error:", error));
     });
+
+    // Create bar chart for metrics
+    function createMetricsChart(metrics) {
+        const ctx = document.getElementById('metricsChart').getContext('2d');
+        
+        if (metricsChart) {
+            metricsChart.destroy();
+        }
+
+        metricsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Registered Students', 'Active Clubs', 'Upcoming Events'],
+                datasets: [{
+                    label: 'Count',
+                    data: [
+                        metrics.totalStudents,
+                        metrics.totalClubs,
+                        metrics.totalEvents
+                    ],
+                    backgroundColor: [
+                        'rgba(219, 39, 119, 0.8)',
+                        'rgba(23, 162, 184, 0.8)',
+                        'rgba(193, 156, 0, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(219, 39, 119, 1)',
+                        'rgba(23, 162, 184, 1)',
+                        'rgba(193, 156, 0, 1)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    hoverBackgroundColor: [
+                        'rgba(219, 39, 119, 1)',
+                        'rgba(23, 162, 184, 1)',
+                        'rgba(193, 156, 0, 1)'
+                    ],
+                    barPercentage: 0.3,  // Change 0.6 to make bars thicker (0.1-1.0)
+                    categoryPercentage: 0.8  // Space between bars (0.1-1.0)
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'x',
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 25,
+                        ticks: {
+                            stepSize: 5,
+                            callback: function(value) {
+                                return value;
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(200, 200, 200, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            maxRotation: 0,
+                            minRotation: 0,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
 
     // Simple XSS sanitizer to protect output rendering
     function escapeHTML(str) {
