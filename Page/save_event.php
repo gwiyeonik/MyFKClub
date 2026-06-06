@@ -11,6 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title    = $_POST['eventTitle'];
     $desc     = $_POST['eventDesc'];
     $venue    = $_POST['eventVenue'];
+    $maxParticipants = $_POST['eventMaxParticipants'];
     $dateType = $_POST['date_type'];
 
     // Handle dates
@@ -36,10 +37,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 eventDateStart,
                 eventDateEnd,
                 eventVenue,
+                eventMaxParticipants,
                 eventStatus
             )
             VALUES
-            (?, ?, ?, ?, ?, ?, 'Upcoming')";
+            (?, ?, ?, ?, ?, ?, ?, 'Upcoming')";
 
     $stmt = $conn->prepare($sql);
 
@@ -48,13 +50,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $stmt->bind_param(
-        "isssss",
+        "isssssi",
         $clubID,
         $title,
         $desc,
         $eventDateStart,
         $eventDateEnd,
-        $venue
+        $venue,
+        $maxParticipants
     );
 
     if ($stmt->execute()) {

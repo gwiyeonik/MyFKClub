@@ -358,6 +358,16 @@ background: #17418f; /* Dark blue color */
     cursor: pointer;
 }
 
+.form-field input[type="text"],
+.form-field input[type="number"] {
+    width: 100%;
+    height: 44px;
+    border: 1px solid #17418f;
+    border-radius: 14px;
+    padding: 0 14px;
+    font-size: 0.95rem;
+}
+
 .form-field input[type="date"] {
     cursor: pointer;
 }
@@ -371,6 +381,7 @@ input[type="date"] {
 }
 
 .form-field input[type="text"]:focus,
+.form-field input[type="number"]:focus,
 .form-field input[type="date"]:focus,
 .club-select:focus {
     border-color: #0f2e60;

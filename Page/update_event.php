@@ -10,6 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title   = $_POST['event_title'];
     $desc    = $_POST['event_desc'];
     $venue   = $_POST['event_venue'];
+    $maxParticipants = $_POST['event_max_participants'];
     $status  = $_POST['event_status'];
     $dateType = $_POST['update_date_type'];
 
@@ -29,6 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             eventTitle = ?,
             eventDesc = ?,
             eventVenue = ?,
+            eventMaxParticipants = ?,
             eventStatus = ?,
             eventDateStart = ?,
             eventDateEnd = ?
@@ -36,10 +38,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ");
 
     $stmt->bind_param(
-        "ssssssi",
+        "sssssssi",
         $title,
         $desc,
         $venue,
+        $maxParticipants,
         $status,
         $eventDateStart,
         $eventDateEnd,

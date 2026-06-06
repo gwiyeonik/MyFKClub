@@ -64,6 +64,7 @@ if ($eventResult && $eventResult->num_rows > 0) {
         box-sizing: border-box;
     }
     .club-info-panel .form-field input[type="text"],
+    .club-info-panel .form-field input[type="number"],
     .club-info-panel .form-field input[type="date"],
     .club-info-panel .form-field input[type="file"],
     .club-info-panel .form-field select {
@@ -192,6 +193,10 @@ if ($eventResult && $eventResult->num_rows > 0) {
                     <input type="text" name="eventVenue">
                   </div>
                   <div class="form-field">
+                    <label>Max Participants</label>
+                    <input type="number" name="eventMaxParticipants">
+                  </div>
+                  <div class="form-field">
                     <label>Event Date</label>
                     <div style="display: flex; gap: 15px; margin-bottom: 8px; align-items: center;">
                         <label class="radio-label" style="white-space: nowrap;">
@@ -257,6 +262,11 @@ if ($eventResult && $eventResult->num_rows > 0) {
                   <div class="form-field">
                     <label for="info-event-venue">Event Venue</label>
                     <input id="info-event-venue" type="text" name="event_venue">
+                  </div>
+
+                  <div class="form-field">
+                    <label for="info-event-max">Max Participants</label>
+                    <input id="info-event-max" type="number" name="event_max_participants">
                   </div>
 
                   <div class="form-field">
@@ -355,6 +365,7 @@ if ($eventResult && $eventResult->num_rows > 0) {
             document.getElementById('info-event-name').value  = d.title;
             document.getElementById('info-event-desc').value  = d.desc;
             document.getElementById('info-event-venue').value = d.venue;
+            document.getElementById('info-event-max').value   = d.max;
             // Auto-switch date type based on data
             const isSameDate = d.dateStart === d.dateEnd || !d.dateEnd;
 
@@ -386,6 +397,7 @@ if ($eventResult && $eventResult->num_rows > 0) {
         document.getElementById('info-event-name').value  = data.eventTitle;
         document.getElementById('info-event-desc').value  = data.eventDesc;
         document.getElementById('info-event-venue').value = data.eventVenue;
+        document.getElementById('info-event-max').value   = data.eventMaxParticipants;
 
         const isSameDate = data.eventDateStart === data.eventDateEnd || !data.eventDateEnd;
 
