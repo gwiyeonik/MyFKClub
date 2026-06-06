@@ -80,7 +80,6 @@ $result = $conn->query($sql);
             <div class="topbar-left">
                 <div class="topbar-title">Events</div>
             </div>
-            <a href="myProfile.php" class="topbar-button">My Profile</a>
         </div>
 
         <div class="events-table-wrapper">
@@ -119,7 +118,7 @@ $result = $conn->query($sql);
                             data-date-end="<?= $row['eventDateEnd'] ?>"
                             data-status="<?= $row['eventStatus'] ?>"
                             data-desc="<?= htmlspecialchars($row['eventDesc']) ?>">
-                            <td><?= $row['eventID'] ?></td>
+                            <td><?= "EV" . str_pad($row['eventID'], 4, '0', STR_PAD_LEFT) ?></td>
                             <td><strong><?= htmlspecialchars($row['eventTitle']) ?></strong></td>
                             <td><?= htmlspecialchars($row['eventVenue']) ?></td>
                             <td>

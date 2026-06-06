@@ -132,7 +132,7 @@ $participantCountsJson = json_encode($participantCounts);
         </div>
       </section>
 
-      <section class="events-grid-bottom">
+      <section class="events-grid-bottom" style="margin-bottom: 40px;">
         <div class="chart-card">
           <div class="chart-title">Popular Events Based on Registration Count</div>
           <div class="table-wrapper">

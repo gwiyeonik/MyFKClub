@@ -91,7 +91,6 @@ if ($eventResult && $eventResult->num_rows > 0) {
     <main class="dashboard-main">
       <div class="topbar">
         <div class="topbar-left"><div class="topbar-title">Manage Events</div></div>
-        <a href="#profile" class="topbar-button">My Profile</a>
       </div>
 
       <div class="content-area">
@@ -127,7 +126,7 @@ if ($eventResult && $eventResult->num_rows > 0) {
                                 data-max="<?= $row['eventMaxParticipants'] ?>"
                                 data-desc="<?= htmlspecialchars($row['eventDesc']) ?>"
                                 style="cursor: pointer;">
-                                <td><?php echo $row['eventID']; ?></td>
+                                <td><?php echo "EV" . str_pad($row['eventID'], 4, '0', STR_PAD_LEFT); ?></td>
                                 <td><strong><?php echo $row['eventTitle']; ?></strong></td>
                                 <td><?php echo $row['eventVenue']; ?></td>
                                 <td>
@@ -238,7 +237,8 @@ if ($eventResult && $eventResult->num_rows > 0) {
                         // Populate the dropdown from DB
                         $res = $conn->query("SELECT eventID, eventTitle FROM event");
                         while($row = $res->fetch_assoc()) {
-                            echo "<option value='{$row['eventID']}'>{$row['eventID']} - {$row['eventTitle']}</option>";
+                            $formattedID = "EV" . str_pad($row['eventID'], 4, '0', STR_PAD_LEFT);
+                            echo "<option value='{$row['eventID']}'>{$formattedID} - {$row['eventTitle']}</option>";
                       }
                       ?>
                     </select>

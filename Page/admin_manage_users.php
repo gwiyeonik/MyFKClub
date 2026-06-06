@@ -221,7 +221,6 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
         <div class="topbar-left">
           <div class="topbar-title">FK Club Admin</div>
         </div>
-        <a href="#profile" class="topbar-button">My Profile</a>
       </div>
 
     <div class="content-area">

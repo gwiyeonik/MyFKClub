@@ -41,8 +41,6 @@ session_start();
         <div class="topbar-left">
           <div class="topbar-title">Participation Reports</div>
         </div>
-
-        <a href="#profile" class="topbar-button">My Profile</a>
       </div>
 
       <!-- CONTENT -->
