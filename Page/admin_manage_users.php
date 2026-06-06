@@ -253,6 +253,7 @@ $roleMap = [1 => 'Admin', 2 => 'Committee', 3 => 'Student'];
             readonly
             style="background:#f1f5f9; cursor:not-allowed;"
           >
+          <input type="hidden" id="inputUserIDRaw">
         </div>
 
         <!-- PASSWORD -->
@@ -656,15 +657,18 @@ function autofillRegistrationForm(jsonData) {
     }
 
     function loadNextUserID() {
-  fetch('admin_manage_users_api.php?action=get_next_user_id')
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        document.getElementById('inputUserID').value = data.nextID;
-      }
-    })
-    .catch(err => console.error(err));
-}
+      fetch('admin_manage_users_api.php?action=get_next_user_id')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const nextID = data.nextID;
+            const formatted = 'US' + String(parseInt(nextID, 10)).padStart(4, '0');
+            document.getElementById('inputUserID').value = formatted;
+            document.getElementById('inputUserIDRaw').value = String(nextID);
+          }
+        })
+        .catch(err => console.error(err));
+    }
 
 document.addEventListener('DOMContentLoaded', loadNextUserID);
 
@@ -1098,7 +1102,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add new user
 function addNewUser() {
 
-  const userID = document.getElementById('inputUserID').value.trim();
+  const userID = document.getElementById('inputUserIDRaw').value.trim();
   const password = document.getElementById('inputPassword').value.trim();
   const name = document.getElementById('inputName').value.trim();
   const email = document.getElementById('inputEmail').value.trim();

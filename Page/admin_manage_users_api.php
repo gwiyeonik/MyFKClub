@@ -99,7 +99,14 @@ if ($action === 'get_user') {
 
 if ($action === 'get_next_user_id') {
 
-    $res = $conn->query("SELECT MAX(CAST(userID AS UNSIGNED)) AS maxID FROM user");
+    $res = $conn->query("SELECT MAX(
+            CASE
+                WHEN userID LIKE 'US%' THEN CAST(SUBSTRING(userID, 3) AS UNSIGNED)
+                WHEN userID RLIKE '^[0-9]+' THEN CAST(userID AS UNSIGNED)
+                ELSE 0
+            END
+        ) AS maxID
+        FROM user");
     $row = $res->fetch_assoc();
 
     $nextID = ($row['maxID'] ?? 0) + 1;
@@ -158,7 +165,14 @@ if ($action === 'add_user') {
     $requestID = $_POST['requestID'] ?? null;
 
     if ($userID === '') {
-        $res = $conn->query("SELECT MAX(CAST(userID AS UNSIGNED)) AS maxID FROM user");
+        $res = $conn->query("SELECT MAX(
+                CASE
+                    WHEN userID LIKE 'US%' THEN CAST(SUBSTRING(userID, 3) AS UNSIGNED)
+                    WHEN userID RLIKE '^[0-9]+' THEN CAST(userID AS UNSIGNED)
+                    ELSE 0
+                END
+            ) AS maxID
+            FROM user");
         $row = $res->fetch_assoc();
         $userID = ($row['maxID'] ?? 0) + 1;
     }

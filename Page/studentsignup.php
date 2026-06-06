@@ -3,6 +3,11 @@
 $link = mysqli_connect("localhost", "root", "", "myfkclub");
 if (!$link) { die("Connection failed: " . mysqli_connect_error()); }
 
+function formatPrefixedID($prefix, $value, $width = 4) {
+    $num = is_numeric($value) ? (int)$value : 0;
+    return $prefix . str_pad($num, $width, '0', STR_PAD_LEFT);
+}
+
 $result = mysqli_query($link, "SHOW TABLE STATUS LIKE 'user'");
 $row = mysqli_fetch_assoc($result);
 $nextID = $row['Auto_increment'] ?? 1; 
@@ -43,7 +48,7 @@ mysqli_close($link);
           
           <label class="form-group">
             <span>User ID</span>
-            <input type="text" name="userId" value="<?php echo $nextID; ?>" readonly required>
+            <input type="text" name="userId" value="<?php echo htmlspecialchars(formatPrefixedID('US', $nextID)); ?>" readonly required>
           </label>
 
           <label class="form-group">

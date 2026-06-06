@@ -17,18 +17,25 @@ if (!$link) {
 /* ================= SAFE ACTION ================= */
 $action = $_REQUEST['action'] ?? '';
 
+function formatPrefixedID($prefix, $value, $width = 4) {
+    $num = is_numeric($value) ? (int)$value : 0;
+    return $prefix . str_pad($num, $width, '0', STR_PAD_LEFT);
+}
+
 /* ======================================================
    GET NEXT MEMBERSHIP ID
 ====================================================== */
 if ($action === 'get_next_membership_id') {
 
-    $query = "SHOW TABLE STATUS LIKE 'clubmembership'";
+    $query = "SELECT MAX(membershipID) AS maxID FROM clubmembership";
     $result = mysqli_query($link, $query);
     $row = mysqli_fetch_assoc($result);
+    $nextID = ($row['maxID'] ?? 0) + 1;
 
     echo json_encode([
         'success' => true,
-        'nextID' => $row['Auto_increment'] ?? null
+        'nextID' => $nextID,
+        'formattedNextID' => formatPrefixedID('MM', $nextID)
     ]);
     exit;
 }
