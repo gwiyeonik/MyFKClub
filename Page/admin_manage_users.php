@@ -3,7 +3,7 @@
 session_start();
 
 // Security check
-if (!isset($_SESSION['user_id']) || ($_SESSION['role_id'] ?? null) !== 1) {
+if (!isset($_SESSION['user_id']) || ($_SESSION['roleID'] ?? null) !== 1) {
     header('Location: login.php');
     exit;
 }
