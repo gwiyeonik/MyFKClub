@@ -21,8 +21,8 @@ $action = $_GET['action'] ?? '';
 // 3. Action: Fetch Dashboard Metrics & Recent Users
 if ($action === 'get_dashboard_data') {
     
-    // Count total students (roleID = 2)
-    $studentCountResult = mysqli_query($link, "SELECT COUNT(*) as total FROM user WHERE roleID = 2"); 
+    // Count total students (roleID = 3)
+    $studentCountResult = mysqli_query($link, "SELECT COUNT(*) as total FROM user WHERE roleID = 3"); 
     if (!$studentCountResult) {
         $studentCountResult = mysqli_query($link, "SELECT COUNT(*) as total FROM user");
     }
@@ -58,7 +58,7 @@ if ($action === 'get_dashboard_data') {
     // --- END OF DYNAMIC LOGIC ---
 
     // Fetch recent 5 registrations
-    $recentUsersQuery = "SELECT userID, userName, userEmail, roleID FROM user ORDER BY userID ASC LIMIT 5";
+    $recentUsersQuery = "SELECT userID, userName, userEmail, roleID FROM user ORDER BY userID DESC LIMIT 5";
     $recentUsersResult = mysqli_query($link, $recentUsersQuery);
     
     $recentUsers = [];
