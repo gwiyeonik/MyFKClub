@@ -93,78 +93,82 @@ if (isset($_POST['save_manual_attendance'])) {
     if ($studentSearch === "" || $eventID === 0 || $attendanceStatus === "") {
         $message = "Please complete all required fields.";
     } else {
-        $studentSql = "SELECT userID, userName
+        // Extract numeric part from US format (US0001 -> 1)
+        $studentID = null;
+        if (preg_match('/^US(\d+)$/i', $studentSearch, $matches)) {
+            $studentID = intval($matches[1]);
+        } else {
+            $message = "Invalid Student ID format. Please use format US0001.";
+        }
+
+        if ($studentID !== null) {
+            $studentSql = "SELECT userID, userName
                FROM `user`
                WHERE roleID = 3
-               AND (
-                    userName LIKE ?
-                    OR userEmail LIKE ?
-                    OR CAST(userID AS CHAR) = ?
-               )
+               AND userID = ?
                LIMIT 1";
 
-        $studentLike = "%" . $studentSearch . "%";
+            $studentStmt = mysqli_prepare($conn, $studentSql);
+            mysqli_stmt_bind_param($studentStmt, "i", $studentID);
+            mysqli_stmt_execute($studentStmt);
+            $studentResult = mysqli_stmt_get_result($studentStmt);
 
-        $studentStmt = mysqli_prepare($conn, $studentSql);
-        mysqli_stmt_bind_param($studentStmt, "sss", $studentLike, $studentLike, $studentSearch);
-        mysqli_stmt_execute($studentStmt);
-        $studentResult = mysqli_stmt_get_result($studentStmt);
+            if (mysqli_num_rows($studentResult) === 0) {
+                $message = "Student with ID " . htmlspecialchars($studentSearch) . " not found or not registered as a student.";
+            } else {
+                $student = mysqli_fetch_assoc($studentResult);
+                $userID = intval($student['userID']);
 
-        if (mysqli_num_rows($studentResult) === 0) {
-            $message = "Student not found.";
-        } else {
-            $student = mysqli_fetch_assoc($studentResult);
-            $userID = intval($student['userID']);
-
-            $registrationSql = "SELECT registrationID
+                $registrationSql = "SELECT registrationID
                                 FROM eventregistration
                                 WHERE eventID = ?
                                 AND userID = ?
                                 LIMIT 1";
 
-            $registrationStmt = mysqli_prepare($conn, $registrationSql);
-            mysqli_stmt_bind_param($registrationStmt, "ii", $eventID, $userID);
-            mysqli_stmt_execute($registrationStmt);
-            $registrationResult = mysqli_stmt_get_result($registrationStmt);
+                $registrationStmt = mysqli_prepare($conn, $registrationSql);
+                mysqli_stmt_bind_param($registrationStmt, "ii", $eventID, $userID);
+                mysqli_stmt_execute($registrationStmt);
+                $registrationResult = mysqli_stmt_get_result($registrationStmt);
 
-            if (mysqli_num_rows($registrationResult) === 0) {
-                $message = "This student is not registered for the selected event.";
-            } else {
-                $registration = mysqli_fetch_assoc($registrationResult);
-                $registrationID = intval($registration['registrationID']);
-                $attendancePoints = calculateAttendancePoints($attendanceStatus, $attendanceIsVolunteer);
+                if (mysqli_num_rows($registrationResult) === 0) {
+                    $message = "This student is not registered for the selected event.";
+                } else {
+                    $registration = mysqli_fetch_assoc($registrationResult);
+                    $registrationID = intval($registration['registrationID']);
+                    $attendancePoints = calculateAttendancePoints($attendanceStatus, $attendanceIsVolunteer);
 
-                $checkSql = "SELECT attendanceID FROM eventattendance WHERE registrationID = ?";
-                $checkStmt = mysqli_prepare($conn, $checkSql);
-                mysqli_stmt_bind_param($checkStmt, "i", $registrationID);
-                mysqli_stmt_execute($checkStmt);
-                $checkResult = mysqli_stmt_get_result($checkStmt);
+                    $checkSql = "SELECT attendanceID FROM eventattendance WHERE registrationID = ?";
+                    $checkStmt = mysqli_prepare($conn, $checkSql);
+                    mysqli_stmt_bind_param($checkStmt, "i", $registrationID);
+                    mysqli_stmt_execute($checkStmt);
+                    $checkResult = mysqli_stmt_get_result($checkStmt);
 
-                if (mysqli_num_rows($checkResult) > 0) {
-                    $updateSql = "UPDATE eventattendance
+                    if (mysqli_num_rows($checkResult) > 0) {
+                        $updateSql = "UPDATE eventattendance
                                   SET attendanceStatus = ?,
                                       attendanceCheckinTime = NOW(),
                                       attendancePoints = ?,
                                       attendanceIsVolunteer = ?
                                   WHERE registrationID = ?";
 
-                    $updateStmt = mysqli_prepare($conn, $updateSql);
-                    mysqli_stmt_bind_param($updateStmt, "siii", $attendanceStatus, $attendancePoints, $attendanceIsVolunteer, $registrationID);
-                    mysqli_stmt_execute($updateStmt);
-                } else {
-                    $insertSql = "INSERT INTO eventattendance
+                        $updateStmt = mysqli_prepare($conn, $updateSql);
+                        mysqli_stmt_bind_param($updateStmt, "siii", $attendanceStatus, $attendancePoints, $attendanceIsVolunteer, $registrationID);
+                        mysqli_stmt_execute($updateStmt);
+                    } else {
+                        $insertSql = "INSERT INTO eventattendance
                                   (registrationID, attendanceStatus, attendanceCheckinTime, attendancePoints, attendanceIsVolunteer)
                                   VALUES (?, ?, NOW(), ?, ?)";
 
-                    $insertStmt = mysqli_prepare($conn, $insertSql);
-                    mysqli_stmt_bind_param($insertStmt, "isii", $registrationID, $attendanceStatus, $attendancePoints, $attendanceIsVolunteer);
-                    mysqli_stmt_execute($insertStmt);
+                        $insertStmt = mysqli_prepare($conn, $insertSql);
+                        mysqli_stmt_bind_param($insertStmt, "isii", $registrationID, $attendanceStatus, $attendancePoints, $attendanceIsVolunteer);
+                        mysqli_stmt_execute($insertStmt);
+                    }
+
+                    refreshStudentPointSummary($conn, $userID);
+
+                    header("Location: committee_attendance_report.php?eventID=" . $eventID . "&saved=1");
+                    exit;
                 }
-
-                refreshStudentPointSummary($conn, $userID);
-
-                header("Location: committee_attendance_report.php?eventID=" . $eventID . "&saved=1");
-                exit;
             }
         }
     }

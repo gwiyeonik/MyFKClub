@@ -18,7 +18,7 @@ require_once "committee_attendance_api.php";
       </div>
 
       <nav class="sidebar-nav">
-        <a href="committee_view_clubs.php" class="sidebar-link">View Clubs</a>
+        <a href="committee_club_details.php" class="sidebar-link">View Clubs</a>
         <a href="committee_manage_events.php" class="sidebar-link">Manage Events</a>
         <a href="committee_members.php" class="sidebar-link">Members</a>
         <a href="committee_attendance_report.php" class="sidebar-link active">Attendance</a>
@@ -105,13 +105,13 @@ require_once "committee_attendance_api.php";
               <div class="manual-entry-layout">
                 <div class="manual-form-left">
                   <div class="form-group">
-                    <label for="student_search">Student Name</label>
+                    <label for="student_search">Student ID</label>
                     <input
                       type="text"
                       id="student_search"
                       name="student_search"
                       class="manual-input"
-                      placeholder="Search student ID or name"
+                      placeholder="Enter ID (e.g., US0001)"
                       required
                     >
                   </div>
@@ -246,7 +246,7 @@ require_once "committee_attendance_api.php";
                 ?>
                           <tr>
                             <td><?php echo htmlspecialchars($row['userName']); ?></td>
-                            <td><?php echo htmlspecialchars($row['userID']); ?></td>
+                            <td><?php echo "US" . str_pad($row['userID'], 4, "0", STR_PAD_LEFT); ?></td>
                             <td>
                               <?php
                                 echo !empty($row['attendanceCheckinTime'])
