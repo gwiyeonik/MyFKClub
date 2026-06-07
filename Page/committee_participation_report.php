@@ -24,7 +24,7 @@ session_start();
       </div>
 
       <nav class="sidebar-nav">
-        <a href="committee_club_details.php" class="sidebar-link">Manage Clubs</a>
+        <a href="committee_view_clubs.php" class="sidebar-link">View Clubs</a>
         <a href="committee_manage_events.php" class="sidebar-link">Manage Events</a>
         <a href="committee_attendance_report.php" class="sidebar-link">Attendance</a>
         <a href="committee_participation_report.php" class="sidebar-link active">Reports</a>
