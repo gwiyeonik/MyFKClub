@@ -82,7 +82,6 @@ if ($eventResult && $eventResult->num_rows > 0) {
       <nav class="sidebar-nav">
         <a href="committee_view_clubs.php" class="sidebar-link">View Clubs</a>
         <a href="committee_manage_events.php" class="sidebar-link active">Manage Events</a>
-        <a href="committee_manage_members.php" class="sidebar-link">Members</a>
         <a href="committee_attendance.php" class="sidebar-link">Attendance</a>
         <a href="committee_participation_report.php" class="sidebar-link">Reports</a>
       </nav>
