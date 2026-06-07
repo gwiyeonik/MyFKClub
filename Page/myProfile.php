@@ -1,6 +1,12 @@
 <?php
 session_start();
 
+// Prevent browser from caching this protected page so Back cannot show it after logout.
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
+
 // 1. SECURITY CONTROL GATE: Protect page from unauthenticated sessions
 if (!isset($_SESSION['user_name'])) {
     header("Location: login.php");
@@ -130,7 +136,8 @@ $committeePosition = "N/A";
 $assignedClubName = "N/A";
 $joinedClubs = [];
 
-if ($roleID === 2) {
+// Check for committee assignment for both dedicated committee users and students assigned by admins.
+if ($roleID === 2 || $roleID === 3) {
     $commQuery = "SELECT cc.committeePosition, c.clubName 
                   FROM clubCommittee cc
                   JOIN clubMembership cm ON cc.membershipID = cm.membershipID
@@ -142,7 +149,9 @@ if ($roleID === 2) {
         $committeePosition = $commRow['committeePosition'];
         $assignedClubName = $commRow['clubName'];
     }
-} elseif ($roleID === 3) {
+}
+
+if ($roleID === 3) {
     $studQuery = "SELECT c.clubName, cm.clubJoinDate 
                   FROM clubMembership cm
                   JOIN club c ON cm.clubID = c.clubID
@@ -285,7 +294,7 @@ if ($roleID === 2) {
                     <tr>
                       <th style="width: 70px; text-align: center;">No</th>
                       <th>Club Name</th>
-                      <th>Affiliation Join Date</th>
+                      <th>Join Date</th>
                     </tr>
                   </thead>
                   <tbody>
