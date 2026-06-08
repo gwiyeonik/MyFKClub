@@ -79,12 +79,36 @@ if ($eventResult && $eventResult->num_rows > 0) {
       <div class="brand-panel">
         <img src="../Image/fkclub.jpg" alt="FKClub logo">
       </div>
-      <nav class="sidebar-nav">
-        <a href="committee_view_clubs.php" class="sidebar-link">View Clubs</a>
-        <a href="committee_manage_events.php" class="sidebar-link active">Manage Events</a>
-        <a href="committee_attendance.php" class="sidebar-link">Attendance</a>
-        <a href="committee_participation_report.php" class="sidebar-link">Reports</a>
-      </nav>
+      <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>
+
+<nav class="sidebar-nav">
+
+    <a href="committee_dashboard.php"
+       class="sidebar-link <?php echo $currentPage == 'committee_dashboard.php' ? 'active' : ''; ?>">
+       Home
+    </a>
+
+    <a href="committee_view_clubs.php"
+       class="sidebar-link <?php echo $currentPage == 'committee_view_clubs.php' ? 'active' : ''; ?>">
+       View Clubs
+    </a>
+
+    <a href="committee_manage_events.php"
+       class="sidebar-link <?php echo $currentPage == 'committee_manage_events.php' ? 'active' : ''; ?>">
+       Manage Events
+    </a>
+
+    <a href="committee_attendance_report.php"
+       class="sidebar-link <?php echo $currentPage == 'committee_attendance_report.php' ? 'active' : ''; ?>">
+       Attendance
+    </a>
+
+    <a href="committee_participation_report.php"
+       class="sidebar-link <?php echo $currentPage == 'committee_participation_report.php' ? 'active' : ''; ?>">
+       Reports
+    </a>
+
+</nav>
     </aside>
 
     <main class="dashboard-main">
