@@ -1,5 +1,24 @@
 <?php
 require_once "committee_attendance_api.php";
+
+function generateEventQRToken($eventID, $eventTitle) {
+    $secret = 'myfkclub_qr_secret';
+    return hash_hmac('sha256', $eventID . '|' . $eventTitle, $secret);
+}
+
+$qrCodeUrl = '';
+$qrScanUrl = '';
+
+if ($selectedEventID > 0 && $eventInfo) {
+    $baseUrl = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http')
+               . '://' . $_SERVER['HTTP_HOST']
+               . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+
+    $qrScanUrl = $baseUrl . '/committee_attendance_scan.php?eventID=' . $selectedEventID
+               . '&token=' . generateEventQRToken($selectedEventID, $eventInfo['eventTitle']);
+
+    $qrCodeUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=' . urlencode($qrScanUrl);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -88,13 +107,20 @@ require_once "committee_attendance_api.php";
         <section class="attendance-grid">
           <div class="attendance-card">
             <div class="attendance-title">Attendance QR</div>
-            <div class="qr-placeholder">
-              &lt;&lt;image&gt;&gt;<br>
-              Event QR Code
+            <div class="qr-placeholder" style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+              <?php if ($qrCodeUrl) { ?>
+                <img id="qr_code_image" src="<?php echo htmlspecialchars($qrCodeUrl); ?>" alt="Event QR Code" style="max-width:100%; height:auto;" />
+                <div class="qr-link">
+                  Scan this code to check in for the event.<br>
+                  <a id="scan_link" href="<?php echo htmlspecialchars($qrScanUrl); ?>" target="_blank"><?php echo htmlspecialchars($qrScanUrl); ?></a>
+                </div>
+              <?php } else { ?>
+                <div style="text-align:center;">Select an event to generate a QR code.</div>
+              <?php } ?>
             </div>
             <div class="attendance-actions">
-              <button class="primary-pill" type="button">Generate QR</button>
-              <button class="secondary-pill" type="button">Refresh QR</button>
+              <button class="primary-pill" type="button" onclick="generateQR();">Generate QR</button>
+              <button class="secondary-pill" type="button" onclick="refreshQR();">Refresh QR</button>
             </div>
           </div>
 
@@ -354,6 +380,21 @@ require_once "committee_attendance_api.php";
       updateCheckinTime();
       attendanceStatus.addEventListener("change", calculatePoints);
       volunteerStatus.addEventListener("change", calculatePoints);
+    }
+
+    function generateQR() {
+      const qrImage = document.getElementById('qr_code_image');
+      const scanLink = document.getElementById('scan_link');
+      if (!qrImage || !scanLink) return;
+      qrImage.src = qrImage.src;
+      scanLink.href = scanLink.href;
+    }
+
+    function refreshQR() {
+      const qrImage = document.getElementById('qr_code_image');
+      if (!qrImage) return;
+      const currentSrc = qrImage.src.replace(/([&?])nonce=\d+/, '');
+      qrImage.src = currentSrc + (currentSrc.includes('?') ? '&' : '?') + 'nonce=' + Date.now();
     }
   </script>
 </body>
