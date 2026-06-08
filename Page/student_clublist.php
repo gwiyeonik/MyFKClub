@@ -35,13 +35,13 @@ mysqli_close($link);
       <div class="brand-panel">
         <img src="../Image/fkclub.jpg" alt="FKClub logo">
       </div>
-      <nav class="sidebar-nav">
-            <a href="myProfile.php" class="sidebar-link">My Profile</a>
-            <a href="student_myclubs.php" class="sidebar-link">My Clubs</a>
-            <a href="student_clublist.php" class="sidebar-link active">Club List</a>
-            <a href="student_events.php" class="sidebar-link">Events</a>
-            <a href="student_participation.php" class="sidebar-link">Participation</a>
-      </nav>
+    <nav class="sidebar-nav">
+        <a href="student_dashboard.php" class="sidebar-link">Home</a>
+        <a href="student_myclubs.php" class="sidebar-link">My Clubs</a>
+        <a href="student_clublist.php" class="sidebar-link active">Club List</a>
+        <a href="student_events.php" class="sidebar-link">Events</a>
+        <a href="student_participation.php" class="sidebar-link">Participation</a>
+    </nav>
     </aside>
 
     <main class="dashboard-main">
@@ -57,13 +57,17 @@ mysqli_close($link);
                       <div class="club-details">
                           <div class="input-group">
                               <label><strong>Club Name/Club ID</strong></label>
+                              <div style="position: relative; display: inline-block; width: 100%;">
                                   <input 
                                       id="club-list-input"
                                       list="club-options-list"
                                       name="club-selection"
                                       class="pill-search-input"
                                       placeholder="Search or select a club..."
+                                      style="padding-right: 40px; width: 100%; box-sizing: border-box;"
                                   >
+                                  <button id="clear-btn" type="button" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 20px; cursor: pointer; color: #999; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; pointer-events: auto;">✕</button>
+                              </div>
                               <datalist id="club-options-list">
                                   <?php foreach ($clubList as $club): ?>
                                       <option value="<?= htmlspecialchars(sprintf('CB%04d - %s', $club['clubID'], $club['clubName'])) ?>">
@@ -221,6 +225,18 @@ document.addEventListener('DOMContentLoaded', function () {
             loadEventsForClub(id);
         }
     });
+    
+    const clearBtn = document.getElementById('clear-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+            input.value = '';
+            document.getElementById('list-club-desc').textContent = 'Select a club to view details';
+            document.getElementById('list-club-advisor').textContent = 'Select a club to view details';
+            document.getElementById('list-club-status').textContent = 'Select a club to view details';
+            document.getElementById('list-club-created').textContent = 'Select a club to view details';
+            document.getElementById('event-table-body').innerHTML = '<tr><td colspan="6" class="empty-cell">Select a club to load events.</td></tr>';
+        });
+    }
 
     const joinBtn = document.getElementById('joinClubBtn');
     const membershipResult = document.getElementById('membership-result');

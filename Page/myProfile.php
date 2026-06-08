@@ -195,10 +195,10 @@ if ($roleID === 3) {
             <a href="admin_events.php" class="sidebar-link">Events</a>
             <a href="admin_participation_reports.php" class="sidebar-link">Participation Reports</a>
         <?php elseif ($roleID === 2): ?>
-            <a href="committee_dashboard.php" class="sidebar-link">Home</a>
-            <a href="#" class="sidebar-link">My Club Panel</a>
-            <a href="#" class="sidebar-link">Organize Events</a>
-            <a href="#" class="sidebar-link">Attendance Logs</a>
+          <a href="committee_view_clubs.php" class="sidebar-link">Home</a>
+          <a href="committee_manage_events.php" class="sidebar-link">Manage Events</a>
+          <a href="committee_attendance_report.php" class="sidebar-link">Attendance</a>
+          <a href="committee_participation_report.php" class="sidebar-link">Reports</a>
         <?php else: ?>
             <a href="myProfile.php" class="sidebar-link active">My Profile</a>
             <a href="student_myclubs.php" class="sidebar-link">My Clubs</a>

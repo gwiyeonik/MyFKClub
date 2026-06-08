@@ -42,7 +42,7 @@ mysqli_close($link);
         <img src="../Image/fkclub.jpg" alt="FKClub logo">
       </div>
       <nav class="sidebar-nav">
-        <a href="myProfile.php" class="sidebar-link">My Profile</a>
+        <a href="student_dashboard.php" class="sidebar-link">Home</a>
         <a href="student_myclubs.php" class="sidebar-link active">My Clubs</a>
         <a href="student_clublist.php" class="sidebar-link">Club List</a>
         <a href="student_events.php" class="sidebar-link">Events</a>
@@ -65,15 +65,17 @@ mysqli_close($link);
                 <?php if (count($clubList) > 0): ?>
 
                     <label><strong>Select your club</strong></label>
-
-                    <input
-                        id="club-list-input"
-                        list="club-options-list"
-                        name="club-selection"
-                        class="pill-search-input"
-                        placeholder="Select your club..."
-                    >
-
+                    <div style="position: relative; display: inline-block; width: 100%;">
+                        <input
+                            id="club-list-input"
+                            list="club-options-list"
+                            name="club-selection"
+                            class="pill-search-input"
+                            placeholder="Select your club..."
+                            style="padding-right: 40px; width: 100%; box-sizing: border-box;"
+                        >
+                        <button id="clear-btn" type="button" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 20px; cursor: pointer; color: #999; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; pointer-events: auto;">✕</button>
+                    </div>
                     <datalist id="club-options-list">
                         <?php foreach ($clubList as $club): ?>
                             <option value="<?= htmlspecialchars(sprintf('CB%04d - %s', $club['clubID'], $club['clubName'])) ?>">
@@ -365,6 +367,19 @@ document.addEventListener('DOMContentLoaded', function () {
             loadEventsForClub(id);
         }
     });
+    
+    const clearBtn = document.getElementById('clear-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+            input.value = '';
+            document.getElementById('list-club-desc').textContent = 'Select a club to view details';
+            document.getElementById('list-club-advisor').textContent = 'Select a club to view details';
+            document.getElementById('list-club-status').textContent = 'Select a club to view details';
+            document.getElementById('list-club-created').textContent = 'Select a club to view details';
+            document.getElementById('list-committee-content').innerHTML = '<div class="empty-cell">Select a club to load committee members.</div>';
+            document.getElementById('event-table-body').innerHTML = '<tr><td colspan="6" class="empty-cell">Select a club to load events.</td></tr>';
+        });
+    }
 });
 </script>
 </body>

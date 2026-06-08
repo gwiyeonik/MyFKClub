@@ -415,14 +415,18 @@ mysqli_close($link);
                 <input type="hidden" id="info-club-id" name="info_club_id">
                 <div class="form-field form-field--stacked">
                     <label for="club-input">Club ID/Name</label>
-                    <input 
-                        type="text" 
-                        id="club-input" 
-                        name="club_select" 
-                        list="club-options" 
-                        class="club-select" 
-                        placeholder="Type or select a club..."
-                    >
+                    <div style="position: relative; display: inline-block; width: 100%;">
+                        <input 
+                            type="text" 
+                            id="club-input" 
+                            name="club_select" 
+                            list="club-options" 
+                            class="club-select" 
+                            placeholder="Type or select a club..."
+                            style="padding-right: 40px; width: 100%; box-sizing: border-box;"
+                        >
+                        <button id="clear-club-input" type="button" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 20px; cursor: pointer; color: #999; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; pointer-events: auto;">✕</button>
+                    </div>
                     <datalist id="club-options">
                         <?php foreach ($clubList as $club): ?>
                             <option value="<?= htmlspecialchars(formatPrefixedID('CB', $club['clubID']) . ' - ' . $club['clubName']) ?>">
@@ -462,16 +466,17 @@ mysqli_close($link);
           <div class="card-header" style="display: flex; gap: 10px; align-items: center;">
             <h3 class="section-title">Club Committee</h3>
             
-            <div class="pill-container" style="position: relative; flex: 1;">
-              <input type="text" list="club-options-committee" id="club-choice" placeholder="Select Club (ID or Name)..." class="pill-search">
+            <div class="pill-container" style="position: relative; flex: 1; display: flex; width: 100%;">
+              <div style="position: relative; width: 100%; display: flex; align-items: center; flex: 1;">
+                <input type="text" list="club-options-committee" id="club-choice" placeholder="Select Club (ID or Name)..." class="pill-search" style="padding-right: 40px; width: 100%; box-sizing: border-box; max-width: none; flex: 1;">
+                <button id="clear-club-choice" type="button" style="position: absolute; right: 15px; background: none; border: none; font-size: 20px; cursor: pointer; color: #999; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 10;">✕</button>
+              </div>
               <datalist id="club-options-committee">
                   <?php foreach ($clubList as $club): ?>
                       <option value="<?= htmlspecialchars(formatPrefixedID('CB', $club['clubID']) . ' - ' . $club['clubName']) ?>">
                   <?php endforeach; ?>
               </datalist>
-            </div>
-
-            <input type="text" id="committee-search" placeholder="Search member..." class="pill-search">
+            </div>  
           </div>
 
           <div class="committee-table-content">
@@ -504,13 +509,17 @@ mysqli_close($link);
                       <div class="club-details">
                           <div class="input-group">
                               <label><strong>Club Name/Club ID</strong></label>
+                              <div style="position: relative; display: inline-block; width: 100%;">
                                   <input 
                                       id="club-list-input"
                                       list="club-options-list"
                                       name="club-selection"
                                       class="pill-search-input"
                                       placeholder="Search or select a club..."
+                                      style="padding-right: 40px; width: 100%; box-sizing: border-box;"
                                   >
+                                  <button id="clear-btn" type="button" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 20px; cursor: pointer; color: #999; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; pointer-events: auto;">✕</button>
+                              </div>
                               <datalist id="club-options-list">
                                   <?php foreach ($clubList as $club): ?>
                                       <option value="<?= htmlspecialchars(formatPrefixedID('CB', $club['clubID']) . ' - ' . $club['clubName']) ?>">
@@ -662,6 +671,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 fetchCommitteeData(clubID);
             }
         });
+        
+        // Clear button for club-choice
+        const clearClubChoice = document.getElementById('clear-club-choice');
+        if (clearClubChoice) {
+            clearClubChoice.addEventListener('click', function () {
+                clubSearchPill.value = '';
+                document.getElementById('committee-data-container').innerHTML = '<tr><td colspan="6" class="empty-cell">No data</td></tr>';
+            });
+        }
     }
 });
 
@@ -694,6 +712,20 @@ document.addEventListener("DOMContentLoaded", function () {
             fetchClubInfo(clubID);
         }
     });
+    
+    // Clear button for club-input
+    const clearClubInput = document.getElementById('clear-club-input');
+    if (clearClubInput) {
+        clearClubInput.addEventListener('click', function () {
+            clubInput.value = '';
+            document.getElementById('info-club-id').value = '';
+            document.getElementById('info-club-name').value = '';
+            document.getElementById('info-club-desc').value = '';
+            document.getElementById('info-club-advisor').value = '';
+            document.getElementById('info-club-status').value = '';
+            document.getElementById('info-club-created').value = '';
+        });
+    }
 });
 
 // wire the list-panel search input to load club details
@@ -724,6 +756,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
         listInput.addEventListener('input', function () { handleListValue(this.value); });
         listInput.addEventListener('change', function () { handleListValue(this.value); });
+        
+        const clearBtn = document.getElementById('clear-btn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                listInput.value = '';
+                const descElm = document.getElementById('list-club-desc');
+                const advElm = document.getElementById('list-club-advisor');
+                const statElm = document.getElementById('list-club-status');
+                const createdElm = document.getElementById('list-club-created');
+                const listCommittee = document.getElementById('list-committee-content');
+                const tbody = document.getElementById('event-table-body');
+                
+                if (descElm) descElm.textContent = 'Not available yet';
+                if (advElm) advElm.textContent = 'Not available yet';
+                if (statElm) statElm.textContent = 'Not available yet';
+                if (createdElm) createdElm.textContent = 'Not available yet';
+                if (listCommittee) listCommittee.innerHTML = '<div class="empty-cell">Not available yet</div>';
+                if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="empty-cell">Not available yet</td></tr>';
+            });
+        }
     }
 });
 

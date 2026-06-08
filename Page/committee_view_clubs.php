@@ -30,19 +30,42 @@ mysqli_close($link);
       <div class="brand-panel">
         <img src="../Image/fkclub.jpg" alt="FKClub logo">
       </div>
-      <nav class="sidebar-nav">
-        <a href="committee_view_clubs.php" class="sidebar-link active">View Clubs</a>
-        <a href="committee_manage_events.php" class="sidebar-link">Manage Events</a>
-        <a href="#" class="sidebar-link">Members</a>
-        <a href="committee_attendance_report.php" class="sidebar-link">Attendance</a>
-        <a href="committee_participation_report.php" class="sidebar-link">Reports</a>
-      </nav>
+     <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>
+
+<nav class="sidebar-nav">
+
+    <a href="committee_dashboard.php"
+       class="sidebar-link <?php echo $currentPage == 'committee_dashboard.php' ? 'active' : ''; ?>">
+       Home
+    </a>
+
+    <a href="committee_view_clubs.php"
+       class="sidebar-link <?php echo $currentPage == 'committee_view_clubs.php' ? 'active' : ''; ?>">
+       View Clubs
+    </a>
+
+    <a href="committee_manage_events.php"
+       class="sidebar-link <?php echo $currentPage == 'committee_manage_events.php' ? 'active' : ''; ?>">
+       Manage Events
+    </a>
+
+    <a href="committee_attendance_report.php"
+       class="sidebar-link <?php echo $currentPage == 'committee_attendance_report.php' ? 'active' : ''; ?>">
+       Attendance
+    </a>
+
+    <a href="committee_participation_report.php"
+       class="sidebar-link <?php echo $currentPage == 'committee_participation_report.php' ? 'active' : ''; ?>">
+       Reports
+    </a>
+
+</nav>
     </aside>
 
     <main class="dashboard-main">
       <div class="topbar">
         <div class="topbar-left"><div class="topbar-title">View Clubs</div></div>
-        <a href="#profile" class="topbar-button">My Profile</a>
+        
       </div>
 
       <div class="event-area">
@@ -55,13 +78,17 @@ mysqli_close($link);
                       <div class="club-details">
                           <div class="input-group">
                               <label><strong>Club Name/Club ID</strong></label>
+                              <div style="position: relative; display: inline-block; width: 100%;">
                                   <input 
                                       id="club-list-input"
                                       list="club-options-list"
                                       name="club-selection"
                                       class="pill-search-input"
                                       placeholder="Search or select a club..."
+                                      style="padding-right: 40px; width: 100%; box-sizing: border-box;"
                                   >
+                                  <button id="clear-btn" type="button" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 20px; cursor: pointer; color: #999; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; pointer-events: auto;">✕</button>
+                              </div>
                               <datalist id="club-options-list">
                                   <?php foreach ($clubList as $club): ?>
                                       <option value="<?= htmlspecialchars(sprintf('CB%04d - %s', $club['clubID'], $club['clubName'])) ?>">
@@ -211,6 +238,8 @@ function parseClubID(value) {
 
 document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('club-list-input');
+    const clearBtn = document.getElementById('clear-btn');
+    
     input.addEventListener('change', function () {
         const val = this.value || '';
         const id = parseClubID(val);
@@ -218,6 +247,16 @@ document.addEventListener('DOMContentLoaded', function () {
             fetchClubDetails(id);
             loadEventsForClub(id);
         }
+    });
+    
+    clearBtn.addEventListener('click', function () {
+        input.value = '';
+        document.getElementById('list-club-desc').textContent = 'Select a club to view details';
+        document.getElementById('list-club-advisor').textContent = 'Select a club to view details';
+        document.getElementById('list-club-status').textContent = 'Select a club to view details';
+        document.getElementById('list-club-created').textContent = 'Select a club to view details';
+        document.getElementById('list-committee-content').innerHTML = '<div class="empty-cell">Select a club to load committee members.</div>';
+        document.getElementById('event-table-body').innerHTML = '<tr><td colspan="6" class="empty-cell">Select a club to load events.</td></tr>';
     });
 });
 </script>

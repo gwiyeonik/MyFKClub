@@ -37,9 +37,9 @@ if ($selectedEventID > 0 && $eventInfo) {
       </div>
 
       <nav class="sidebar-nav">
+        <a href="committee_dashboard.php" class="sidebar-link">Home</a>
         <a href="committee_club_details.php" class="sidebar-link">View Clubs</a>
         <a href="committee_manage_events.php" class="sidebar-link">Manage Events</a>
-        <a href="committee_members.php" class="sidebar-link">Members</a>
         <a href="committee_attendance_report.php" class="sidebar-link active">Attendance</a>
         <a href="committee_participation_report.php" class="sidebar-link">Reports</a>
       </nav>
@@ -50,7 +50,7 @@ if ($selectedEventID > 0 && $eventInfo) {
         <div class="topbar-left">
           <div class="topbar-title">Record Attendance</div>
         </div>
-        <a href="#profile" class="topbar-button">My Profile</a>
+      
       </div>
 
       <div class="content-area">
