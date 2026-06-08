@@ -191,5 +191,11 @@ if ($action === 'get_participation_data') {
         'activeMembers' => $activeMembers,
         'memberParticipation' => $memberParticipation
     ]);
+    exit;
 }
+
+// Invalid or missing action
+mysqli_close($conn);
+echo json_encode(['success' => false, 'message' => 'Invalid action']);
+exit;
 ?>

@@ -238,8 +238,8 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
 
   document.addEventListener("DOMContentLoaded", function() {
     // Fetch data from backend API
-    const apiUrl = window.location.origin + window.location.pathname.replace(/\/admin_participation_reports\.php$/, '/admin_participation_reports_api.php') + '?action=get_participation_data';
-    
+    const apiUrl = './admin_participation_reports_api.php?action=get_participation_data';
+
     fetch(apiUrl, { credentials: 'same-origin' })
       .then(response => {
         if (!response.ok) {
@@ -248,28 +248,30 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
         return response.json();
       })
       .then(data => {
-        createMonthlyTrendChart(data.monthlyTrend);
-
-        if (data.success) {
+        if (data && data.success) {
           // Populate stat cards
-          document.getElementById('stat-events').textContent = data.metrics.totalEvents;
-          document.getElementById('stat-participation').textContent = data.metrics.totalParticipation;
-          document.getElementById('stat-attendance').textContent = data.metrics.avgAttendance + '%';
-          document.getElementById('stat-outstanding').textContent = data.metrics.outstandingStudents;
+          document.getElementById('stat-events').textContent = data.metrics.totalEvents ?? 0;
+          document.getElementById('stat-participation').textContent = data.metrics.totalParticipation ?? 0;
+          document.getElementById('stat-attendance').textContent = (data.metrics.avgAttendance ?? 0) + '%';
+          document.getElementById('stat-outstanding').textContent = data.metrics.outstandingStudents ?? 0;
 
           // Create charts
-          createMonthlyTrendChart(data.monthlyTrend);
-          createRecognitionChart(data.recognitionDistribution);
+          createMonthlyTrendChart(data.monthlyTrend || {labels: [], data: []});
+          createRecognitionChart(data.recognitionDistribution || {labels: [], data: []});
 
           // Populate tables
-          populateEventAttendance(data.eventAttendance);
-          populateTopStudents(data.topStudents);
+          populateEventAttendance(data.eventAttendance || []);
+          populateTopStudents(data.topStudents || []);
         } else {
-          console.error("API Error: " + data.message);
+          console.error("API Error:", data && data.message ? data.message : data);
+          document.getElementById('event-attendance-body').innerHTML = '<tr><td colspan="7" class="empty-cell">Unable to load event data.</td></tr>';
+          document.getElementById('top-students-body').innerHTML = '<tr><td colspan="6" class="empty-cell">Unable to load student data.</td></tr>';
         }
       })
       .catch(error => {
         console.error("Fetch Error:", error);
+        document.getElementById('event-attendance-body').innerHTML = '<tr><td colspan="7" class="empty-cell">Error fetching event data.</td></tr>';
+        document.getElementById('top-students-body').innerHTML = '<tr><td colspan="6" class="empty-cell">Error fetching student data.</td></tr>';
       });
   });
 

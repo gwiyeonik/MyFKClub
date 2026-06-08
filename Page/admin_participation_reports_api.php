@@ -47,14 +47,19 @@ if ($action === 'get_participation_data') {
     $topPointsQuery = "SELECT MAX(totalPoints) as max_points FROM studentpointsummary";
     $topPointsResult = mysqli_query($conn, $topPointsQuery);
     $topPoints = $topPointsResult ? (int)mysqli_fetch_assoc($topPointsResult)['max_points'] : 0;
-    $threshold = ($topPoints > 0) ? ($topPoints * 0.9) : 0;
+    $threshold = ($topPoints > 0) ? intval($topPoints * 0.9) : 0;
 
     $outstandingQuery = "SELECT COUNT(*) as total FROM studentpointsummary WHERE totalPoints >= ?";
     $outstandingStmt = mysqli_prepare($conn, $outstandingQuery);
-    mysqli_stmt_bind_param($outstandingStmt, "i", $threshold);
-    mysqli_stmt_execute($outstandingStmt);
-    $outstandingResult = mysqli_stmt_get_result($outstandingStmt);
-    $outstandingStudents = $outstandingResult ? (int)mysqli_fetch_assoc($outstandingResult)['total'] : 0;
+    if ($outstandingStmt) {
+        mysqli_stmt_bind_param($outstandingStmt, "i", $threshold);
+        mysqli_stmt_execute($outstandingStmt);
+        $outstandingResult = mysqli_stmt_get_result($outstandingStmt);
+        $outstandingStudents = $outstandingResult ? (int)mysqli_fetch_assoc($outstandingResult)['total'] : 0;
+        mysqli_stmt_close($outstandingStmt);
+    } else {
+        $outstandingStudents = 0;
+    }
 
     // Get monthly participation trend (last 12 months)
     $monthlyTrendQuery = "SELECT 
@@ -117,7 +122,9 @@ if ($action === 'get_participation_data') {
                                 SUM(CASE WHEN ea.attendanceStatus = 'present' THEN 1 ELSE 0 END) as present,
                                 SUM(CASE WHEN ea.attendanceStatus = 'late' THEN 1 ELSE 0 END) as late,
                                 SUM(CASE WHEN ea.attendanceStatus = 'absent' THEN 1 ELSE 0 END) as absent,
-                                ROUND(SUM(CASE WHEN ea.attendanceStatus IN ('present', 'late') THEN 1 ELSE 0 END) / COUNT(DISTINCT er.userID) * 100) as attendance_rate
+                                IF(COUNT(DISTINCT er.userID) > 0,
+                                   ROUND(SUM(CASE WHEN ea.attendanceStatus IN ('present', 'late') THEN 1 ELSE 0 END) / COUNT(DISTINCT er.userID) * 100),
+                                   0) as attendance_rate
                             FROM event e
                             LEFT JOIN club c ON e.clubID = c.clubID
                             LEFT JOIN eventregistration er ON e.eventID = er.eventID
@@ -177,7 +184,7 @@ if ($action === 'get_participation_data') {
                 'userName' => $row['userName'],
                 'clubName' => $row['clubName'] ?: 'N/A',
                 'events_attended' => (int)$row['events_attended'],
-                'total_points' => (int)$row['total_points'],
+                'total_points' => (int)$row['totalPoints'],
                 'recognition' => $row['recognition']
             ];
         }
@@ -204,5 +211,11 @@ if ($action === 'get_participation_data') {
         'eventAttendance' => $eventAttendanceData,
         'topStudents' => $topStudentsData
     ]);
+    exit;
 }
+
+// Invalid or missing action
+mysqli_close($conn);
+echo json_encode(['success' => false, 'message' => 'Invalid action']);
+exit;
 ?>

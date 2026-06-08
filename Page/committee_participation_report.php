@@ -1,7 +1,16 @@
 <?php
 // committee_participation_report.php
 session_start();
-// Add authentication logic as needed.
+
+// SECURITY CONTROL GATE: Protect page for committee role
+if (
+    !isset($_SESSION['user_id']) ||
+    !isset($_SESSION['role']) ||
+    strtolower(trim($_SESSION['role'])) !== 'committee'
+) {
+    header('Location: login.php');
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,44 +22,6 @@ session_start();
   <link rel="stylesheet" href="../CSS/dashboard.css">
   <link rel="stylesheet" href="../CSS/committee_participation_report.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    .chart-card canvas {
-      display: block;
-      width: 100% !important;
-      height: 320px !important;
-      max-height: 320px;
-    }
-
-    .committee-charts-row {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-      margin-bottom: 30px;
-    }
-
-    .chart-card {
-      min-height: 360px;
-    }
-
-    .chart-card .chart-title {
-      margin-bottom: 16px;
-    }
-
-    .overview-section {
-      width: calc(100% + 60px);
-      margin-left: 0px;
-      margin-right: 0px;
-      padding: 0;
-      margin-bottom: 30px;
-    }
-
-    .overview-card {
-      width: 90%;
-      padding: 30px;
-      border-radius: 0;
-      margin: 0;
-    }
-  </style>
 </head>
 <body>
 
@@ -78,110 +49,97 @@ session_start();
         <div class="topbar-left">
           <div class="topbar-title">Participation Reports</div>
         </div>
+        <a href="myProfile.php" class="topbar-button">My Profile</a>
       </div>
 
       <!-- CONTENT -->
       <div class="content-area">
 
-        <!-- SYSTEM OVERVIEW CHART -->
-        <section class="overview-section">
-          <div class="chart-card overview-card">
-            <div class="chart-title" style="margin-bottom: 20px;">System Overview</div>
-            <canvas id="metricsChart" style="height: 350px; max-height: 350px;"></canvas>
+        <!-- STAT CARDS (3 columns) -->
+        <section style="display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:24px;">
+          <div style="background:#fff; padding:18px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+            <div style="color:#556; font-size:13px; margin-bottom:8px">Total Club Participation</div>
+            <div style="font-size:12px; color:#999; margin-bottom:6px">Registered | Present | Late | Absent</div>
+            <div id="stat-club-participation" style="font-size:18px; font-weight:700; color:#174f86">—</div>
+          </div>
+          <div style="background:#fff; padding:18px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+            <div style="color:#556; font-size:13px; margin-bottom:8px">Avg Attendance Rate Per Club Events</div>
+            <div id="stat-attendance-rate" style="font-size:18px; font-weight:700; color:#174f86">—</div>
+          </div>
+          <div style="background:#fff; padding:18px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+            <div style="color:#556; font-size:13px; margin-bottom:8px">Most Active Members & Top Members by Points</div>
+            <div style="font-size:18px; font-weight:700; color:#174f86">—</div>
           </div>
         </section>
 
-        <!-- SEARCH AND FILTERS -->
-        <div class="search-bar-wrap">
-          <input class="search-input" type="search" id="search-input" placeholder="Search Events/EventID">
-        </div>
-
-        <div class="filter-row">
-          <select class="filter-select" name="event_filter" id="event-filter">
-            <option value="">Event</option>
-          </select>
-
-          <select class="filter-select" name="semester_filter">
-            <option value="">Semester</option>
-            <option value="sem1">1st Semester</option>
-            <option value="sem2">2nd Semester</option>
-            <option value="sem3">3rd Semester</option>
-          </select>
-
-          <button class="secondary-pill" type="button" onclick="exportReport()">Export Report</button>
-        </div>
-
-        <!-- CLUB PARTICIPATION CHARTS -->
-        <section class="committee-charts-row">
-          <div class="chart-card">
-            <div class="chart-title">Club Participation Summary</div>
-            <canvas id="clubMetricsChart"></canvas>
+        <!-- CHARTS (2 columns) -->
+        <section style="display:grid; grid-template-columns:1.5fr 1fr; gap:18px; margin-bottom:24px;">
+          <div style="background:#fff; padding:18px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.06); display:flex; flex-direction:column">
+            <div style="color:#174f86; font-weight:600; margin-bottom:12px">Club Attendance Trend</div>
+            <div style="height:300px; position:relative; flex:1">
+              <canvas id="metricsChart"></canvas>
+            </div>
           </div>
-
-          <div class="chart-card">
-            <div class="chart-title">Student Distribution Across Clubs</div>
-            <canvas id="studentsPerClubChart"></canvas>
+          <div style="background:#fff; padding:18px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.06); display:flex; flex-direction:column">
+            <div style="color:#174f86; font-weight:600; margin-bottom:12px">Points Distribution</div>
+            <div style="height:300px; position:relative; flex:1">
+              <canvas id="clubMetricsChart"></canvas>
+            </div>
           </div>
         </section>
 
         <!-- CLUB MEMBER PARTICIPATION -->
-        <section class="table-section">
-          <div class="table-panel large-table-panel">
-            <div class="table-heading">Club Member Participation</div>
-
-            <div class="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Student ID</th>
-                    <th>Student Name</th>
-                    <th>Club</th>
-                    <th>Event</th>
-                    <th>Attendance Status</th>
-                    <th>Volunteer</th>
-                    <th>Points</th>
-                  </tr>
-                </thead>
-                <tbody id="member-participation-body">
-                  <tr><td colspan="7" class="empty-cell">Loading participation data...</td></tr>
-                </tbody>
-              </table>
-            </div>
+        <section style="background:#fff; padding:18px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:24px">
+          <div style="color:#174f86; font-weight:600; margin-bottom:12px">Club Member Participation</div>
+          <div style="overflow-x:auto">
+            <table style="width:100%; border-collapse:collapse">
+              <thead>
+                <tr style="background:#f8f9fa; border-bottom:1px solid #e0e0e0">
+                  <th style="padding:10px 12px; text-align:left; color:#556; font-weight:600; font-size:13px">Student</th>
+                  <th style="padding:10px 12px; text-align:left; color:#556; font-weight:600; font-size:13px">Event</th>
+                  <th style="padding:10px 12px; text-align:left; color:#556; font-weight:600; font-size:13px">Attendance Status</th>
+                  <th style="padding:10px 12px; text-align:left; color:#556; font-weight:600; font-size:13px">Volunteer</th>
+                  <th style="padding:10px 12px; text-align:left; color:#556; font-weight:600; font-size:13px">Points</th>
+                  <th style="padding:10px 12px; text-align:left; color:#556; font-weight:600; font-size:13px">Recognition</th>
+                </tr>
+              </thead>
+              <tbody id="member-participation-body">
+                <tr><td colspan="6" style="text-align:center; color:#999; padding:24px">Loading participation data...</td></tr>
+              </tbody>
+            </table>
           </div>
         </section>
 
-        <!-- BOTTOM SECTION -->
-        <section class="committee-bottom-grid">
-
-          <div class="table-panel small-table-panel">
-            <div class="table-heading">Most Active Members (By Points)</div>
-
-            <div class="table-wrapper">
-              <table>
+        <!-- BOTTOM GRID (2 columns) -->
+        <section style="display:grid; grid-template-columns:1.6fr 1fr; gap:18px;">
+          <div style="background:#fff; padding:18px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+            <div style="color:#174f86; font-weight:600; margin-bottom:12px">Most Active Members</div>
+            <div style="overflow-x:auto">
+              <table style="width:100%; border-collapse:collapse">
                 <thead>
-                  <tr>
-                    <th>Rank</th>
-                    <th>Student ID</th>
-                    <th>Student Name</th>
-                    <th>Events</th>
-                    <th>Total Points</th>
+                  <tr style="background:#f8f9fa; border-bottom:1px solid #e0e0e0">
+                    <th style="padding:10px 12px; text-align:left; color:#556; font-weight:600; font-size:13px">Rank</th>
+                    <th style="padding:10px 12px; text-align:left; color:#556; font-weight:600; font-size:13px">Student</th>
+                    <th style="padding:10px 12px; text-align:left; color:#556; font-weight:600; font-size:13px">Event Attended</th>
+                    <th style="padding:10px 12px; text-align:left; color:#556; font-weight:600; font-size:13px">Total Points</th>
+                    <th style="padding:10px 12px; text-align:left; color:#556; font-weight:600; font-size:13px">Recognition Status</th>
                   </tr>
                 </thead>
                 <tbody id="active-members-body">
-                  <tr><td colspan="5" class="empty-cell">Loading active members...</td></tr>
+                  <tr><td colspan="5" style="text-align:center; color:#999; padding:24px">Loading active members...</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
 
-          <div class="engagement-card">
-            <div class="engagement-title">Participation Statistics</div>
-            <div class="engagement-content" id="engagement-stats">
-              <p>Loading statistics...</p>
+          <div style="background:#fff; padding:18px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+            <div style="color:#174f86; font-weight:600; margin-bottom:12px">Engagement Summary</div>
+            <div id="engagement-stats" style="padding:12px 0">
+              <p style="color:#999; margin:0">Loading statistics...</p>
             </div>
           </div>
-
         </section>
+
 
       </div>
     </main>
@@ -190,37 +148,66 @@ session_start();
 <script>
     let metricsChart = null;
     let clubMetricsChart = null;
-    let studentsPerClubChart = null;
 
     document.addEventListener("DOMContentLoaded", function() {
-        // Fetch data from backend API
-        const apiUrl = window.location.origin + window.location.pathname.replace(/\/committee_participation_report\.php$/, '/committee_participation_api.php') + '?action=get_participation_data';
-        
-        fetch(apiUrl, { credentials: 'same-origin' })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Create charts
-                    createMetricsChart(data.metrics);
-                    createClubMetricsChart(data.clubParticipation);
-                    createStudentsPerClubChart(data.studentsPerClub);
+      // Fetch data from backend API (relative path)
+      const apiUrl = './committee_participation_api.php?action=get_participation_data';
 
-                    // Populate tables
-                    populateMemberParticipation(data.memberParticipation);
-                    populateActiveMembers(data.activeMembers);
-                    populateEngagementStats(data.metrics);
-                } else {
-                    console.error("API Error: " + data.message);
-                }
-            })
-            .catch(error => {
-                console.error("Fetch Error:", error);
-            });
+      fetch(apiUrl, { credentials: 'same-origin' })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('HTTP ' + response.status + ' ' + response.statusText);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data && data.success) {
+            // Create charts
+            createMetricsChart(data.metrics || {});
+            createClubMetricsChart(data.clubParticipation || {labels:[], present:[], late:[], absent:[]});
+
+            // Populate stat cards
+            try {
+              // compute totals from clubParticipation arrays if present
+              const cp = data.clubParticipation || {};
+              let totalRegistered = 0, totalPresent = 0, totalLate = 0, totalAbsent = 0;
+              if (Array.isArray(cp.registered)) {
+                cp.registered.forEach(v => totalRegistered += Number(v) || 0);
+              }
+              if (Array.isArray(cp.present)) { cp.present.forEach(v => totalPresent += Number(v) || 0); }
+              if (Array.isArray(cp.late)) { cp.late.forEach(v => totalLate += Number(v) || 0); }
+              if (Array.isArray(cp.absent)) { cp.absent.forEach(v => totalAbsent += Number(v) || 0); }
+
+              const statClubEl = document.getElementById('stat-club-participation');
+              if (statClubEl) {
+                statClubEl.innerHTML = `${totalRegistered} &nbsp;|&nbsp; ${totalPresent} &nbsp;|&nbsp; ${totalLate} &nbsp;|&nbsp; ${totalAbsent}`;
+              }
+
+              const statAvgEl = document.getElementById('stat-attendance-rate');
+              if (statAvgEl) {
+                statAvgEl.textContent = (data.metrics && typeof data.metrics.avgAttendance !== 'undefined') ? data.metrics.avgAttendance + '%' : '-';
+              }
+            } catch (err) {
+              console.warn('Stat card population failed', err);
+            }
+
+            // Populate tables
+            populateMemberParticipation(data.memberParticipation || []);
+            populateActiveMembers(data.activeMembers || []);
+            populateEngagementStats(data.metrics || {totalStudents:0,totalEvents:0,totalClubs:0,avgAttendance:0});
+          } else {
+            console.error('API Error:', data && data.message ? data.message : data);
+            document.getElementById('member-participation-body').innerHTML = '<tr><td colspan="6" class="empty-cell">Unable to load participation data.</td></tr>';
+            document.getElementById('active-members-body').innerHTML = '<tr><td colspan="5" class="empty-cell">Unable to load active members.</td></tr>';
+            document.getElementById('engagement-stats').innerHTML = '<p class="empty-cell">Unable to load statistics.</p>';
+          }
+        })
+        .catch(error => {
+          console.error('Fetch Error:', error);
+          document.getElementById('member-participation-body').innerHTML = '<tr><td colspan="6" class="empty-cell">Error fetching data.</td></tr>';
+          document.getElementById('active-members-body').innerHTML = '<tr><td colspan="5" class="empty-cell">Error fetching data.</td></tr>';
+          document.getElementById('engagement-stats').innerHTML = '<p class="empty-cell">Error fetching data.</p>';
+        });
     });
 
     // Create System Overview Bar Chart
@@ -345,104 +332,75 @@ session_start();
         });
     }
 
-    // Create Student Distribution Doughnut Chart
-    function createStudentsPerClubChart(clubDistribution) {
-        const ctx = document.getElementById('studentsPerClubChart');
-        if (!ctx) return;
-
-        if (studentsPerClubChart) {
-            studentsPerClubChart.destroy();
-        }
-
-        const colors = [
-            'rgba(54, 162, 235, 0.8)',
-            'rgba(75, 192, 192, 0.8)',
-            'rgba(255, 206, 86, 0.8)',
-            'rgba(75, 50, 192, 0.8)',
-            'rgba(255, 99, 132, 0.8)',
-            'rgba(153, 102, 255, 0.8)',
-            'rgba(255, 159, 64, 0.8)',
-            'rgba(199, 199, 199, 0.8)',
-            'rgba(83, 102, 255, 0.8)',
-            'rgba(255, 99, 192, 0.8)'
-        ];
-
-        studentsPerClubChart = new Chart(ctx.getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: clubDistribution.labels,
-                datasets: [{
-                    data: clubDistribution.data,
-                    backgroundColor: colors.slice(0, clubDistribution.data.length),
-                    borderColor: colors.slice(0, clubDistribution.data.length).map(c => c.replace('0.8', '1')),
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right'
-                    }
-                }
-            }
-        });
-    }
-
-    // Populate Member Participation Table
+    // Populate Member Participation Table (matches current columns)
     function populateMemberParticipation(data) {
-        const tbody = document.getElementById('member-participation-body');
-        if (!tbody) return;
+      const tbody = document.getElementById('member-participation-body');
+      if (!tbody) return;
 
-        tbody.innerHTML = '';
+      tbody.innerHTML = '';
 
-        if (data && data.length > 0) {
-            data.forEach(record => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${escapeHTML(record.userID)}</td>
-                    <td>${escapeHTML(record.userName)}</td>
-                    <td>${escapeHTML(record.clubName)}</td>
-                    <td>${escapeHTML(record.eventTitle)}</td>
-                    <td>
-                        <span class="status-badge status-${record.attendanceStatus.toLowerCase().replace(' ', '-')}">
-                            ${escapeHTML(record.attendanceStatus)}
-                        </span>
-                    </td>
-                    <td>${escapeHTML(record.volunteer)}</td>
-                    <td>${record.points}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        } else {
-            tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">No participation records found.</td></tr>';
-        }
+      if (data && data.length > 0) {
+        data.forEach(record => {
+          const row = document.createElement('tr');
+          row.style.cssText = 'border-bottom:1px solid #e0e0e0';
+          const studentLabel = `${escapeHTML(record.userName || '')} (${escapeHTML(record.userID || '')})`;
+          const attendanceStatus = record.attendanceStatus || 'Not Recorded';
+          const volunteer = record.volunteer || 'No';
+          const points = Number(record.points) || 0;
+          const recognition = computeRecognition(points);
+
+          row.innerHTML = `
+            <td style="padding:10px 12px; color:#374151">${studentLabel}</td>
+            <td style="padding:10px 12px; color:#374151">${escapeHTML(record.eventTitle || '')}</td>
+            <td style="padding:10px 12px; color:#374151"><span class="status-badge status-${String(attendanceStatus).toLowerCase().replace(/\s+/g, '-')}">${escapeHTML(attendanceStatus)}</span></td>
+            <td style="padding:10px 12px; color:#374151">${escapeHTML(volunteer)}</td>
+            <td style="padding:10px 12px; color:#374151">${points}</td>
+            <td style="padding:10px 12px; color:#374151">${recognition}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } else {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#999; padding:24px">No participation records found.</td></tr>';
+      }
     }
 
-    // Populate Active Members Table
+    // Populate Active Members Table (with recognition)
     function populateActiveMembers(data) {
-        const tbody = document.getElementById('active-members-body');
-        if (!tbody) return;
+      const tbody = document.getElementById('active-members-body');
+      if (!tbody) return;
 
-        tbody.innerHTML = '';
+      tbody.innerHTML = '';
 
-        if (data && data.length > 0) {
-            data.forEach((member, index) => {
-                const row = document.createElement('tr');
-                const rank = index + 1;
-                row.innerHTML = `
-                    <td>${rank}</td>
-                    <td>${escapeHTML(member.userID)}</td>
-                    <td>${escapeHTML(member.userName)}</td>
-                    <td>${member.events_attended}</td>
-                    <td><strong>${member.total_points}</strong></td>
-                `;
-                tbody.appendChild(row);
-            });
-        } else {
-            tbody.innerHTML = '<tr><td colspan="5" class="empty-cell">No active members found.</td></tr>';
-        }
+      if (data && data.length > 0) {
+        data.forEach((member, index) => {
+          const row = document.createElement('tr');
+          row.style.cssText = 'border-bottom:1px solid #e0e0e0';
+          const rank = index + 1;
+          const points = Number(member.total_points) || 0;
+          const recognition = computeRecognition(points);
+          const studentLabel = `${escapeHTML(member.userName || '')} (${escapeHTML(member.userID || '')})`;
+
+          row.innerHTML = `
+            <td style="padding:10px 12px; color:#374151">${rank}</td>
+            <td style="padding:10px 12px; color:#374151">${studentLabel}</td>
+            <td style="padding:10px 12px; color:#374151">${member.events_attended || 0}</td>
+            <td style="padding:10px 12px; color:#374151"><strong>${points}</strong></td>
+            <td style="padding:10px 12px; color:#374151">${recognition}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999; padding:24px">No active members found.</td></tr>';
+      }
+    }
+
+    // Determine recognition label by points
+    function computeRecognition(points) {
+      points = Number(points) || 0;
+      if (points >= 80) return 'Outstanding participant';
+      if (points >= 50) return 'Eligible for active student award';
+      if (points >= 20) return 'Eligible for participation certificate';
+      return 'Warning/Reminder';
     }
 
     // Populate Engagement Statistics
