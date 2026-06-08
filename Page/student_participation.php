@@ -160,11 +160,11 @@ mysqli_close($conn);
     <aside class="dashboard-sidebar">
       <div class="brand-panel"><img src="../Image/fkclub.jpg" alt="FKClub logo"></div>
       <nav class="sidebar-nav">
-        <a href="myProfile.php" class="sidebar-link">My Profile</a>
+        <a href="student_dashboard.php" class="sidebar-link">Home</a>
         <a href="student_myclubs.php" class="sidebar-link">My Clubs</a>
         <a href="student_clublist.php" class="sidebar-link">Club List</a>
         <a href="student_events.php" class="sidebar-link">Events</a>
-        <a href="student_participations.php" class="sidebar-link active">Participation</a>
+        <a href="student_participation.php" class="sidebar-link active">Participation</a>
       </nav>
     </aside>
 
