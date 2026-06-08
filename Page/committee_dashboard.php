@@ -132,7 +132,7 @@ mysqli_close($link);
                     Position: <?php echo htmlspecialchars($position); ?>
                 </h1>
             </div>
-            
+            <a href="logout.php" class="topbar-button">Logout</a>
         </header>
 
         <div class="content-area">
