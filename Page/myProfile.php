@@ -138,11 +138,11 @@ $joinedClubs = [];
 
 // Check for committee assignment for both dedicated committee users and students assigned by admins.
 if ($roleID === 2 || $roleID === 3) {
-    $commQuery = "SELECT cc.committeePosition, c.clubName 
-                  FROM clubCommittee cc
-                  JOIN clubMembership cm ON cc.membershipID = cm.membershipID
-                  JOIN club c ON cm.clubID = c.clubID
-                  WHERE cm.userID = '$userID' LIMIT 1";
+$commQuery = "SELECT cc.committeePosition, c.clubName 
+              FROM clubcommittee cc 
+              JOIN clubmembership cm ON cc.membershipID = cm.membershipID
+              JOIN club c ON cm.clubID = c.clubID
+              WHERE cm.userID = '$userID' LIMIT 1";
     $commResult = mysqli_query($link, $commQuery);
     if ($commResult && mysqli_num_rows($commResult) > 0) {
         $commRow = mysqli_fetch_assoc($commResult);
@@ -152,10 +152,10 @@ if ($roleID === 2 || $roleID === 3) {
 }
 
 if ($roleID === 3) {
-    $studQuery = "SELECT c.clubName, cm.clubJoinDate 
-                  FROM clubMembership cm
-                  JOIN club c ON cm.clubID = c.clubID
-                  WHERE cm.userID = '$userID' ORDER BY cm.clubJoinDate DESC";
+$studQuery = "SELECT c.clubName, cm.clubJoinDate 
+              FROM clubmembership cm
+              JOIN club c ON cm.clubID = c.clubID
+              WHERE cm.userID = '$userID' ORDER BY cm.clubJoinDate DESC";
     $studResult = mysqli_query($link, $studQuery);
     if ($studResult) {
         while ($row = mysqli_fetch_assoc($studResult)) {
