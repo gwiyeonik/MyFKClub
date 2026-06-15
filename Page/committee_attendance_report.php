@@ -210,7 +210,7 @@ if ($selectedEventID > 0 && $eventInfo) {
                   </div>
                   <ul>
                     <li>Present on time : +10 Points</li>
-                    <li>Late arrival : -5 Points</li>
+                    <li>Late arrival : +5 Points</li>
                     <li>Absent without notice : -10 Points</li>
                     <li>Volunteer / helper : +5 Points</li>
                   </ul>
@@ -364,7 +364,7 @@ if ($selectedEventID > 0 && $eventInfo) {
       if (attendanceStatus.value === "present") {
         points += 10;
       } else if (attendanceStatus.value === "late") {
-        points -= 5;
+        points += 5;
       } else if (attendanceStatus.value === "absent") {
         points -= 10;
       }

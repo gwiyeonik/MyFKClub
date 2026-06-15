@@ -31,7 +31,7 @@ function calculateAttendancePoints($attendanceStatus, $attendanceIsVolunteer) {
     if ($attendanceStatus === "present") {
         $attendancePoints += 10;
     } elseif ($attendanceStatus === "late") {
-        $attendancePoints -= 5;
+        $attendancePoints += 5;
     } elseif ($attendanceStatus === "absent") {
         $attendancePoints -= 10;
     }
