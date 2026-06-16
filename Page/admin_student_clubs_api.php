@@ -163,7 +163,8 @@ if ($action === 'add_club') {
             'success' => true,
             'message' => 'Club added successfully.',
             'clubID' => $newID,
-            'nextID' => $newID + 1
+            'nextID' => $newID + 1,
+            'formattedNextID' => formatPrefixedID('CB', $newID + 1)
         ]);
     } else {
         echo json_encode([
