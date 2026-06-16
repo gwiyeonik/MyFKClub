@@ -1,9 +1,9 @@
 <?php
 session_start();
 
-$conn = mysqli_connect("localhost", "root", "", "myfkclub");
+$conn = new mysqli("localhost", "root", "", "myfkclub");
 if (!$conn) {
-    die("Database connection failed: " . mysqli_connect_error());
+    die("Database connection failed: " . $conn->connect_error);
 }
 
 function calculateAttendancePoints($attendanceStatus, $attendanceIsVolunteer) {
@@ -30,18 +30,18 @@ function refreshStudentPointSummary($conn, $userID) {
                  INNER JOIN eventregistration er ON ea.registrationID = er.registrationID
                  WHERE er.userID = ?";
 
-    $totalStmt = mysqli_prepare($conn, $totalSql);
-    mysqli_stmt_bind_param($totalStmt, "i", $userID);
-    mysqli_stmt_execute($totalStmt);
-    $totalResult = mysqli_stmt_get_result($totalStmt);
-    $totalRow = mysqli_fetch_assoc($totalResult);
+    $totalStmt = $conn->prepare($totalSql);
+    $totalStmt->bind_param("i", $userID);
+    $totalStmt->execute();
+    $totalResult = $totalStmt->get_result();
+    $totalRow = $totalResult->fetch_assoc();
     $newTotalPoints = intval($totalRow['totalPoints']);
 
     $summaryCheckSql = "SELECT userID FROM studentpointsummary WHERE userID = ? LIMIT 1";
-    $summaryCheckStmt = mysqli_prepare($conn, $summaryCheckSql);
-    mysqli_stmt_bind_param($summaryCheckStmt, "i", $userID);
-    mysqli_stmt_execute($summaryCheckStmt);
-    $summaryCheckResult = mysqli_stmt_get_result($summaryCheckStmt);
+    $summaryCheckStmt = $conn->prepare($summaryCheckSql);
+    $summaryCheckStmt->bind_param("i", $userID);
+    $summaryCheckStmt->execute();
+    $summaryCheckResult = $summaryCheckStmt->get_result();
 
     if (mysqli_num_rows($summaryCheckResult) > 0) {
         $summaryUpdateSql = "UPDATE studentpointsummary SET totalPoints = ?, lastUpdated = NOW() WHERE userID = ?";

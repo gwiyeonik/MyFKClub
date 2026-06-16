@@ -2,7 +2,7 @@
 session_start();
 
 /* DATABASE CONNECTION */
-$conn = mysqli_connect("localhost", "root", "", "myfkclub");
+$conn = new mysqli("localhost", "root", "", "myfkclub");
 
 if (!$conn) {
     die("Database connection failed: " . mysqli_connect_error());

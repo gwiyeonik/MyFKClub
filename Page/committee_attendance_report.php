@@ -17,7 +17,7 @@ if ($selectedEventID > 0 && $eventInfo) {
     $qrScanUrl = $baseUrl . '/committee_attendance_scan.php?eventID=' . $selectedEventID
                . '&token=' . generateEventQRToken($selectedEventID, $eventInfo['eventTitle']);
 
-    $qrCodeUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=' . urlencode($qrScanUrl);
+$qrCodeUrl = 'generate_qr_image.php?data=' . urlencode($qrScanUrl);
 }
 ?>
 <!DOCTYPE html>
@@ -111,16 +111,13 @@ if ($selectedEventID > 0 && $eventInfo) {
               <?php if ($qrCodeUrl) { ?>
                 <img id="qr_code_image" src="<?php echo htmlspecialchars($qrCodeUrl); ?>" alt="Event QR Code" style="max-width:100%; height:auto;" />
                 <div class="qr-link">
-                  Scan this code to check in for the event.<br>
-                  <a id="scan_link" href="<?php echo htmlspecialchars($qrScanUrl); ?>" target="_blank"><?php echo htmlspecialchars($qrScanUrl); ?></a>
                 </div>
               <?php } else { ?>
                 <div style="text-align:center;">Select an event to generate a QR code.</div>
               <?php } ?>
             </div>
             <div class="attendance-actions">
-              <button class="primary-pill" type="button" onclick="generateQR();">Generate QR</button>
-              <button class="secondary-pill" type="button" onclick="refreshQR();">Refresh QR</button>
+                <div class="qr-status">Scan this code to check in for the event.</div>
             </div>
           </div>
 
@@ -386,16 +383,28 @@ if ($selectedEventID > 0 && $eventInfo) {
       const qrImage = document.getElementById('qr_code_image');
       const scanLink = document.getElementById('scan_link');
       if (!qrImage || !scanLink) return;
-      qrImage.src = qrImage.src;
+
+      const currentSrc = qrImage.getAttribute('src') || '';
+      const baseSrc = currentSrc.split('?')[0];
+      qrImage.src = baseSrc + '?t=' + Date.now();
       scanLink.href = scanLink.href;
     }
 
-    function refreshQR() {
+function refreshQR() {
+    const qrImage = document.getElementById('qr_code_image');
+    if (!qrImage) return;
+
+    // We keep the data parameter but append a timestamp to force a reload
+    const baseUrl = 'generate_qr_image.php?data=<?php echo urlencode($qrScanUrl); ?>';
+    qrImage.src = baseUrl + '&t=' + Date.now();
+}
+
+    document.addEventListener('DOMContentLoaded', function () {
       const qrImage = document.getElementById('qr_code_image');
-      if (!qrImage) return;
-      const currentSrc = qrImage.src.replace(/([&?])nonce=\d+/, '');
-      qrImage.src = currentSrc + (currentSrc.includes('?') ? '&' : '?') + 'nonce=' + Date.now();
-    }
+      if (qrImage && qrImage.getAttribute('src')) {
+        refreshQR();
+      }
+    });
   </script>
 </body>
 </html>
