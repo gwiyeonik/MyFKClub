@@ -218,7 +218,6 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
                     <th>Club</th>
                     <th>Events</th>
                     <th>Total Points</th>
-                    <th>Recognition</th>
                   </tr>
                 </thead>
                 <tbody id="top-students-body">
@@ -437,7 +436,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
           <td>${escapeHTML(student.clubName)}</td>
           <td>${student.events_attended}</td>
           <td><strong>${student.total_points}</strong></td>
-          <td><span class="${recognitionClass}">${escapeHTML(student.recognition)}</span></td>
+  
         `;
         tbody.appendChild(row);
       });
