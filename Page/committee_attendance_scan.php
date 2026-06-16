@@ -124,52 +124,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $eventInfo) {
                 $registration = mysqli_fetch_assoc($registrationResult);
                 $registrationID = intval($registration['registrationID']);
 
-                $checkinTime = new DateTime('now');
-                $startTime = new DateTime($eventInfo['eventDateStart']);
-                $endTime = new DateTime($eventInfo['eventDateEnd'] ?: $eventInfo['eventDateStart']);
+                $allowedStatuses = ['present', 'late', 'absent'];
+                $status = isset($_POST['attendance_status']) ? trim($_POST['attendance_status']) : '';
 
-                $status = 'present';
-                $lateThreshold = clone $startTime;
-                $lateThreshold->modify('+15 minutes');
-                $absentThreshold = clone $startTime;
-                $absentThreshold->modify('+60 minutes');
-
-                if ($checkinTime > $absentThreshold && $checkinTime <= $endTime) {
-                    $status = 'late';
-                } elseif ($checkinTime > $endTime) {
-                    $status = 'absent';
-                }
-
-                $attendancePoints = calculateAttendancePoints($status, $attendanceIsVolunteer);
-
-                $checkSql = "SELECT attendanceID FROM eventattendance WHERE registrationID = ?";
-                $checkStmt = mysqli_prepare($conn, $checkSql);
-                mysqli_stmt_bind_param($checkStmt, "i", $registrationID);
-                mysqli_stmt_execute($checkStmt);
-                $checkResult = mysqli_stmt_get_result($checkStmt);
-
-                if ($checkResult && mysqli_num_rows($checkResult) > 0) {
-                    $updateSql = "UPDATE eventattendance
-                                  SET attendanceStatus = ?,
-                                      attendanceCheckinTime = NOW(),
-                                      attendancePoints = ?,
-                                      attendanceIsVolunteer = ?
-                                  WHERE registrationID = ?";
-                    $updateStmt = mysqli_prepare($conn, $updateSql);
-                    mysqli_stmt_bind_param($updateStmt, "siii", $status, $attendancePoints, $attendanceIsVolunteer, $registrationID);
-                    mysqli_stmt_execute($updateStmt);
+                if (!in_array($status, $allowedStatuses, true)) {
+                    $message = 'Please select an attendance status.';
                 } else {
-                    $insertSql = "INSERT INTO eventattendance
-                                  (registrationID, attendanceStatus, attendanceCheckinTime, attendancePoints, attendanceIsVolunteer)
-                                  VALUES (?, ?, NOW(), ?, ?)";
-                    $insertStmt = mysqli_prepare($conn, $insertSql);
-                    mysqli_stmt_bind_param($insertStmt, "isii", $registrationID, $status, $attendancePoints, $attendanceIsVolunteer);
-                    mysqli_stmt_execute($insertStmt);
-                }
+                    $attendancePoints = calculateAttendancePoints($status, $attendanceIsVolunteer);
 
-                refreshStudentPointSummary($conn, $userID);
-                $success = true;
-                $message = 'Check-in recorded. Status: ' . ucfirst($status) . '. Points: ' . $attendancePoints . '.';
+                    $checkSql = "SELECT attendanceID FROM eventattendance WHERE registrationID = ?";
+                    $checkStmt = mysqli_prepare($conn, $checkSql);
+                    mysqli_stmt_bind_param($checkStmt, "i", $registrationID);
+                    mysqli_stmt_execute($checkStmt);
+                    $checkResult = mysqli_stmt_get_result($checkStmt);
+
+                    if ($checkResult && mysqli_num_rows($checkResult) > 0) {
+                        $updateSql = "UPDATE eventattendance
+                                      SET attendanceStatus = ?,
+                                          attendanceCheckinTime = NOW(),
+                                          attendancePoints = ?,
+                                          attendanceIsVolunteer = ?
+                                      WHERE registrationID = ?";
+                        $updateStmt = mysqli_prepare($conn, $updateSql);
+                        mysqli_stmt_bind_param($updateStmt, "siii", $status, $attendancePoints, $attendanceIsVolunteer, $registrationID);
+                        mysqli_stmt_execute($updateStmt);
+                    } else {
+                        $insertSql = "INSERT INTO eventattendance
+                                      (registrationID, attendanceStatus, attendanceCheckinTime, attendancePoints, attendanceIsVolunteer)
+                                      VALUES (?, ?, NOW(), ?, ?)";
+                        $insertStmt = mysqli_prepare($conn, $insertSql);
+                        mysqli_stmt_bind_param($insertStmt, "isii", $registrationID, $status, $attendancePoints, $attendanceIsVolunteer);
+                        mysqli_stmt_execute($insertStmt);
+                    }
+
+                    refreshStudentPointSummary($conn, $userID);
+                    $success = true;
+                    $message = 'Check-in recorded. Status: ' . ucfirst($status) . '. Points: ' . $attendancePoints . '.';
+                }
             }
         }
     }
@@ -244,6 +235,15 @@ function htmlEscape($value) {
           <div class="scan-field">
             <label for="student_id">Student ID</label>
             <input type="text" id="student_id" name="student_id" placeholder="US0001" required />
+          </div>
+          <div class="scan-field">
+            <label for="attendance_status">Attendance Status</label>
+            <select id="attendance_status" name="attendance_status" required>
+              <option value="">Select Status</option>
+              <option value="present">Present on time</option>
+              <option value="late">Late arrival</option>
+              <option value="absent">Absent without notice</option>
+            </select>
           </div>
           <div class="scan-field">
             <label for="is_volunteer">Volunteer / Helper</label>
