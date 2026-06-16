@@ -319,9 +319,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['club_name'])) {
 }
 
 $nextID = 1;
-$idResult = mysqli_query($link, "SELECT MAX(clubID) AS maxID FROM club");
-if ($idResult && $row = mysqli_fetch_assoc($idResult)) {
-    $nextID = isset($row['maxID']) ? ((int)$row['maxID'] + 1) : 1;
+// Prefer the table AUTO_INCREMENT value (reflects next insert id), fallback to MAX(clubID)+1
+$statusResult = mysqli_query($link, "SHOW TABLE STATUS LIKE 'club'");
+if ($statusResult) {
+    $srow = mysqli_fetch_assoc($statusResult);
+    if ($srow && isset($srow['Auto_increment'])) {
+        $nextID = (int)$srow['Auto_increment'];
+    } else {
+        $idResult = mysqli_query($link, "SELECT MAX(clubID) AS maxID FROM club");
+        if ($idResult && $row = mysqli_fetch_assoc($idResult)) {
+            $nextID = isset($row['maxID']) ? ((int)$row['maxID'] + 1) : 1;
+        }
+    }
+} else {
+    $idResult = mysqli_query($link, "SELECT MAX(clubID) AS maxID FROM club");
+    if ($idResult && $row = mysqli_fetch_assoc($idResult)) {
+        $nextID = isset($row['maxID']) ? ((int)$row['maxID'] + 1) : 1;
+    }
 }
 
 $clubList = [];
@@ -1324,9 +1338,9 @@ function addClub() {
                 radio.checked = false;
             });
 
-            // Update next club ID
+            // Update next club ID (keep CB-prefixed, zero-padded format)
             if (data.nextID) {
-                document.getElementById('club-id').value = data.nextID;
+                document.getElementById('club-id').value = formatID('CB', data.nextID);
             }
 
             // Reload datalist
